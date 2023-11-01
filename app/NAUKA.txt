@@ -1,0 +1,10 @@
+ Przesyłanie parametru po miedzy komponentami JSONEM - serializowanym   
+    
+    KOmponent który wysyła
+    <Link href={{ pathname: '/router/cards/rateCC', query: {rateCC_: JSON.stringify(rateCC), onEdit}, }}> PREVIEW </Link>
+    
+
+    KOMPONENT KTÓRY ODBIERA
+    const searchParams = useSearchParams();
+    const onEdit_ = searchParams.get('onEdit');
+    const rateCC_ = searchParams.get('rateCC_');
