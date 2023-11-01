@@ -2,17 +2,15 @@
 //*********************** Global Varible *************************
 //================================================================
 import { Role, User } from "./classes/user";
+import { userList_ } from "./factory/factory_user";
 
 export const app_name: String = "Atena";
 export const app_version: String = "0.0.1";
 
-let activeUser: User;
+let activeUser: User = userList_.find(user => user.$nameUser = "Ares") || new User();
 
 export function setActiveUser() {
-
-    activeUser = new User();
-    activeUser.$role = Role.ADMIN_;
-    activeUser.$nameUser = "Ares";
+    activeUser = userList_.find(user => user.$nameUser = "Ares") || new User();
 }
 
 

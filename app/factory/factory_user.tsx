@@ -28,7 +28,7 @@ export function CreateUser(id: number, login: string, nameUser: string, role: Ro
 
 export let userList_: User[] = [];
 
-const admin1 = CreateUser(1, "", "Szymon Admin", Role.ADMIN_, true, "", 0, 0, 0, "", "");
+const admin1 = CreateUser(1, "", "Ares", Role.ADMIN_, true, "", 0, 0, 0, "", "");
 const admin2 = CreateUser(12, "", "Szymon Admin2", Role.ADMIN_, true, "", 0, 0, 0, "", "");
 
 const user1 = CreateUser(20, "", "1_Szymon", Role.ADMIN_, true, "", 1, 11, 0, "", "");
@@ -44,4 +44,4 @@ const user9 = CreateUser(100, "", "9_Szymon", Role.AGENT_, true, "", 12, 11, 0, 
 const kiero = CreateUser(11, "", "Szymon Kiero", Role.ADMIN_, true, "", 0, 0, 0, "", "");
 const kiero2 = CreateUser(13, "", "Szymon Kiero", Role.ADMIN_, true, "", 0, 0, 0, "", "");
 
-userList_.push(user1, user2, user3, user4, user5, user6, user7, user8, user9, admin1, admin2, kiero, kiero2);
+userList_.push(admin1, admin2, user1, user2, user3, user4, user5, user6, user7, user8, user9, admin1, admin2, kiero, kiero2);

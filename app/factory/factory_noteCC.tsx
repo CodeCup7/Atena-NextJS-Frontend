@@ -5,6 +5,7 @@ import { RateM } from "../classes/rateM";
 import { Role, User } from "../classes/user";
 import { userList_ } from '@/app/factory/factory_user';
 import { CreateNewEmptyRateCC } from "./factory_rateCC";
+import { getActiveUser } from "../global";
 
 
 export function CreateNewEmptyNoteCC() {
@@ -65,7 +66,7 @@ export function Get_NoteList_With_NoStartNote(noteList: Array<NoteCC>, appliesDa
 
                 noteCC.$id = id++; // KASUJ
                 noteListWitnNoStart.push(noteCC);
-                //noteCC.$coach = ActiveUser
+                noteCC.$coach = getActiveUser();
                 addRateCCToNoteCC(noteCC);
 
             }
@@ -80,7 +81,7 @@ export function Get_NoteList_With_NoStartNote(noteList: Array<NoteCC>, appliesDa
 
         let rateCC = CreateNewEmptyRateCC();
         rateCC.$dateRate = "18.10.2023";
-        rateCC.$Queue.$nameQueue = "test";
+        rateCC.$queue.$nameQueue = "test";
         rateCC.$rate = 100;
         rateCC.$dateCall = "19.10.2023";
         rateCC.$dateShare = "20.10.2023";
