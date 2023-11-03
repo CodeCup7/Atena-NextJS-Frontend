@@ -3,13 +3,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Status_Note } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/noteCC';
-import { CreateNewEmptyNoteCC, Get_NoteList_With_NoStartNote } from '@/app/factory/factory_noteCC';
+import { Get_NoteList_With_NoStartNote } from '@/app/factory/factory_noteCC';
 import { RateCC } from '@/app/classes/rateCC';
-import { User } from '@/app/classes/user';
-import { userList_ } from '@/app/factory/factory_user';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { getActiveUser } from '@/app/global';
+import { Checkbox } from 'flowbite-react';
 
 export const NoteMain = () => {
 
@@ -22,15 +21,24 @@ export const NoteMain = () => {
     const [noteList, setNoteList] = useState<Array<NoteCC>>([]);
     const [downloadList, setDowloadList] = useState<Array<NoteCC>>([]);
 
-    const [agentFilter, setAgentFilter] = useState('Wszyscy');
-    const [statusFilter, setStatusFilter] = useState('Wszystkie');
+    const [agentFilter, setAgentFilter] = useState('ALL');
+    const [statusFilter, setStatusFilter] = useState('ALL');
+
+
+    useEffect(() => {
+        setNoteList(downloadList);
+        console.log("🚀 ~ file: page.tsx:30 ~ useEffect ~ downloadList:", downloadList)
+        
+    }, [downloadList]);
+
+
 
 
     function getCoaching() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
-            setDowloadList(Get_NoteList_With_NoStartNote([], dateValue));
-            setNoteList(downloadList);
+            const list = Get_NoteList_With_NoStartNote([], dateValue);
+            setDowloadList(list);
         } else {
             toast.error("Wybierz datę!", {
                 position: toast.POSITION.TOP_RIGHT,
@@ -41,57 +49,24 @@ export const NoteMain = () => {
 
     const handleTableNoteCCRowClick = (noteCC: NoteCC) => {
         setSelectedNoteCC(noteCC);
+        setSelectedRow(noteCC.$id);
     };
+
+    const [selectedRow, setSelectedRow] = useState<number | null>(null);
+
 
 
     function filterService() {
 
-        if (agentFilter === 'ALL') {
+        if (agentFilter === 'ALL' && statusFilter === 'ALL') {// Filtr wszystko
             setNoteList(downloadList)
-        } else {
-
-
-            const list = downloadList.filter(note => note.$coach.$id === getActiveUser().$id)
-            console.log("🚀 ~ file: page.tsx:55 ~ filterService ~ downloadList:", downloadList)
-            console.log("🚀 ~ file: page.tsx:58 ~ filterService ~ list:", list)
-
+        } else if (agentFilter === 'MY' && statusFilter === 'ALL') { // Filtr dla MOICH i wszytskich statusów
             setNoteList(downloadList.filter(note => note.$agent.$coachId === getActiveUser().$id));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
+        } else if (agentFilter === 'MY' && statusFilter != 'ALL') { // Filtr dla MOICH i wybranego statusu)
+            setNoteList(downloadList.filter(note => note.$agent.$coachId === getActiveUser().$id && note.$status === statusFilter));
+        } else if (agentFilter === 'ALL' && statusFilter != 'ALL') { // Filtr dla wszystkich i wybranego statusu
+            setNoteList(downloadList.filter(note => note.$status === statusFilter));
         }
-
-
-        // if (chosenUser.$id === 0 && chosenStatus === '') { // Filtr wszystko
-        //     filterList = noteList
-        //     console.log("🚀 ~ file: page.tsx:55 ~ filterService ~ filterList:1", filterList)
-        // } else if (chosenUser.$id === 0 && chosenStatus === '') { // Filtr dla wybranego usera i wszytskich statusów
-        //     filterList = noteList.filter(note => { note.$agent.$id === chosenUser.$id });
-        //     console.log("🚀 ~ file: page.tsx:55 ~ filterService ~ filterList:2", filterList)
-        // } else if (chosenUser.$id === 0 && chosenStatus != '') { // Filtr dla wszystki userów i wybranego statusu)
-        //     filterList = noteList.filter(note => { note.$status === chosenStatus });
-        //     console.log("🚀 ~ file: page.tsx:55 ~ filterService ~ filterList:3", filterList)
-        // } else { // Filtr dla wybranego usera i wybranego statusu
-        //     filterList = noteList.filter(note => { note.$agent.$id === chosenUser.$id && note.$status === chosenStatus });
-        //     console.log("🚀 ~ file: page.tsx:55 ~ filterService ~ filterList:4", filterList)
-
-        // }
-
-        //setNoteList(filterList);
-        //console.log("🚀 ~ file: page.tsx:71 ~ filterService ~ filterList:", filterList)
     }
 
     return (
@@ -168,9 +143,15 @@ export const NoteMain = () => {
                         <tbody className="table-auto overflow-scroll w-full" >
                             {noteList.map((noteCC, index) => { //{noteList.map(({$id}) => {
                                 return (
-                                    <tr key={index} className="hover:bg-base-200 cursor-pointer" onClick={() => handleTableNoteCCRowClick(noteCC)}>
+                                    <tr key={index} 
+                                    onClick={() => handleTableNoteCCRowClick(noteCC)}
+                                    className={`hover:bg-base-300  hover:text-white cursor-pointer ${
+                                        selectedRow === noteCC.$id ? 'bg-base-300 text-white' : ''
+                                      } cursor-pointer`}>
+
                                         <td>{noteCC.$agent.$nameUser}</td>
                                         <td>{noteCC.$status}</td>
+                                        <td>{noteCC.$appliesDate}</td>
                                     </tr>
                                 )
                             })}
@@ -229,7 +210,7 @@ export const NoteMain = () => {
                                     <tbody className="table-auto overflow-scroll w-full">
                                         {selectedNoteCC.$rateCC_Col.map((rateCC, index) => { //{noteList.map(({$id}) => {
                                             return (
-                                                <tr key={index} className="hover:bg-base-200 cursor-pointer" onClick={() => handleTableNoteCCRowClick(rateCC)}>
+                                                <tr key={index} className="hover:bg-base-200 cursor-pointer" onClick={() => handleTableNoteCCRowClick(new NoteCC)}>
                                                     <td>{rateCC.$dateCall}</td>
                                                     <td>{rateCC.$queue.$nameQueue}</td>
                                                     <td>{rateCC.$rate}</td>

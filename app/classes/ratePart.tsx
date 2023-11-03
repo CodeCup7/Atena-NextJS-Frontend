@@ -9,8 +9,7 @@ export class RatePart {
     private nieprawidlowosci: string = ""
     private opis: string = ""
     private uwagi: string = ""
-    private used: boolean = true; // 'Flaga użycia (zawsze true dla RATTING_ ale dla CURRENT i MYSTERY tylko dla bloku który został wykorzystany w ocenie)
-
+ 
     /**
      * Getter $key
      * @return {string}
@@ -60,14 +59,6 @@ export class RatePart {
     }
 
     /**
-     * Getter $used
-     * @return {boolean}
-     */
-    public get $used(): boolean {
-        return this.used;
-    }
-
-    /**
      * Setter $key
      * @param {string} value
      */
@@ -113,14 +104,6 @@ export class RatePart {
      */
     public set $uwagi(value: string) {
         this.uwagi = value;
-    }
-
-    /**
-     * Setter $used
-     * @param {boolean} value
-     */
-    public set $used(value: boolean) {
-        this.used = value;
     }
 
 }

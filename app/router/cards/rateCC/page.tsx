@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import { rateList } from '@/app/db';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { selectedRateCC } from '../test/page';
+import { api_rateCC_add } from '@/app/api/rateCC_api';
 
 const RateCC_Page = () => {
 
@@ -82,8 +83,12 @@ const RateCC_Page = () => {
         if (validate()) {
             rateCC.$mode = Rate_Mode.PREVIEW_;
             setPreviewMode(true)
-            rateList.push(rateCC);
-            toast.success("Oceniono rozmowę!", {
+            
+
+            const response = api_rateCC_add(rateCC);
+
+
+            toast.update(response, {
                 position: toast.POSITION.TOP_RIGHT,
                 theme: "dark"
             });
