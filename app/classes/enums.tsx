@@ -2,10 +2,10 @@
 // '*********************** AppEnum CLASS ****************************************************************************************************
 // '==========================================================================================================================================
 
-export enum Status_Note { 
+export enum Status_Note {
     NO_START_ = "Nie rozpoczęty",
-    CLOSE__ = "Zamknięty", 
-    CLOSE_WITHOUT_ = "Zamknięty BEZ", 
+    CLOSE__ = "Zamknięty",
+    CLOSE_WITHOUT_ = "Zamknięty BEZ",
 }
 
 export enum Type_RateCC {
@@ -16,7 +16,6 @@ export enum Type_RateCC {
 }
 
 export enum Rate_Mode {
-
     NEW_ = "Nowa",
     EDIT_ = "Edycja",
     PREVIEW_ = "Podgląd",

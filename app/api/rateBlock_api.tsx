@@ -1,15 +1,18 @@
+import { RateBlock } from "../classes/rateBlock";
 import { RateCC } from "../classes/rateCC";
+import { RatePart } from "../classes/ratePart";
 
-export function api_rateCC_add(rateCC: RateCC): string {
+export function api_rateBlock_add(rateBlock: RateBlock): string {
 
     let callback = '';
-    fetch('http://localhost:8080/api/rateCC/add', {
+    console.log(rateBlock);
+    fetch('http://localhost:8080/api/rateBlock/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json', // Określenie, że dane są w formacie JSON
         },
-
-        body: JSON.stringify(rateCC)
+        
+        body: JSON.stringify(rateBlock),
     })
         .then(response => {
             if (response.ok) {
@@ -23,7 +26,7 @@ export function api_rateCC_add(rateCC: RateCC): string {
             callback = 'Błąd dodawania oceny ' + error;
         });
 
-    return callback;
+        return callback;
 }
 
 export function api_rateCC_get(): RateCC {

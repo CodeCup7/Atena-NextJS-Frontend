@@ -7,10 +7,10 @@ import { userList_ } from "./factory/factory_user";
 export const app_name: String = "Atena";
 export const app_version: String = "0.0.1";
 
-let activeUser: User = userList_.find(user => user.$nameUser = "Ares") || new User();
+let activeUser: User = userList_.find(user => user.nameUser = "Ares") || new User();
 
 export function setActiveUser() {
-    activeUser = userList_.find(user => user.$nameUser = "Ares") || new User();
+    activeUser = userList_.find(user => user.nameUser = "Ares") || new User();
 }
 
 
@@ -19,7 +19,7 @@ export function getActiveUser(): User {
 }
 
 export function getActiveUserRole(): Role {
-    return activeUser.$role;
+    return activeUser.role;
 }
 
 

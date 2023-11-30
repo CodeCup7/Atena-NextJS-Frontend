@@ -10,9 +10,9 @@ export function CreateNewEmptyQueue() {
 export function CreateQueue(id: number, nameQueue: string, available: boolean) {
 
     let queue = new Queue();
-    queue.$available = available;
-    queue.$id = id;
-    queue.$nameQueue = nameQueue;
+    queue.available = available;
+    queue.id = id;
+    queue.nameQueue = nameQueue;
 
     return queue;
 }

@@ -49,7 +49,7 @@ export const NoteMain = () => {
 
     const handleTableNoteCCRowClick = (noteCC: NoteCC) => {
         setSelectedNoteCC(noteCC);
-        setSelectedRow(noteCC.$id);
+        setSelectedRow(noteCC.id);
     };
 
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
@@ -61,11 +61,11 @@ export const NoteMain = () => {
         if (agentFilter === 'ALL' && statusFilter === 'ALL') {// Filtr wszystko
             setNoteList(downloadList)
         } else if (agentFilter === 'MY' && statusFilter === 'ALL') { // Filtr dla MOICH i wszytskich statusów
-            setNoteList(downloadList.filter(note => note.$agent.$coachId === getActiveUser().$id));
+            setNoteList(downloadList.filter(note => note.agent.coachId === getActiveUser().id));
         } else if (agentFilter === 'MY' && statusFilter != 'ALL') { // Filtr dla MOICH i wybranego statusu)
-            setNoteList(downloadList.filter(note => note.$agent.$coachId === getActiveUser().$id && note.$status === statusFilter));
+            setNoteList(downloadList.filter(note => note.agent.coachId === getActiveUser().id && note.status === statusFilter));
         } else if (agentFilter === 'ALL' && statusFilter != 'ALL') { // Filtr dla wszystkich i wybranego statusu
-            setNoteList(downloadList.filter(note => note.$status === statusFilter));
+            setNoteList(downloadList.filter(note => note.status === statusFilter));
         }
     }
 
@@ -109,7 +109,6 @@ export const NoteMain = () => {
                         <h1 className='text-info text-2xl text-center ml-3'> Coachingi</h1>
                     </div>
 
-
                     <table className="table min-w-full">
                         {/* head */}
                         <thead>
@@ -141,17 +140,17 @@ export const NoteMain = () => {
                             </tr>
                         </thead>
                         <tbody className="table-auto overflow-scroll w-full" >
-                            {noteList.map((noteCC, index) => { //{noteList.map(({$id}) => {
+                            {noteList.map((noteCC, index) => { //{noteList.map(({id}) => {
                                 return (
                                     <tr key={index} 
                                     onClick={() => handleTableNoteCCRowClick(noteCC)}
-                                    className={`hover:bg-base-300  hover:text-white cursor-pointer ${
-                                        selectedRow === noteCC.$id ? 'bg-base-300 text-white' : ''
+                                    className={`hover:bg-base-300  hover:text-white cursor-pointer {
+                                        selectedRow === noteCC.id ? 'bg-base-300 text-white' : ''
                                       } cursor-pointer`}>
-
-                                        <td>{noteCC.$agent.$nameUser}</td>
-                                        <td>{noteCC.$status}</td>
-                                        <td>{noteCC.$appliesDate}</td>
+        
+                                        <td>{noteCC.agent.nameUser}</td>
+                                        <td>{noteCC.status}</td>
+                                        <td>{noteCC.appliesDate}</td>
                                     </tr>
                                 )
                             })}
@@ -208,15 +207,15 @@ export const NoteMain = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="table-auto overflow-scroll w-full">
-                                        {selectedNoteCC.$rateCC_Col.map((rateCC, index) => { //{noteList.map(({$id}) => {
+                                        {selectedNoteCC.rateCC_Col.map((rateCC, index) => { //{noteList.map(({id}) => {
                                             return (
                                                 <tr key={index} className="hover:bg-base-200 cursor-pointer" onClick={() => handleTableNoteCCRowClick(new NoteCC)}>
-                                                    <td>{rateCC.$dateCall}</td>
-                                                    <td>{rateCC.$queue.$nameQueue}</td>
-                                                    <td>{rateCC.$rate}</td>
-                                                    <td>{rateCC.$dateRate}</td>
-                                                    <td>{rateCC.$dateShare}</td>
-                                                    <td>{selectedNoteCC.$id}</td>
+                                                    <td>{rateCC.dateCall}</td>
+                                                    <td>{rateCC.queue.nameQueue}</td>
+                                                    <td>{rateCC.rate}</td>
+                                                    <td>{rateCC.dateRate}</td>
+                                                    <td>{rateCC.dateShare}</td>
+                                                    <td>{selectedNoteCC.id}</td>
                                                 </tr>
                                             )
                                         })}

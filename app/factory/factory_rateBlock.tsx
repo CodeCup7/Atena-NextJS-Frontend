@@ -4,8 +4,8 @@ export function getRateBlock(rateBlock: RateBlock): number {
 
     let rate: number = 0;
     
-    rateBlock.$ratePartCol.forEach(e => {
-        rate = rate + (e.$ocena * (e.$waga / 100))
+    rateBlock.ratePartCol.forEach(e => {
+        rate = rate + (e.ocena * (e.waga / 100))
 
     });
     return rate;
