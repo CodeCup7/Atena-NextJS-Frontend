@@ -29,9 +29,7 @@ export function api_User_add(user:User): string {
 }
 
 export function api_UserList_add(): string {
-
-    let callback = '';
-
+    console.log('sd')
     fetch('http://localhost:8080/api/user/addList', {
         method: 'POST',
         headers: {
@@ -48,7 +46,7 @@ export function api_UserList_add(): string {
 
         })
         .catch(error => {
-            console.log('Błąd dodawania User ')
+            console.log(error + 'Błąd dodawania User ')
         });
 
     return callback;

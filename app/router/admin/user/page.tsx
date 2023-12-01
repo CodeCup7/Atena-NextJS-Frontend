@@ -17,7 +17,7 @@ const UsersPage = () => {
     }, []);
 
     function addAll(){
-        api_UserList_add;
+        api_UserList_add();
     }
 
     return (
@@ -43,8 +43,9 @@ const UsersPage = () => {
                 Dodaj użytkownika
             </button>
 
-            <button 
-            onClick={addAll}
+            <button onClick={() => {
+                addAll();
+            }}
             className='btn btn-info max-w-xs hover:btn-primary mt-2'>Add ALL</button>
 
             <div className="overflow-x-auto">
