@@ -2,9 +2,7 @@
 import { User } from "../classes/user";
 import { userList_ } from "../factory/factory_user";
 
-export function api_User_add(user:User): string {
-
-    let callback = '';
+export function api_User_add(user: User) {
 
     fetch('http://localhost:8080/api/user/add', {
         method: 'POST',
@@ -22,14 +20,12 @@ export function api_User_add(user:User): string {
 
         })
         .catch(error => {
-            console.log('Błąd dodawania User ')
+            console.log('Błąd dodawania User ' + error)
         });
 
-    return callback;
 }
 
-export function api_UserList_add(): string {
-    console.log('sd')
+export function api_UserList_add() {
     fetch('http://localhost:8080/api/user/addList', {
         method: 'POST',
         headers: {
@@ -46,9 +42,45 @@ export function api_UserList_add(): string {
 
         })
         .catch(error => {
-            console.log(error + 'Błąd dodawania User ')
+            console.log('Błąd dodawania User ' + error)
         });
-
-    return callback;
 }
 
+export async function api_UserList_getAll(): Promise<User[]> {
+    try {
+        const response = await fetch('http://localhost:8080/api/user/getUserAll');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Błąd pobierania użytkowników:', error);
+        return [];
+    }
+}
+
+export async function api_UserList_getByLogin(login:string): Promise<User> {
+    try {
+        const response = await fetch('http://localhost:8080/api/user/getUserLogin/' + login);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Błąd pobierania użytkowników:', error);
+        return new User;
+    }
+}
+
+export async function api_UserList_getById(id:number): Promise<User> {
+    try {
+        const response = await fetch('http://localhost:8080/api/user/getUserId/' + id);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Błąd pobierania użytkowników:', error);
+        return new User;
+    }
+}

@@ -1,10 +1,9 @@
 'use client'
 import { User } from '@/app/classes/user'
 import { userList_ } from '@/app/factory/factory_user'
-import Layout from '@/app/layout'
 import React, { useEffect, useState } from 'react'
 import UserDetailsDialog from '../../components/dialog/UserDetailsDialog'
-import { api_UserList_add } from '@/app/api/user_api'
+import { api_UserList_getByLogin } from '@/app/api/user_api'
 
 const UsersPage = () => {
 
@@ -16,10 +15,6 @@ const UsersPage = () => {
         setUserList(userList_);
     }, []);
 
-    function addAll(){
-        api_UserList_add();
-    }
-
     return (
 
         <div className='flex flex-col'>
@@ -29,7 +24,7 @@ const UsersPage = () => {
                 onClose={(isOpen) => setOpenNewRateModal(isOpen)}
                 user={selectedUser} // Przekaż wybranego użytkownika
                 isEditMode={false} // Ustaw odpowiedni tryb (true dla edycji, false dla podglądu)
-                onEdit={false}/>
+                onEdit={false} />
 
             <button onClick={() => {
                 setUser(new User());
@@ -42,11 +37,6 @@ const UsersPage = () => {
                 </svg>
                 Dodaj użytkownika
             </button>
-
-            <button onClick={() => {
-                addAll();
-            }}
-            className='btn btn-info max-w-xs hover:btn-primary mt-2'>Add ALL</button>
 
             <div className="overflow-x-auto">
                 <table className="table table-pin-rows">

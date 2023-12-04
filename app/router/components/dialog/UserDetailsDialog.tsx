@@ -1,4 +1,5 @@
 // Komponent ConfirmDialog
+import { api_UserList_getByLogin } from '@/app/api/user_api';
 import { Role, User } from '@/app/classes/user';
 import { userList_ } from '@/app/factory/factory_user';
 import React, { useEffect, useState } from 'react';
@@ -33,7 +34,29 @@ const UserDetailsDialog: React.FC<Prop> = (props) => {
   const userList = userList_;
   const [user, setUser] = useState(props.user)
 
-  console.log(user.nameUser)
+  function action() {
+
+    //Sprawdzenie wypełnienia wszystkich wymaganych pól
+    if (user.login != '') {
+
+      //Sprawdzenie czy login istnieje w bazie
+      api_UserList_getByLogin(user.login)
+        .then(dbUser => {
+          if (dbUser.login === user.login) {
+            console.log('Już taki istnieje')
+          }
+        })
+        .catch(error => {
+          console.error('Błąd pobierania użytkownika:', error);
+        });
+
+    }
+
+
+
+    //Dodanie lub edytowanie usera w DB
+
+  }
 
   return (
     <div className={`fixed z-50 top-0 left-0 w-screen h-screen flex items-center justify-center ${props.open ? '' : 'hidden'}`}>S
@@ -132,7 +155,9 @@ const UserDetailsDialog: React.FC<Prop> = (props) => {
               type="text"
               placeholder="E-Mail"
               onChange={e => user.mail = e.target.value} />
-            <button className='btn btn-info hover:btn-primary'>{props.onEdit ? "Edytuj" : "Dodaj"}</button>
+            <button
+              onClick={action}
+              className='btn btn-info hover:btn-primary'>{props.onEdit ? "Edytuj" : "Dodaj"}</button>
           </div>
         </div>
       </div>
