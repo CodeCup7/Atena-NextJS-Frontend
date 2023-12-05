@@ -26,16 +26,15 @@ export function CreateUser(id: number, login: string, nameUser: string, role: Ro
 
 }
 
-export let userList_: User[] = [];
+export let global_userList: User[] = [];
 
-export async function setUserList() {
+export async function updateUserList() {
     try {
-        userList_ = await api_UserList_getAll();
+        global_userList = await api_UserList_getAll();
     } catch (error) {
         console.error('Błąd pobierania użytkowników:', error);
     }
 }
-
 
 // # TEMP USER LIST #
 

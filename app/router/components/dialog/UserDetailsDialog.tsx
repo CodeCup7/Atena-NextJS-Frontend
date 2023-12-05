@@ -1,8 +1,9 @@
 // Komponent ConfirmDialog
-import { api_UserList_getByLogin } from '@/app/api/user_api';
+import { api_UserList_getByLogin, api_User_add } from '@/app/api/user_api';
 import { Role, User } from '@/app/classes/user';
-import { userList_ } from '@/app/factory/factory_user';
+import { global_userList, updateUserList } from '@/app/factory/factory_user';
 import React, { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Prop {
   open: boolean;
@@ -15,51 +16,83 @@ interface Prop {
 const UserDetailsDialog: React.FC<Prop> = (props) => {
   useEffect(() => {
     if (props.open) {
+      toast.dismiss();
+      setUser(new User());
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
-    }
-  }, [props.open]);
-
-  useEffect(() => {
-    if (props.open) {
-      document.body.style.overflow = 'hidden';
-      setUser(props.user);
-    } else {
-      document.body.style.overflow = 'auto';
+      setUser(new User());
     }
   }, [props.open, props.user]);
 
   const [isAgent, setIsAgent] = useState(false);
-  const userList = userList_;
+  const [userList, setUserList] = useState(global_userList);
   const [user, setUser] = useState(props.user)
 
-  function action() {
+  async function action() {
 
     //Sprawdzenie wypełnienia wszystkich wymaganych pól
-    if (user.login != '') {
+    if (user.login != '' && user.nameUser != '' && user.mail != '') {
+      if (user.role === Role.AGENT_ && (user.bossId === 0 || user.leaderId === 0 || user.coachId === 0)) {
 
-      //Sprawdzenie czy login istnieje w bazie
-      api_UserList_getByLogin(user.login)
-        .then(dbUser => {
-          if (dbUser.login === user.login) {
-            console.log('Już taki istnieje')
-          }
-        })
-        .catch(error => {
-          console.error('Błąd pobierania użytkownika:', error);
+        toast.error("Nie uzupełniono wszystkich wymaganych pól dla roli agenta", {
+          position: toast.POSITION.TOP_RIGHT,
+          theme: "dark"
         });
 
+      } else {
+
+        //Sprawdzenie czy login istnieje w bazie
+        api_UserList_getByLogin(user.login)
+          .then(dbUser => {
+            if (dbUser.login === user.login) {
+              toast.error("Login " + user.login + " istnieje już w systemie", {
+                position: toast.POSITION.TOP_RIGHT,
+                theme: "dark"
+              });
+            } else {
+              //Dodanie lub edytowanie usera w DB
+              if (props.isEditMode) {
+
+              } else {
+
+                api_User_add(user).then((foo => {
+                  if (foo.isOK === true) {
+                    toast.info(foo.callback, {
+                      position: toast.POSITION.TOP_RIGHT,
+                      theme: "dark"
+                    });
+                  } else {
+                    toast.error(foo.callback, {
+                      position: toast.POSITION.TOP_RIGHT,
+                      theme: "dark"
+                    });
+                  }
+                  updateUserList().then(() => {
+                    setUserList(global_userList)
+                  }
+                  )
+                }));
+              }
+
+            }
+          })
+          .catch(error => {
+            console.error('Błąd pobierania użytkownika:', error);
+          });
+
+      }
+    } else {
+      toast.error("Nie uzupełniono wszystkich wymaganych pól", {
+        position: toast.POSITION.TOP_RIGHT,
+        theme: "dark"
+      });
     }
-
-
-
-    //Dodanie lub edytowanie usera w DB
-
   }
 
   return (
-    <div className={`fixed z-50 top-0 left-0 w-screen h-screen flex items-center justify-center ${props.open ? '' : 'hidden'}`}>S
+    <div className={`fixed z-50 top-0 left-0 w-screen h-screen flex items-center justify-center ${props.open ? '' : 'hidden'}`}>
+      <ToastContainer />
       <div className='flex flex-col bg-slate-800 border-2 border-info rounded-2xl z-10 inset-0'>
         {/* HEAD */}
         <div className='flex w-full h-8 justify-end'>

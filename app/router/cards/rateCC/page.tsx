@@ -5,7 +5,6 @@ import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { queueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, } from '@/app/factory/factory_rateCC';
-import { userList_ } from '@/app/factory/factory_user';
 import { getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
 import { getWagRateCC, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
 import React, { useEffect, useState } from 'react'
@@ -16,6 +15,7 @@ import { useSearchParams } from 'next/navigation';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { selectedRateCC } from '../test/page';
 import { api_rateCC_add } from '@/app/api/rateCC_api';
+import { global_userList } from '@/app/factory/factory_user';
 
 const RateCC_Page = () => {
 
@@ -43,7 +43,7 @@ const RateCC_Page = () => {
     // ====== Ustawienie i kontrola active usera ==========================================
     let isPermit: boolean = false;
     setActiveUser();
-    if (getActiveUserRole() === Role.ADMIN_) {
+    if (getActiveUserRole() === Role.ADMIN_ || getActiveUserRole() === Role.COACH_) {
         isPermit = true;
     }
 
@@ -225,10 +225,10 @@ const RateCC_Page = () => {
                             className="select select-info w-72"
                             disabled={prewievMode}
                             onChange={
-                                e => rateCC.agent = userList_.find(user => user.id = parseInt(e.target.value)) || new User()
+                                e => rateCC.agent = global_userList.find(user => user.id = parseInt(e.target.value)) || new User()
                             }>
                             <option value="DEFAULT" disabled>Wybierz agenta ...</option>
-                            {userList_.filter((user,) => user.role === Role.AGENT_).map((user, index) => (
+                            {global_userList.filter((user,) => user.role === Role.AGENT_).map((user, index) => (
                                 <option key={index} value={user.id}>{user.nameUser}</option>
                             ))}
 
@@ -1071,7 +1071,7 @@ const RateCC_Page = () => {
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
                                     <p className='text-sm text-justify'>Powitanie i pożegnanie zgodnie ze standardem CC. Konsultant zobowiązany jest wyraźnie podać imię i nazwisko oraz wyrazić chęć pomocy.
-                                        W zakończeniu -  wyrażenie chęci pomocy w innej niż omówiona/podsumowana sprawa (elastyczne stosowanie sformułowania "Czy mogę jeszcze w czymś pomóc?"),
+                                        W zakończeniu -  wyrażenie chęci pomocy w innej niż omówiona/podsumowana sprawa (elastyczne stosowanie sformułowania Czy mogę jeszcze w czymś pomóc?),
                                         podziękowanie za rozmowę oraz  miły akcent, np. do usłyszenia, miłego dnia, zapraszam ponownie.</p>
                                 </div>
                             </div>

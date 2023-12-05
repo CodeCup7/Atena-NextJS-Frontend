@@ -1,9 +1,8 @@
 'use client'
 import { User } from '@/app/classes/user'
-import { userList_ } from '@/app/factory/factory_user'
 import React, { useEffect, useState } from 'react'
 import UserDetailsDialog from '../../components/dialog/UserDetailsDialog'
-import { api_UserList_getByLogin } from '@/app/api/user_api'
+import { global_userList, updateUserList } from '@/app/factory/factory_user'
 
 const UsersPage = () => {
 
@@ -12,7 +11,8 @@ const UsersPage = () => {
     const [selectedUser, setUser] = useState(new User)
 
     useEffect(() => {
-        setUserList(userList_);
+        updateUserList();
+        setUserList(global_userList);
     }, []);
 
     return (

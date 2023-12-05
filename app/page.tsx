@@ -1,12 +1,17 @@
 'use client'
-import { setUserList } from "./factory/factory_user";
+import { global_userList, updateUserList } from "./factory/factory_user";
 
 export default function Home() {
 
-  setUserList();
+  async function updateUseList(){
+
+    await updateUserList();
+
+  }
 
   return (
     <div>
+      <button onClick={updateUseList}>UPDATE</button>
     </div>
   )
 }

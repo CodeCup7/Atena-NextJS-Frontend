@@ -1,37 +1,45 @@
 
 import { User } from "../classes/user";
-import { userList_ } from "../factory/factory_user";
 
-export function api_User_add(user: User) {
-
-    fetch('http://localhost:8080/api/user/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json', // Określenie, że dane są w formacie JSON
-        },
-        body: JSON.stringify(user),
-    })
-        .then(response => {
-            if (response.ok) {
-                console.log('User została dodana');
-            } else {
-                console.log('User nie została dodana ');;
-            }
-
-        })
-        .catch(error => {
-            console.log('Błąd dodawania User ' + error)
-        });
-
+interface Foo {
+    callback: string;
+    isOK: boolean;
 }
 
-export function api_UserList_add() {
+export async function api_User_add(user: User): Promise<Foo> {
+    try {
+        let foo: Foo = { callback: '', isOK: false };
+
+        const response = await fetch('http://localhost:8080/api/user/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+
+        if (response.ok) {
+            foo.callback = 'Użytkownik został dodany';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Użytkownik nie został dodany';
+            foo.isOK = false;
+        }
+
+        return foo;
+    } catch (error) {
+        console.error('Błąd dodawania Użytkownika:', error);
+        return { callback: 'Błąd dodawania Użytkownika ' + error, isOK: false };
+    }
+}
+
+export async function api_UserList_add(userList: []) {
     fetch('http://localhost:8080/api/user/addList', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json', // Określenie, że dane są w formacie JSON
         },
-        body: JSON.stringify(userList_),
+        body: JSON.stringify(userList),
     })
         .then(response => {
             if (response.ok) {
@@ -59,7 +67,7 @@ export async function api_UserList_getAll(): Promise<User[]> {
     }
 }
 
-export async function api_UserList_getByLogin(login:string): Promise<User> {
+export async function api_UserList_getByLogin(login: string): Promise<User> {
     try {
         const response = await fetch('http://localhost:8080/api/user/getUserLogin/' + login);
         if (!response.ok) {
@@ -72,7 +80,7 @@ export async function api_UserList_getByLogin(login:string): Promise<User> {
     }
 }
 
-export async function api_UserList_getById(id:number): Promise<User> {
+export async function api_UserList_getById(id: number): Promise<User> {
     try {
         const response = await fetch('http://localhost:8080/api/user/getUserId/' + id);
         if (!response.ok) {
