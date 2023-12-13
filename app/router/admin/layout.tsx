@@ -74,7 +74,7 @@ export default function Administracja({
                 </div>
             </div>
 
-            <div className='flex w-full mt-5'>
+            <div className='w-full mt-5'>
                 {children}
             </div>
         </div>

@@ -34,6 +34,8 @@ export async function updateUserList() {
     } catch (error) {
         console.error('Błąd pobierania użytkowników:', error);
     }
+
+    return global_userList
 }
 
 // # TEMP USER LIST #

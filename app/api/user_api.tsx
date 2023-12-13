@@ -7,6 +7,7 @@ interface Foo {
 }
 
 export async function api_User_add(user: User): Promise<Foo> {
+    
     try {
         let foo: Foo = { callback: '', isOK: false };
 
@@ -25,10 +26,8 @@ export async function api_User_add(user: User): Promise<Foo> {
             foo.callback = 'Użytkownik nie został dodany';
             foo.isOK = false;
         }
-
         return foo;
     } catch (error) {
-        console.error('Błąd dodawania Użytkownika:', error);
         return { callback: 'Błąd dodawania Użytkownika ' + error, isOK: false };
     }
 }
@@ -75,7 +74,6 @@ export async function api_UserList_getByLogin(login: string): Promise<User> {
         }
         return await response.json();
     } catch (error) {
-        console.error('Błąd pobierania użytkowników:', error);
         return new User;
     }
 }
