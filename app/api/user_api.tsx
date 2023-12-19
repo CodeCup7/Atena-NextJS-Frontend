@@ -7,7 +7,7 @@ interface Foo {
 }
 
 export async function api_User_add(user: User): Promise<Foo> {
-    
+
     try {
         let foo: Foo = { callback: '', isOK: false };
 
@@ -88,5 +88,31 @@ export async function api_UserList_getById(id: number): Promise<User> {
     } catch (error) {
         console.error('Błąd pobierania użytkowników:', error);
         return new User;
+    }
+}
+
+export async function api_User_update(user: User): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false };
+
+        const response = await fetch('http://localhost:8080/api/user/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+
+        if (response.ok) {
+            foo.callback = 'Użytkownik został edytowany';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Użytkownik nie został edytownay';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd edytowania Użytkownika ' + error, isOK: false };
     }
 }

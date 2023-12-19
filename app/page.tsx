@@ -1,17 +1,19 @@
 'use client'
-import { global_userList, updateUserList } from "./factory/factory_user";
+import { updateUserList } from "./factory/factory_user";
+import React from "react";
+import { Input } from "@nextui-org/react";
 
 export default function Home() {
 
-  async function updateUseList(){
-
+  async function updateUseList() {
     await updateUserList();
-
   }
 
   return (
     <div>
       <button onClick={updateUseList}>UPDATE</button>
+
+
     </div>
   )
 }

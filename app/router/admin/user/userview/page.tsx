@@ -1,11 +1,14 @@
 'use client'
-import { api_UserList_getByLogin, api_User_add } from "@/app/api/user_api";
+import { api_UserList_getByLogin, api_User_add, api_User_update } from "@/app/api/user_api";
 import { Role, User } from "@/app/classes/user";
 import { global_userList } from "@/app/factory/factory_user";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSearchParams } from "next/navigation";;
+import { useSearchParams } from "next/navigation";
+import { Input } from "@nextui-org/react";
+import React from "react";
+import { Select, SelectItem } from "@nextui-org/react";
 
 const UserView = () => {
 
@@ -31,13 +34,14 @@ const UserView = () => {
         }
     }, [userData]); // Add userData as a dependency
 
-    async function action() {
+    console.log(user.available)
 
+    async function action() {
         let loginExist = false;
 
         if (user.login != '' && user.nameUser != '' && user.mail != '') {
             if (user.role === Role.AGENT_ && (user.bossId === 0 || user.leaderId === 0 || user.coachId === 0)) {
-                
+
                 toast.error("Nie uzupełniono wszystkich wymaganych pól dla roli agenta", {
                     position: toast.POSITION.TOP_RIGHT,
                     theme: "dark"
@@ -63,6 +67,21 @@ const UserView = () => {
                 //Dodanie lub edytowanie usera w DB
                 if (loginExist === false) {
                     if (onEdit) {
+
+                        api_User_update(user).then((foo => {
+                            if (foo.isOK === true) {
+                                toast.info(foo.callback, {
+                                    position: toast.POSITION.TOP_RIGHT,
+                                    theme: "dark"
+                                });
+                            } else {
+                                toast.error(foo.callback, {
+                                    position: toast.POSITION.TOP_RIGHT,
+                                    theme: "dark"
+                                });
+                            }
+                        }));
+
 
                     } else {
 
@@ -111,72 +130,71 @@ const UserView = () => {
             {/* BODY */}
             <div className='flex items-center justify-center'>
                 <div className="flex flex-col w-full items-center justify-center gap-y-4 ">
-                    <input
-                        className="input input-bordered input-info max-w-md w-72"
-                        defaultValue={onEdit ? user.login : ''}
+                    <Input className="max-w-md w-72"
+
+                        label="Login"
+                        value={onEdit ? user.login : ''}
                         type="text"
-                        placeholder="Login"
-                        onChange={e => user.login = e.target.value} />
-                    <input
-                        className="input input-bordered input-info max-w-md gap-y-2 w-72"
-                        defaultValue={onEdit ? user.nameUser : ''}
+                        onChange={(e) => setUser({ ...user, login: e.target.value })} />
+                    <Input
+                        className="max-w-md gap-y-2 w-72"
+                        value={onEdit ? user.nameUser : ''}
                         type="text"
-                        placeholder="Imię i nazwisko"
-                        onChange={e => user.nameUser = e.target.value} />
-                    <select
-                        defaultValue={onEdit && user.id != 0 ? user.role : 'DEFAULT'}
-                        className="select select-info w-72 "
+                        label="Imię i nazwisko"
+                        onChange={(e) => setUser({ ...user, nameUser: e.target.value })} />
+                    <Select
+                        label="Rola"
+                        selectedKeys={onEdit ? [user.role] : ""}
+                        className="w-72 "
                         onChange={
                             e => {
-                                
                                 user.role = Object.values(Role).find(role => role === e.target.value) || Role.SUPERVISOR_
-                                //setIsAgent(user.role === Role.AGENT_);
-                                console.log(user)
+                                setIsAgent(user.role === Role.AGENT_);
                             }
                         }>
-                        <option value="DEFAULT" disabled>Wybierz rolę ...</option>
-                        {Object.values(Role).map((role, index) => (
-                            <option key={index} value={role}>{role}</option>
+                        {Object.values(Role).map((role) => (
+                            <SelectItem key={role} value={role} textValue={role}>{role}</SelectItem >
                         ))}
-                    </select>
+                    </Select>
                     {/* Jeżlei rola agent to odpal Boss, Coach, Leader */}
-                    <select
-                        defaultValue={onEdit ? userList.find(coach => coach.id === user.coachId)?.nameUser : 'DEFAULT'}
-                        className={`select select-info w-72 ${isAgent ? '' : 'hidden'}`}
-                        onChange={e => user.coachId = parseInt(e.target.value)}>
-                        <option value="DEFAULT" disabled>Coach ...</option>
+                    <Select
+                        value={onEdit ? userList.find(coach => coach.id === user.coachId)?.nameUser : 'DEFAULT'}
+                        className={`w-72 ${isAgent ? '' : 'hidden'}`}
+                        onChange={e => user.coachId = parseInt(e.target.value)}
+                        label="Coach">
                         {userList.filter(user => user.role === Role.COACH_).map((user, index) => (
-                            <option key={index} value={user.id}>{user.nameUser}</option>
+                            <SelectItem key={index} value={user.id}>{user.nameUser}</SelectItem>
                         ))}
-                    </select>
-                    <select
-                        defaultValue={onEdit ? userList.find(boss => boss.id === user.bossId)?.nameUser : 'DEFAULT'}
-                        className={`select select-info w-72 ${isAgent ? '' : 'hidden'}`}
-                        onChange={e => user.bossId = parseInt(e.target.value)}>
-                        <option value="DEFAULT" disabled>Kierownik ...</option>
+                    </Select>
+                    <Select
+                        value={onEdit ? userList.find(boss => boss.id === user.bossId)?.nameUser : 'DEFAULT'}
+                        className={`w-72 ${isAgent ? '' : 'hidden'}`}
+                        onChange={e => user.bossId = parseInt(e.target.value)}
+                        label="Boss">
                         {userList.filter(user => user.role === Role.BOSS_).map((user, index) => (
-                            <option key={index} value={user.id}>{user.nameUser}</option>
+                            <SelectItem key={index} value={user.id}>{user.nameUser}</SelectItem>
                         ))}
-                    </select>
-                    <select
-                        defaultValue={onEdit ? userList.find(leader => leader.id === user.leaderId)?.nameUser : 'DEFAULT'}
-                        className={`select select-info w-72 ${isAgent ? '' : 'hidden'}`}
-                        onChange={e => user.leaderId = parseInt(e.target.value)}>
-                        <option value="DEFAULT" disabled>Leader ...</option>
+                    </Select>
+                    <Select
+                        value={onEdit ? userList.find(leader => leader.id === user.leaderId)?.nameUser : 'DEFAULT'}
+                        className={`w-72 ${isAgent ? '' : 'hidden'}`}
+                        onChange={e => user.leaderId = parseInt(e.target.value)}
+                        label="Leader">
                         {userList.filter(user => user.role === Role.LEADER_).map((user, index) => (
-                            <option key={index} value={user.id}>{user.nameUser}</option>
+                            <SelectItem key={index} value={user.id}>{user.nameUser}</SelectItem>
                         ))}
-                    </select>
-                    <select
-                        defaultValue={onEdit && user.id != 0 ? String(user.available) : 'DEFAULT'}
-                        className="select select-info w-72 "
-                        onChange={(e) => user.available = e.target.value === "true"}>
-                        <option value="DEFAULT" disabled>Czy aktywny ...</option>
-                        <option value="true">TAK</option>
-                        <option value="false">NIE</option>
-                    </select>
-                    <input
-                        className="input input-bordered input-info max-w-md gap-y-2 w-72"
+                    </Select>
+                    <Select
+                        value={onEdit && user.id !== 0 ? user.available.toString() : ''}
+                        className="w-72"
+                        onChange={(e) => setUser({ ...user, available: e.target.value === 'true' })}
+                        label="Czy aktywny ...">
+                        <SelectItem key={1} value={'true'} textValue="Tak">Tak</SelectItem>
+                        <SelectItem key={2} value={'false'} textValue="Nie">Nie</SelectItem>
+                    </Select>
+
+                    <Input
+                        className="max-w-md gap-y-2 w-72"
                         defaultValue={onEdit ? user.mail : ''}
                         type="text"
                         placeholder="E-Mail"

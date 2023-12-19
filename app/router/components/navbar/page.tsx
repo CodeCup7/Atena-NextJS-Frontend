@@ -1,8 +1,5 @@
 
-import { RateCC } from '@/app/classes/rateCC'
-import { CreateNewEmptyRateCC } from '@/app/factory/factory_rateCC'
 import Link from 'next/link'
-import { json } from 'stream/consumers';
 
 export const Navbar = () => {
 

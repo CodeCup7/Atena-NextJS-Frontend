@@ -3,7 +3,6 @@ import React from 'react'
 const Administracja_Home = () => {
     return (
         <div>
-            
         </div>
     )
 }
