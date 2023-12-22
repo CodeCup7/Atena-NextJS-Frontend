@@ -11,21 +11,22 @@ export enum Role {
     SUPERVISOR_ = "Superwajzor",
 }
 
+
 export class User {
 
     // Wspólne
     public id: number = 0;
     public login: string = "";
     public nameUser: string = "";
-    public role: Role = Role.AGENT_;
-    public available: boolean = true;
+    public role: Role | undefined;
+    public available: boolean | undefined;
     public mail: string = "";
 
     // Tylko agent
     public coachId: number = 0;
     public bossId: number = 0;
     public leaderId: number = 0;
-    
+
 }
 
 
