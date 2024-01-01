@@ -4,7 +4,6 @@ import { Inter } from 'next/font/google'
 import Image from 'next/image'
 import Navbar from './router/components/navbar/page'
 import 'reflect-metadata';
-import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,11 +27,11 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
               <h1 className='text-4xl text-info ml-2'>Atena</h1>
             </div>
           </header>
-          <Providers>
-            <main className='flex w-full'>
-              {children}
-            </main>
-          </Providers>
+
+          <main className='flex w-full'>
+            {children}
+          </main>
+
 
           <footer className="footer footer-center p-4 text-base-content bg-neutral-focus max-w-screen-2xl">
             <aside>

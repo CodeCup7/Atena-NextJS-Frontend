@@ -1,7 +1,7 @@
 'use client'
-import { api_UserList_getByLogin, api_User_add } from "@/app/api/user_api";
+import { api_UserList_getAll, api_UserList_getByLogin, api_User_add } from "@/app/api/user_api";
 import { Role, User } from "@/app/classes/user";
-import { global_userList } from "@/app/factory/factory_user";
+import { global_userList, updateUserList } from "@/app/factory/factory_user";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,8 +11,19 @@ import { useSearchParams } from "next/navigation";
 const UserView = () => {
 
     const [user, setUser] = useState(new User());
+    const [userList, setUserList] = useState<Array<User>>([]);
 
-    const userList = global_userList;
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const users = await updateUserList();
+                setUserList(users);
+            } catch (error) {
+                console.error('Błąd pobierania użytkowników:', error);
+            }
+        }
+        fetchData();
+    }, []); 
 
     const searchParams = useSearchParams();
     const userData = searchParams.get('userData');
@@ -45,47 +56,40 @@ const UserView = () => {
             });
         } else {
 
-            let loginExist = false;
             //Sprawdzenie czy login istnieje w bazie
             api_UserList_getByLogin(user.login)
                 .then(dbUser => {
+
                     if (dbUser.login === user.login) {
-                        loginExist = true;
                         toast.error("Login " + user.login + " istnieje już w systemie", {
                             position: toast.POSITION.TOP_RIGHT,
                             theme: "dark"
                         });
+                    } else {
+                        if (user.id === 0) { // Dodanie nowego usera
+                            api_User_add(user).then((foo => {
+                                if (foo.isOK === true) {
+                                    toast.info(foo.callback, {
+                                        position: toast.POSITION.TOP_RIGHT,
+                                        theme: "dark"
+                                    });
+                                } else {
+                                    toast.error(foo.callback, {
+                                        position: toast.POSITION.TOP_RIGHT,
+                                        theme: "dark"
+                                    });
+                                }
+                            }));
+                        } else { // Edytowanie usera
+
+                        }
+
                     }
                 })
                 .catch(error => {
                     console.error('Błąd pobierania użytkownika:', error);
                 });
 
-            if (loginExist) {
-                toast.error("Nie uzupełniono wszystkich wymaganych pól", {
-                    position: toast.POSITION.TOP_RIGHT,
-                    theme: "dark"
-                });
-            } else {
-
-                if (user.id === 0) { // Dodanie nowego usera
-                    api_User_add(user).then((foo => {
-                        if (foo.isOK === true) {
-                            toast.info(foo.callback, {
-                                position: toast.POSITION.TOP_RIGHT,
-                                theme: "dark"
-                            });
-                        } else {
-                            toast.error(foo.callback, {
-                                position: toast.POSITION.TOP_RIGHT,
-                                theme: "dark"
-                            });
-                        }
-                    }));
-                } else { // Edytowanie usera
-
-                }
-            }
         }
     }
 
@@ -246,11 +250,11 @@ const UserView = () => {
                         onClick={action}
                         className='btn btn-info hover:btn-primary mt-5'>
                         {user.id === 0 ?
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg> :
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>}
                         {user.id != 0 ? "Edytuj" : "Dodaj"}
                     </button>

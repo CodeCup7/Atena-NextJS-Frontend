@@ -13,7 +13,7 @@ export default function Administracja({
 }) {
 
     return (
-        <div className='container border-2 border-info border-opacity-50 p-2 w-screen'>
+        <div className='container mx-auto border-2 border-info border-opacity-50 p-2'>
             <div className='flex flex-col items-center justify-center'>
                 <h1 className='text-2xl'>Panel Administracyjny</h1>
                 <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
