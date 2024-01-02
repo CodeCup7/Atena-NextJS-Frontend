@@ -1,17 +1,22 @@
 'use client'
-import { api_UserList_getAll, api_UserList_getByLogin, api_User_add } from "@/app/api/user_api";
+import { api_UserList_getByLogin, api_User_add, api_User_update } from "@/app/api/user_api";
 import { Role, User } from "@/app/classes/user";
-import { global_userList, updateUserList } from "@/app/factory/factory_user";
+import { updateUserList } from "@/app/factory/factory_user";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSearchParams } from "next/navigation";
 
-
 const UserView = () => {
+
+    const [selectedRole, setSelectedRole] = useState(Role.SUPERVISOR_);
+    const [selectedCoach, setSelectedCoach] = useState(0);
+    const [selectedBoss, setSelectedBoss] = useState(0);
+    const [selectedLeader, setSelectedLeader] = useState(0);
 
     const [user, setUser] = useState(new User());
     const [userList, setUserList] = useState<Array<User>>([]);
+    const [editUser, setEditUser] = useState(new User());
 
     useEffect(() => {
         async function fetchData() {
@@ -23,7 +28,7 @@ const UserView = () => {
             }
         }
         fetchData();
-    }, []); 
+    }, []);
 
     const searchParams = useSearchParams();
     const userData = searchParams.get('userData');
@@ -32,21 +37,32 @@ const UserView = () => {
         if (userData != null) {
             const parsedUser = JSON.parse(userData);
             setUser(parsedUser);
+            setEditUser(parsedUser);
+
+            if (parsedUser.coachId !== undefined) {
+                setSelectedCoach(parsedUser.coachId);
+                setSelectedBoss(parsedUser.bossId);
+                setSelectedLeader(parsedUser.leaderId);
+                setSelectedRole(parsedUser.rola);
+            }
         }
     }, [userData]);
 
     async function action() {
 
-        let fillFields;
+        let fillFields = false;
 
-        if (user.login !== '' && user.nameUser !== '' && user.mail !== '') {
-            if (user.role === Role.AGENT_ && (user.bossId === 0 || user.leaderId === 0 || user.coachId === 0)) {
-                fillFields = false;
-            } else {
-                fillFields = true;
-            }
-        } else {
+        if (user.login.length !== 0 && user.nameUser.length != 0 && user.mail.length !== 0 && user.role !== undefined) {
             fillFields = true;
+
+            if (user.role === Role.AGENT_) {
+
+                if (user.bossId !== 0 && user.leaderId !== 0 && user.coachId !== 0) {
+                    fillFields = true;
+                } else {
+                    fillFields = false;
+                }
+            }
         }
 
         if (fillFields === false) {
@@ -60,13 +76,21 @@ const UserView = () => {
             api_UserList_getByLogin(user.login)
                 .then(dbUser => {
 
-                    if (dbUser.login === user.login) {
+                    let existLogin = false;
+
+                    //Sprawdz login tylko wtedy gdy jest nowy user lub edytowany user któremu zmienia się login
+                    if (editUser.id === 0 || ((user.login !== editUser.login) && editUser.id !== 0)) {
+                        existLogin = dbUser.login === user.login
+                    }
+
+                    if (existLogin === true) {
+
                         toast.error("Login " + user.login + " istnieje już w systemie", {
                             position: toast.POSITION.TOP_RIGHT,
                             theme: "dark"
                         });
                     } else {
-                        if (user.id === 0) { // Dodanie nowego usera
+                        if (editUser.id === 0) { // Dodanie nowego usera
                             api_User_add(user).then((foo => {
                                 if (foo.isOK === true) {
                                     toast.info(foo.callback, {
@@ -82,14 +106,25 @@ const UserView = () => {
                             }));
                         } else { // Edytowanie usera
 
+                            api_User_update(user).then((foo => {
+                                if (foo.isOK === true) {
+                                    toast.info(foo.callback, {
+                                        position: toast.POSITION.TOP_RIGHT,
+                                        theme: "dark"
+                                    });
+                                } else {
+                                    toast.error(foo.callback, {
+                                        position: toast.POSITION.TOP_RIGHT,
+                                        theme: "dark"
+                                    });
+                                }
+                            }));
                         }
-
                     }
                 })
                 .catch(error => {
                     console.error('Błąd pobierania użytkownika:', error);
                 });
-
         }
     }
 
@@ -172,12 +207,12 @@ const UserView = () => {
                             </div>
                             <select
                                 className="select select-info w-72"
-                                defaultValue={'DEFAULT'}
-                                value={userList.find(coach => coach.id === user.coachId)?.nameUser}
-                                onChange={
-                                    e => setUser({ ...user, coachId: parseInt(e.target.value) })
-                                }>
-                                <option value="DEFAULT" disabled>Coach ...</option>
+                                value={selectedCoach}
+                                onChange={e => {
+                                    setUser({ ...user, coachId: parseInt(e.target.value) });
+                                    setSelectedCoach(parseInt(e.target.value));
+                                }}>
+                                <option value={0} disabled>Coach ...</option>
                                 {userList.filter(user => user.role === Role.COACH_ || user.role === Role.ADMIN_).map((user, index) => (
                                     <option key={user.id} value={user.id}>{user.nameUser}</option>
                                 ))}
@@ -190,12 +225,12 @@ const UserView = () => {
                             </div>
                             <select
                                 className="select select-info w-72"
-                                defaultValue={'DEFAULT'}
-                                value={userList.find(boss => boss.id === user.bossId)?.nameUser}
-                                onChange={
-                                    e => setUser({ ...user, bossId: parseInt(e.target.value) })
-                                }>
-                                <option value="DEFAULT" disabled>Kierownik ...</option>
+                                value={selectedBoss}
+                                onChange={e => {
+                                    setUser({ ...user, bossId: parseInt(e.target.value) });
+                                    setSelectedBoss(parseInt(e.target.value));
+                                }}>
+                                <option value={0} disabled>Kierownik ...</option>
                                 {userList.filter(user => user.role === Role.BOSS_).map((user, index) => (
                                     <option key={index} value={user.id}>{user.nameUser}</option>
                                 ))}
@@ -208,12 +243,12 @@ const UserView = () => {
                             </div>
                             <select
                                 className="select select-info w-72"
-                                defaultValue={'DEFAULT'}
-                                value={userList.find(leader => leader.id === user.leaderId)?.nameUser}
-                                onChange={
-                                    e => setUser({ ...user, leaderId: parseInt(e.target.value) })
-                                }>
-                                <option value="DEFAULT" disabled>Leader ...</option>
+                                value={selectedLeader}
+                                onChange={e => {
+                                    setUser({ ...user, leaderId: parseInt(e.target.value) });
+                                    setSelectedLeader(parseInt(e.target.value));
+                                }}>
+                                <option value={0} disabled>Leader ...</option>
                                 {userList.filter(user => user.role === Role.LEADER_).map((user, index) => (
                                     <option key={index} value={user.id}>{user.nameUser}</option>
                                 ))}
