@@ -149,7 +149,7 @@ const RateCC_Page = () => {
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
-            <ConfirmDialog open={newRateModal} onClose={() => setOpenNewRateModal(true)} onConfirm={() => handlenNewRateOkClick(true)} title='Potwierdź decyzję' content='Czy napewno chcesz otworzyć nową ocenę ?' />
+            <ConfirmDialog open={newRateModal} onClose={() => setOpenNewRateModal(false)} onConfirm={() => handlenNewRateOkClick(true)} title='Potwierdź decyzję' content='Czy napewno chcesz otworzyć nową ocenę ?' />
             {/* Nagłówek */}
             <div className='grid grid-cols-12'>
                 <div className="col-span-2 navbar-start">

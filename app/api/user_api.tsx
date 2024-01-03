@@ -114,5 +114,29 @@ export async function api_User_update(user: User): Promise<Foo> {
         return foo;
     } catch (error) {
         return { callback: 'Błąd edytowania Użytkownika ' + error, isOK: false };
+    }  
+}
+
+export async function api_User_delete(userId: number): Promise<Foo> {
+    try {
+        let foo: Foo = { callback: '', isOK: false };
+
+        const response = await fetch('http://localhost:8080/api/user/delete/' + userId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            foo.callback = 'Użytkownik został usunięty';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Użytkownik nie został usunięty';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd usuwania użytkownika ' + error, isOK: false };
     }
 }

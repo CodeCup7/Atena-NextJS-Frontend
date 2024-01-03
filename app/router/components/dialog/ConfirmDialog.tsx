@@ -41,7 +41,9 @@ const ConfirmDialog: React.FC<Prop> = (props) => {
             }}
             className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-green-400 text-black rounded-lg font-semibold text-sm md:ml-2 md:order-2 shadow-2xl hover:bg-green-500 hover:shadow-white hover:drop-shadow-sm">   Potwierdzam   </button>
           <button
-            onClick={props.onClose}
+            onClick={() => {
+              props.onClose();
+            }}
             className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-400 text-black rounded-lg font-semibold text-sm mt-4 md:mt-0 md:order-1 shadow-2xl hover:bg-gray-500 hover:shadow-white hover:drop-shadow-sm"> Anuluj </button>
         </div>
       </div>

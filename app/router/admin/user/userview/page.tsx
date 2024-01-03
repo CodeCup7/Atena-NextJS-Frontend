@@ -145,8 +145,8 @@ const UserView = () => {
 
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-2 my-7"></hr>
             {/* BODY */}
-            <div className='flex items-center justify-center'>
-                <div className="flex flex-col w-full items-center justify-center ">
+            <div className='flex items-start justify-center'>
+                <div className="flex flex-col col-span-6 w-full items-end justify-end ">
 
                     <label className="form-control w-full max-w-xs mt-2">
                         <div className="label">
@@ -177,6 +177,45 @@ const UserView = () => {
                             }} />
                     </label>
 
+                    <label className="form-control w-full max-w-xs mt-2">
+                        <div className="label">
+                            <span className="label-text">Czy aktywny</span>
+                        </div>
+                        <select
+                            className="select select-info w-72"
+                            value={String(user.available)}
+                            onChange={(e) => setUser({ ...user, available: e.target.value === 'true' ? true : false })}>
+                            <option value="true">TAK</option>
+                            <option value="false">NIE</option>
+                        </select>
+                    </label>
+
+                    <label className="form-control w-full max-w-xs mt-2">
+                        <div className="label">
+                            <span className={`label-text ${user.mail != '' ? '' : 'hidden'}`}>E-Mail</span>
+                        </div>
+                        <input
+                            className="input input-bordered input-info max-w-md w-72"
+                            value={user.mail}
+                            type="text"
+                            placeholder="E-Mail"
+                            onChange={e => setUser({ ...user, mail: e.target.value })} />
+                    </label>
+                    <button
+                        onClick={action}
+                        className='btn btn-info hover:btn-primary mt-5'>
+                        {user.id === 0 ?
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg> :
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                            </svg>}
+                        {user.id != 0 ? "Edytuj" : "Dodaj"}
+                    </button>
+                </div>
+
+                <div className="flex flex-col col-span-6 w-full items-start justify-start ">
                     <label className="form-control w-full max-w-xs mt-2">
                         <div className="label">
                             <span className={`label-text ${user.role != undefined ? '' : 'hidden'}`}>Rola</span>
@@ -257,43 +296,9 @@ const UserView = () => {
 
                     </div>
 
-                    <label className="form-control w-full max-w-xs mt-2">
-                        <div className="label">
-                            <span className="label-text">Czy aktywny</span>
-                        </div>
-                        <select
-                            className="select select-info w-72"
-                            value={String(user.available)}
-                            onChange={(e) => setUser({ ...user, available: e.target.value === 'true' ? true : false })}>
-                            <option value="true">TAK</option>
-                            <option value="false">NIE</option>
-                        </select>
-                    </label>
-
-                    <label className="form-control w-full max-w-xs mt-2">
-                        <div className="label">
-                            <span className={`label-text ${user.mail != '' ? '' : 'hidden'}`}>E-Mail</span>
-                        </div>
-                        <input
-                            className="input input-bordered input-info max-w-md w-72"
-                            value={user.mail}
-                            type="text"
-                            placeholder="E-Mail"
-                            onChange={e => setUser({ ...user, mail: e.target.value })} />
-                    </label>
-                    <button
-                        onClick={action}
-                        className='btn btn-info hover:btn-primary mt-5'>
-                        {user.id === 0 ?
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg> :
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                            </svg>}
-                        {user.id != 0 ? "Edytuj" : "Dodaj"}
-                    </button>
                 </div>
+
+
             </div>
         </div >
 
