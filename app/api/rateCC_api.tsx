@@ -1,29 +1,34 @@
 import { RateCC } from "../classes/rateCC";
 
-export function api_rateCC_add(rateCC: RateCC): string {
+interface Foo {
+    callback: string;
+    isOK: boolean;
+}
 
-    let callback = '';
-    fetch('http://localhost:8080/api/rateCC/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json', // Określenie, że dane są w formacie JSON
-        },
+export async function api_rateCC_add(rateCC: RateCC): Promise<Foo> {
 
-        body: JSON.stringify(rateCC)
-    })
-        .then(response => {
-            if (response.ok) {
-                callback = 'Ocena została dodana';
-            } else {
-                callback = 'Ocena nie została dodana ' + response;
-            }
+    try {
+        let foo: Foo = { callback: '', isOK: false };
 
-        })
-        .catch(error => {
-            callback = 'Błąd dodawania oceny ' + error;
+        const response = await fetch('http://localhost:8080/api/rateCC/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateCC)
         });
 
-    return callback;
+        if (response.ok) {
+            foo.callback = 'Ocena została dodana';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Ocena nie została dodana';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd dodawania oceny ' + error, isOK: false };
+    }
 }
 
 export function api_rateCC_get(): RateCC {

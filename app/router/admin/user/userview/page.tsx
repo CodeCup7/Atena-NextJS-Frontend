@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 
 const UserView = () => {
 
-    const [selectedRole, setSelectedRole] = useState(Role.SUPERVISOR_);
+    const [selectedRole, setSelectedRole] = useState('');
     const [selectedCoach, setSelectedCoach] = useState(0);
     const [selectedBoss, setSelectedBoss] = useState(0);
     const [selectedLeader, setSelectedLeader] = useState(0);
@@ -38,12 +38,12 @@ const UserView = () => {
             const parsedUser = JSON.parse(userData);
             setUser(parsedUser);
             setEditUser(parsedUser);
+            setSelectedRole(parsedUser.role);
 
             if (parsedUser.coachId !== undefined) {
                 setSelectedCoach(parsedUser.coachId);
                 setSelectedBoss(parsedUser.bossId);
                 setSelectedLeader(parsedUser.leaderId);
-                setSelectedRole(parsedUser.rola);
             }
         }
     }, [userData]);
@@ -222,14 +222,13 @@ const UserView = () => {
                         </div>
                         <select
                             className="select select-info w-72 "
-                            defaultValue={'DEFAULT'}
-                            value={user.role}
-                            onChange={
-                                e => {
-                                    setUser({ ...user, role: Object.values(Role).find(role => role === e.target.value) || Role.SUPERVISOR_ });
-                                }
-                            }>
-                            <option value="DEFAULT" disabled>Wybierz rolę ...</option>
+                            value={selectedRole}
+                            onChange={e => {
+                                setSelectedRole(e.target.value)
+                                setUser({ ...user, role: Object.values(Role).find(role => role === e.target.value) || Role.SUPERVISOR_ });
+
+                            }}>
+                            <option value={''} disabled>Wybierz rolę ...</option>
                             {Object.values(Role).map((role, index) => (
                                 <option key={role} value={role}>
                                     {role}

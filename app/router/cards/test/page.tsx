@@ -1,53 +1,42 @@
 'use client'
-import { updateUserList } from "@/app/factory/factory_user";
-import { Role, User } from "@/app/classes/user";
-import 'react-toastify/dist/ReactToastify.css';
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
-const idList = [1, 2, 3]
-const id = 1;
+import { Role, User } from "@/app/classes/user";
+import { useEffect, useState } from "react";
 
 export const Test = () => {
 
-  const [userList, setUserList] = useState<Array<User>>([]);
+  const i:number = 1;
+
+  let userEDIT = new User();
+  userEDIT.role = Role.BOSS_;
+
+  const [selectedRole, setSelectedRole] = useState('');
   const [user, setUser] = useState(new User());
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const users = await updateUserList();
-        setUserList(users);
-      } catch (error) {
-        console.error('Błąd pobierania użytkowników:', error);
+
+    if (i === 0) {
+      if (i === 0 && userEDIT.role !== undefined) {
+        setSelectedRole(userEDIT.role);
       }
     }
-    fetchData();
+
+    
   }, []);
 
-  useEffect(() => {
-    if (userList.length > 1) {
-      setUser(userList[1]);
-      console.log(userList[1]); // Wyświetli zaktualizowanego użytkownika
-
-    }
-  }, [userList]);
-
-  console.log(user != null && user.id != 0 ? user.role : user.role); // Wyświetli zaktualizowanego użytkownika
+  console.log(user.role)
 
   return (
     <div>
       <select
-        value={user != null && user.id != 0 ? user.role : 'DEFAULT'}
-        className="select select-info w-72"
+        className="select select-info w-72 "
+        value={selectedRole}
         onChange={e => {
-          const selectedRole = Object.values(Role).find(role => role === e.target.value) || Role.SUPERVISOR_;
-          setUser({ ...user, role: selectedRole });
-        }}
-      >
-        <option value="DEFAULT" disabled>
-          Wybierz rolę ...
-        </option>
+          setSelectedRole(e.target.value)
+          setUser({ ...user, role: Object.values(Role).find(role => role === e.target.value) || Role.SUPERVISOR_ });
+
+        }}>
+        <option value={''} disabled>Wybierz rolę ...</option>
         {Object.values(Role).map((role, index) => (
           <option key={role} value={role}>
             {role}
@@ -55,7 +44,6 @@ export const Test = () => {
         ))}
       </select>
     </div>
-
   );
 };
 

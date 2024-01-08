@@ -5,7 +5,7 @@ import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { queueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, } from '@/app/factory/factory_rateCC';
-import { getActiveUser, getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
+import { getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
 import { getWagRateCC, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
@@ -13,48 +13,26 @@ import "react-toastify/dist/ReactToastify.css";
 import { Arced } from '../../components/chart/rateCC_chart';
 import { useSearchParams } from 'next/navigation';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
+import { selectedRateCC } from '../test/page';
 import { api_rateCC_add } from '@/app/api/rateCC_api';
-import { updateUserList } from '@/app/factory/factory_user';
+import { global_userList } from '@/app/factory/factory_user';
 
 const RateCC_Page = () => {
 
-    setActiveUser();
-    // Sprawdzenie czy to nowa ocena czy podgląd / edycja
-    const [rateCC, setRateCC] = useState(CreateNewEmptyRateCC());
-    const [prewievMode, setPreviewMode] = useState(false);
-    const [userList, setUserList] = useState<Array<User>>([]);
-    const [queue, setQueue] = useState(0);
-    const [agent, setAgent] = useState(0);
-
+    // ====== Ustawienie i kontrola aktywnej oceny =========================================
     const searchParams = useSearchParams();
-    const rateData = searchParams.get('rateData');
+    const onPrev_ = searchParams.get('onPrev'); //wyszukanie czy przesłano do komponentu props EDIT
+    const [prewievMode, setPreviewMode] = useState(false);
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const users = await updateUserList();
-                setRateCC(CreateNewEmptyRateCC());
-                setUserList(users);
-            } catch (error) {
-                console.error('Błąd pobierania użytkowników:', error);
-            }
+        if (onPrev_ != null) {
+            updateRateCC(selectedRateCC);
+            setPreviewMode(true)
         }
-        fetchData();
-    }, []);
-
-    // Sprawdzenie czy jako parametr nie została wysłana ocena - jeżeli tak ustawienie jej jako obiekt do podglądu / edycji
-    useEffect(() => {
-        if (rateData != null) {
-            const parsedRate = JSON.parse(rateData);
-            setRateCC(parsedRate);
-        }
-    }, [rateData]);
-
-    useEffect(() => {
-        rateCC.mode === Rate_Mode.NEW_ ? setPreviewMode(false) : setPreviewMode(true);
-    }, [rateCC])
+    }, [])
 
     // RateCC hooks
+    const [rateCC, setRateCC] = useState(onPrev_ === null ? CreateNewEmptyRateCC() : selectedRateCC);
     const [wiedzaScore, setWiedzaScore] = useState(rateCC.wiedzaBlock.getRateAs100());
     const [obsługaScore, setObsługaScore] = useState(rateCC.obslugaBlock.getRateAs100());
     const [technikaScore, setTechnikaScore] = useState(rateCC.technikaBlock.getRateAs100());
@@ -64,11 +42,9 @@ const RateCC_Page = () => {
 
     // ====== Ustawienie i kontrola active usera ==========================================
     let isPermit: boolean = false;
-
+    setActiveUser();
     if (getActiveUserRole() === Role.ADMIN_ || getActiveUserRole() === Role.COACH_) {
         isPermit = true;
-        console.log('isPermit :', isPermit);
-        
     }
 
     // ====== Ustawienie dodatkowej oceny i tytułu stony ==========================================
@@ -88,6 +64,7 @@ const RateCC_Page = () => {
     }
 
     // ====== Funkcje ==========================================
+
     // Update wartości
     function updateRateCC(rateCC: RateCC) {
         setRateCC(rateCC);
@@ -154,9 +131,8 @@ const RateCC_Page = () => {
 
     function newBtn_Click() {
         setOpenNewRateModal(true);
-        setRateCC(CreateNewEmptyRateCC());
     }
-    function handlenNewRateOkClick(refresh: boolean) {
+    function handlenNewRateOkClick(refresh:boolean) {
 
         // W przypadku przejścia ze stony z parametrem onPrev szukamy tego parametru i go usuwamy
         const currentURL = new URL(window.location.href);// Pobieramy aktualny URL
@@ -164,7 +140,7 @@ const RateCC_Page = () => {
         newSearchParams.delete('onPrev');// Usuwamy niechciany parametr (np. "key")
         const newURL = currentURL.origin + currentURL.pathname + '?' + newSearchParams.toString();// Aktualizujemy adres URL bez niechcianego parametru
         window.history.replaceState(null, '', newURL);// Ustawiamy nowy adres URL
-        if (refresh) {
+        if(refresh){
             window.location.reload();
         }
     }
@@ -174,7 +150,7 @@ const RateCC_Page = () => {
         if (window.performance) {
             handlenNewRateOkClick(false);
         }
-    }, []);
+      }, []);
 
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -199,7 +175,7 @@ const RateCC_Page = () => {
                                 disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={isPermit && prewievMode} onClick={rateBtn_Click}>Oceń</button>
+                                disabled={!isPermit && !prewievMode} onClick={rateBtn_Click}>Oceń</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit}>Zapisz</button>
@@ -250,29 +226,26 @@ const RateCC_Page = () => {
                     <div className="flex flex-col items-center justify-center gap-y-2">
 
                         <select
+
+                            defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.agent.id : 'DEFAULT'}
                             className="select select-info w-72"
                             disabled={prewievMode}
-                            value={agent}
-                            onChange={e => {
-                                rateCC.agent = userList.find(user => user.id = parseInt(e.target.value)) || new User()
-                                setAgent(parseInt(e.target.value));
-                            }}>
-                            <option value={0} disabled>Wybierz agenta ...</option>
-                            {userList.filter(user => user.role === Role.AGENT_).map((user, index) => (
-                                <option key={user.id} value={user.id}>{user.nameUser}</option>
+                            onChange={
+                                e => rateCC.agent = global_userList.find(user => user.id = parseInt(e.target.value)) || new User()
+                            }>
+                            <option value="DEFAULT" disabled>Wybierz agenta ...</option>
+                            {global_userList.filter((user,) => user.role === Role.AGENT_).map((user, index) => (
+                                <option key={index} value={user.id}>{user.nameUser}</option>
                             ))}
 
                         </select>
 
                         <select
+                            defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.queue.id : 'DEFAULT'}
                             className="select select-info  w-72 "
                             disabled={prewievMode}
-                            value={queue}
-                            onChange={e => {
-                                rateCC.queue = queueList.find(queue => queue.id = parseInt(e.target.value)) || new Queue()
-                                setQueue(parseInt(e.target.value));
-                            }}>
-                            <option value={0} disabled>Wybierz kolejkę ...</option>
+                            onChange={e => rateCC.queue = queueList.find(queue => queue.id = parseInt(e.target.value)) || new Queue()}>
+                            <option value="DEFAULT" disabled>Wybierz kolejkę ...</option>
                             {queueList.map((e, index) => (
                                 <option key={index} value={e.id}>{e.nameQueue} </option>
                             ))}

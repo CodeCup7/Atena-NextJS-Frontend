@@ -7,20 +7,23 @@ import { global_userList } from "./factory/factory_user";
 export const app_name: String = "Atena";
 export const app_version: String = "0.0.1";
 
-let activeUser: User = global_userList.find(user => user.nameUser = "Szymon") || new User();
+let activeUser: User = global_userList.find(user => user.nameUser = "user7") || new User();
 
 export function setActiveUser() {
-    activeUser = global_userList.find(user => user.nameUser = "Szymon") || new User();
+    activeUser = global_userList.find(user => user.nameUser = "user7") || new User();
 }
 
 export function getActiveUser(): User {
+    let activeUser: User = global_userList.find(user => user.nameUser = "user7") || new User();
     return activeUser;
 }
 
-export function getActiveUserRole(): Role {
-    return activeUser.role;
+export function getActiveUserRole(): Role | null {
+    if (activeUser.role !== undefined) {
+        return activeUser.role;
+    }
+    return null;
 }
-
 
 // '==========================================================================================================================================
 // '*********************** Wartości ocen ****************************************************************************************************
