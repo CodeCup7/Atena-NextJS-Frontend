@@ -8,7 +8,9 @@ import { RateCC } from '@/app/classes/rateCC';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { getActiveUser } from '@/app/global';
-import { Checkbox } from 'flowbite-react';
+import { updateUserList } from '@/app/factory/factory_user';
+import { User } from '@/app/classes/user';
+
 
 export const NoteMain = () => {
 
@@ -21,24 +23,44 @@ export const NoteMain = () => {
     const [noteList, setNoteList] = useState<Array<NoteCC>>([]);
     const [downloadList, setDowloadList] = useState<Array<NoteCC>>([]);
 
+    const [userList, setUserList] = useState<Array<User>>([]);
+
     const [agentFilter, setAgentFilter] = useState('ALL');
     const [statusFilter, setStatusFilter] = useState('ALL');
 
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const users = await updateUserList();
+                setUserList(users);
+
+            } catch (error) {
+                console.error('Błąd pobierania użytkowników:', error);
+            }
+        }
+        fetchData();
+
+    }, []);
 
     useEffect(() => {
-        setNoteList(downloadList);
-        console.log("🚀 ~ file: page.tsx:30 ~ useEffect ~ downloadList:", downloadList)
-        
-    }, [downloadList]);
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().split('T')[0]; // Formatowanie daty do postaci 'YYYY-MM-DD'
+        currentDate.getm
 
 
 
+        const formattedDate = `${month.toString().padStart(2, '0')}.${year}`;
+
+        setDateValue(formattedDate);
+      }, []);
 
     function getCoaching() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
-            const list = Get_NoteList_With_NoStartNote([], dateValue);
-            setDowloadList(list);
+            const list = Get_NoteList_With_NoStartNote(userList, [], dateValue);
+            console.log('list :', list);
+
+            setNoteList(list);
         } else {
             toast.error("Wybierz datę!", {
                 position: toast.POSITION.TOP_RIGHT,
@@ -53,8 +75,6 @@ export const NoteMain = () => {
     };
 
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
-
-
 
     function filterService() {
 
@@ -87,7 +107,7 @@ export const NoteMain = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
                     </svg>
                     <input
-                        defaultValue={dateValue}
+                        value={dateValue}
                         onChange={e => { setDateValue(e.currentTarget.value); }}
                         type="month"
                         placeholder="Type here"
@@ -142,12 +162,12 @@ export const NoteMain = () => {
                         <tbody className="table-auto overflow-scroll w-full" >
                             {noteList.map((noteCC, index) => { //{noteList.map(({id}) => {
                                 return (
-                                    <tr key={index} 
-                                    onClick={() => handleTableNoteCCRowClick(noteCC)}
-                                    className={`hover:bg-base-300  hover:text-white cursor-pointer {
+                                    <tr key={index}
+                                        onClick={() => handleTableNoteCCRowClick(noteCC)}
+                                        className={`hover:bg-base-300  hover:text-white cursor-pointer {
                                         selectedRow === noteCC.id ? 'bg-base-300 text-white' : ''
                                       } cursor-pointer`}>
-        
+
                                         <td>{noteCC.agent.nameUser}</td>
                                         <td>{noteCC.status}</td>
                                         <td>{noteCC.appliesDate}</td>

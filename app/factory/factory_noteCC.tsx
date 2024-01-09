@@ -3,7 +3,6 @@ import { NoteCC } from "../classes/noteCC";
 import { RateCC } from "../classes/rateCC";
 import { RateM } from "../classes/rateM";
 import { Role, User } from "../classes/user";
-import { userList_ } from '@/app/factory/factory_user';
 import { CreateNewEmptyRateCC } from "./factory_rateCC";
 import { getActiveUser } from "../global";
 
@@ -37,14 +36,13 @@ export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach
 
 }
 
-export function Get_NoteList_With_NoStartNote(noteList: Array<NoteCC>, appliesDate: string) {
+export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: Array<NoteCC>, appliesDate: string) {
 
-    const userlist = userList_;
     let foundFlag: boolean = false;
     let noteListWitnNoStart: Array<NoteCC> = new Array();
     let id: number = 0; // KASUJ
 
-    userlist.forEach(user => {
+    userList.forEach(user => {
         if (user.role === Role.AGENT_ && user.available === true) {
 
             foundFlag = false;

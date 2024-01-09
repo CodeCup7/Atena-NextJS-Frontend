@@ -67,8 +67,6 @@ const RateCC_Page = () => {
 
     if (getActiveUserRole() === Role.ADMIN_ || getActiveUserRole() === Role.COACH_) {
         isPermit = true;
-        console.log('isPermit :', isPermit);
-        
     }
 
     // ====== Ustawienie dodatkowej oceny i tytułu stony ==========================================
