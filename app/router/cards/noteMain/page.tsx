@@ -8,9 +8,9 @@ import { RateCC } from '@/app/classes/rateCC';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { getActiveUser } from '@/app/global';
-import { updateUserList } from '@/app/factory/factory_user';
+import { global_userList, updateUserList } from '@/app/factory/factory_user';
 import { User } from '@/app/classes/user';
-
+import { api_NoteCC_getDate } from '@/app/api/noteCC_api';
 
 export const NoteMain = () => {
 
@@ -44,28 +44,56 @@ export const NoteMain = () => {
 
     useEffect(() => {
         const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().split('T')[0]; // Formatowanie daty do postaci 'YYYY-MM-DD'
-        currentDate.getm
-
-
-
-        const formattedDate = `${month.toString().padStart(2, '0')}.${year}`;
-
+        const formattedDate = currentDate.toISOString().slice(0, 7); // YYYY-MM
         setDateValue(formattedDate);
-      }, []);
+    }, []);
 
-    function getCoaching() {
+    function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
-            const list = Get_NoteList_With_NoStartNote(userList, [], dateValue);
-            console.log('list :', list);
-
-            setNoteList(list);
+            getCoaching(dateValue);
         } else {
             toast.error("Wybierz datę!", {
                 position: toast.POSITION.TOP_RIGHT,
                 theme: "dark"
             });
+        }
+    }
+
+    function getCoaching(dateValue: string) {
+
+        if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
+
+            async function fetchData() {
+                try {
+                    const parts = dateValue.split('-'); // Rozbijanie daty na części
+
+                    // Tworzenie daty z części daty
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
+
+                    const date = new Date(year, month, 1);
+
+                    // Ustawienie daty na pierwszy dzień miesiąca
+                    const startDate = new Date(year, month, 1);
+                    console.log('startDate :', startDate.toLocaleDateString());
+
+                    // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
+                    const endDate = new Date(year, month + 1, 0);
+                    console.log('endDate :', endDate.toLocaleDateString());
+
+                    setUserList(global_userList);
+
+                    const getExistNoteList = await api_NoteCC_getDate(startDate.toLocaleDateString(), endDate.toLocaleDateString()); 
+                    const noteList = Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
+                    
+                    setNoteList(noteList);
+
+                } catch (error) {
+                    console.error('Błąd pobierania użytkowników:', error);
+                }
+            }
+            fetchData();
         }
     }
 
@@ -112,7 +140,7 @@ export const NoteMain = () => {
                         type="month"
                         placeholder="Type here"
                         className="input input-bordered w-full max-w-xs" />
-                    <button onClick={getCoaching} className="btn btn-outline btn-info mx-2">
+                    <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
                         Pobierz dane
                     </button>
                 </div>
@@ -148,9 +176,9 @@ export const NoteMain = () => {
                                         defaultValue={'DEFAULT'}
                                         onChange={e => { setStatusFilter(e.target.value) }}>
                                         <option value="DEFAULT">Wszystkie</option>
-                                        <option> {Status_Note.NO_START_} </option>
-                                        <option> {Status_Note.CLOSE__} </option>
-                                        <option> {Status_Note.CLOSE_WITHOUT_} </option>
+                                        <option> {Status_Note.NO_START} </option>
+                                        <option> {Status_Note.CLOSE} </option>
+                                        <option> {Status_Note.CLOSE_WITHOUT} </option>
                                     </select>
                                 </th>
                                 <th>

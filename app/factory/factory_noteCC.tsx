@@ -10,26 +10,24 @@ import { getActiveUser } from "../global";
 export function CreateNewEmptyNoteCC() {
 
     let noteCC = new NoteCC();
-    noteCC.status = Status_Note.NO_START_;
+    noteCC.status = Status_Note.NO_START
 
     return noteCC;
 }
 
-export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach: User, score: number, coachDate: string, appliesDate: string,
-    zalecenia: string, odwolanie: string, rateCC_Col: Array<RateCC>, rateM_Col: Array<RateM>, mode: Rate_Mode) {
+export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach: User, coachDate: string, appliesDate: string,
+    zalecenia: string, odwolanie: string, rateCC_Col: Array<RateCC>, mode: Rate_Mode) {
 
     let noteCC = new NoteCC();
     noteCC.id = id;
     noteCC.status = status;
     noteCC.agent = agent;
     noteCC.coach = coach;
-    noteCC.score = score;
     noteCC.coachDate = coachDate;
     noteCC.appliesDate = appliesDate;
     noteCC.zalecenia = zalecenia;
     noteCC.odwolanie = odwolanie;
     noteCC.rateCC_Col = rateCC_Col;
-    noteCC.rateM_Col = rateM_Col;
     noteCC.mode = mode;
 
     return noteCC;
@@ -37,12 +35,17 @@ export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach
 }
 
 export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: Array<NoteCC>, appliesDate: string) {
+    console.log('appliesDate :', appliesDate);
+
+    console.log('userList :', userList);
+    console.log('noteList :', noteList);
 
     let foundFlag: boolean = false;
     let noteListWitnNoStart: Array<NoteCC> = new Array();
     let id: number = 0; // KASUJ
 
     userList.forEach(user => {
+
         if (user.role === Role.AGENT_ && user.available === true) {
 
             foundFlag = false;
@@ -52,10 +55,12 @@ export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: A
                     noteCC.mode = Rate_Mode.PREVIEW_;
                     noteListWitnNoStart.push(noteCC);
                     foundFlag = true;
+
+
                 }
             });
 
-            if(foundFlag === false){
+            if (foundFlag === false) {
 
                 let noteCC = CreateNewEmptyNoteCC();
                 noteCC.mode = Rate_Mode.NEW_;
@@ -75,7 +80,7 @@ export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: A
 
 
 
-    function addRateCCToNoteCC(noteCC:NoteCC):void{
+    function addRateCCToNoteCC(noteCC: NoteCC): void {
 
         let rateCC = CreateNewEmptyRateCC();
         rateCC.dateRate = "18.10.2023";

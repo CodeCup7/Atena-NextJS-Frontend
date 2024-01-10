@@ -5,7 +5,7 @@ interface Foo {
     isOK: boolean;
 }
 
-export async function api_noteCC_add(noteCC: NoteCC): Promise<Foo> {
+export async function api_NoteCC_add(noteCC: NoteCC): Promise<Foo> {
 
     try {
         let foo: Foo = { callback: '', isOK: false };
@@ -31,29 +31,24 @@ export async function api_noteCC_add(noteCC: NoteCC): Promise<Foo> {
     }
 }
 
-// export async function api_noteCC_get(): NoteCC {
-
-//     return new NoteCC();
-// }
-
-export async function api_noteCC_getAll(): Promise<NoteCC[]> {
+export async function api_NoteCC_getDate(startDate: string, endDate: string): Promise<NoteCC[]> {
 
     try {
-        const response = await fetch('http://localhost:8080/api/note/getNoteAll');
+        const response = await fetch('http://localhost:8080/api/noteCC/getAllNoteBetweenDates/'
+            + startDate + '/' + endDate );
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         return await response.json();
     } catch (error) {
-        console.error('Błąd pobierania użytkcoachingówowników:', error);
         return [];
     }
 }
 
-export async function api_noteCC_deleteNote() {
+export async function api_NoteCC_deleteNote() {
 
 }
 
-export async function api_noteCC_update() {
+export async function api_NoteCC_update() {
 
 }
