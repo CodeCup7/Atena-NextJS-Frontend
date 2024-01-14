@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Status_Note } from '@/app/classes/enums';
+import { StatusLabels, Status_Note } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/noteCC';
 import { Get_NoteList_With_NoStartNote } from '@/app/factory/factory_noteCC';
 import { RateCC } from '@/app/classes/rateCC';
@@ -13,6 +13,8 @@ import { User } from '@/app/classes/user';
 import { api_NoteCC_getDate } from '@/app/api/noteCC_api';
 
 export const NoteMain = () => {
+
+    const [rowIndex, setRowIndex] = useState(-1);
 
     const [dateValue, setDateValue] = useState('');
     const [openTab, setOpenTab] = useState(1);
@@ -48,6 +50,13 @@ export const NoteMain = () => {
         setDateValue(formattedDate);
     }, []);
 
+    useEffect(() => {
+        const empyNote = new NoteCC();
+        empyNote.id = -1;
+        setSelectedNoteCC(empyNote);
+        setRowIndex(-1);
+    }, [noteList]);
+
     function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
@@ -76,17 +85,15 @@ export const NoteMain = () => {
 
                     // Ustawienie daty na pierwszy dzień miesiąca
                     const startDate = new Date(year, month, 1);
-                    console.log('startDate :', startDate.toLocaleDateString());
 
                     // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
                     const endDate = new Date(year, month + 1, 0);
-                    console.log('endDate :', endDate.toLocaleDateString());
 
                     setUserList(global_userList);
 
-                    const getExistNoteList = await api_NoteCC_getDate(startDate.toLocaleDateString(), endDate.toLocaleDateString()); 
-                    const noteList = Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
-                    
+                    const getExistNoteList = await api_NoteCC_getDate(startDate.toLocaleDateString(), endDate.toLocaleDateString());
+                    const noteList = await Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
+
                     setNoteList(noteList);
 
                 } catch (error) {
@@ -96,13 +103,6 @@ export const NoteMain = () => {
             fetchData();
         }
     }
-
-    const handleTableNoteCCRowClick = (noteCC: NoteCC) => {
-        setSelectedNoteCC(noteCC);
-        setSelectedRow(noteCC.id);
-    };
-
-    const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
     function filterService() {
 
@@ -142,6 +142,8 @@ export const NoteMain = () => {
                         className="input input-bordered w-full max-w-xs" />
                     <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
                         Pobierz dane
+                        +
+
                     </button>
                 </div>
             </div>
@@ -176,9 +178,9 @@ export const NoteMain = () => {
                                         defaultValue={'DEFAULT'}
                                         onChange={e => { setStatusFilter(e.target.value) }}>
                                         <option value="DEFAULT">Wszystkie</option>
-                                        <option> {Status_Note.NO_START} </option>
-                                        <option> {Status_Note.CLOSE} </option>
-                                        <option> {Status_Note.CLOSE_WITHOUT} </option>
+                                        <option> {StatusLabels[Status_Note.NO_START]} </option>
+                                        <option> {StatusLabels[Status_Note.CLOSE]} </option>
+                                        <option> {StatusLabels[Status_Note.CLOSE_WITHOUT]} </option>
                                     </select>
                                 </th>
                                 <th>
@@ -188,16 +190,18 @@ export const NoteMain = () => {
                             </tr>
                         </thead>
                         <tbody className="table-auto overflow-scroll w-full" >
-                            {noteList.map((noteCC, index) => { //{noteList.map(({id}) => {
+                            {noteList.map((noteCC, index) => {
                                 return (
                                     <tr key={index}
-                                        onClick={() => handleTableNoteCCRowClick(noteCC)}
-                                        className={`hover:bg-base-300  hover:text-white cursor-pointer {
-                                        selectedRow === noteCC.id ? 'bg-base-300 text-white' : ''
-                                      } cursor-pointer`}>
+                                        onClick={() => {
+                                            setSelectedNoteCC(noteCC);
+                                            setRowIndex(index)
+                                        }}
+                                        className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
+                                            } cursor-pointer`}>
 
                                         <td>{noteCC.agent.nameUser}</td>
-                                        <td>{noteCC.status}</td>
+                                        <td>{StatusLabels[noteCC.status]}</td>
                                         <td>{noteCC.appliesDate}</td>
                                     </tr>
                                 )
@@ -206,9 +210,10 @@ export const NoteMain = () => {
                         </tbody>
                     </table>
 
-                    <div className='flex gap-2 mt-2'>
-                        <Link className="group link link-accent link-hover text-lg" href="/router/cards/noteCC">
-                            <button className="btn btn-outline btn-info btn-sm">Rozpocznij coaching</button>
+                    <div className={`flex gap-2 mt-2 disabled: ${selectedNoteCC.id > - 1} `}>
+
+                        <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`} href="/router/cards/noteCC" >
+                            <button className="btn btn-outline btn-info btn-sm" disabled={selectedNoteCC.id === -1}>Rozpocznij coaching</button>
                         </Link>
 
                         <button className="btn btn-outline btn-error btn-sm">Usuń</button>
@@ -239,7 +244,7 @@ export const NoteMain = () => {
                     {/* <!-- Tab content --> */}
                     <div className="flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
                         {/* # Rozmowy TAB */}
-                        <div className={openTab === 1 ? "block" : "hidden"} id="link1">
+                        <div className={openTab === 1 ? 'block' : 'hidden'} id="link1">
                             <div className="overflow-x-auto">
 
                                 <table className="table">
@@ -255,9 +260,9 @@ export const NoteMain = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="table-auto overflow-scroll w-full">
-                                        {selectedNoteCC.rateCC_Col.map((rateCC, index) => { //{noteList.map(({id}) => {
+                                        {selectedNoteCC.rateCC_Col.map((rateCC, index) => {
                                             return (
-                                                <tr key={index} className="hover:bg-base-200 cursor-pointer" onClick={() => handleTableNoteCCRowClick(new NoteCC)}>
+                                                <tr key={index} className="hover:bg-base-200 cursor-pointer">
                                                     <td>{rateCC.dateCall}</td>
                                                     <td>{rateCC.queue.nameQueue}</td>
                                                     <td>{rateCC.rate}</td>

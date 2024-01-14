@@ -48,3 +48,18 @@ export function api_rateCC_deleteRate() {
 export function api_rateCC_update() {
 
 }
+
+
+
+export async function api_rateCC_getAllRateNoNote(): Promise<RateCC[]> {
+    try {
+        const response = await fetch('http://localhost:8080/api/rateCC/getAllRateNoNote');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Błąd pobierania ocen RateCC:', error);
+        return [];
+    }
+}

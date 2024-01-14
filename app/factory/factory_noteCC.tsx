@@ -5,6 +5,7 @@ import { RateM } from "../classes/rateM";
 import { Role, User } from "../classes/user";
 import { CreateNewEmptyRateCC } from "./factory_rateCC";
 import { getActiveUser } from "../global";
+import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";
 
 
 export function CreateNewEmptyNoteCC() {
@@ -34,16 +35,14 @@ export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach
 
 }
 
-export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: Array<NoteCC>, appliesDate: string) {
-    console.log('appliesDate :', appliesDate);
-
-    console.log('userList :', userList);
-    console.log('noteList :', noteList);
+export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: Array<NoteCC>, appliesDate: string) {
 
     let foundFlag: boolean = false;
     let noteListWitnNoStart: Array<NoteCC> = new Array();
     let id: number = 0; // KASUJ
 
+    const rateListNoNote = await api_rateCC_getAllRateNoNote();
+    
     userList.forEach(user => {
 
         if (user.role === Role.AGENT_ && user.available === true) {
@@ -55,8 +54,6 @@ export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: A
                     noteCC.mode = Rate_Mode.PREVIEW_;
                     noteListWitnNoStart.push(noteCC);
                     foundFlag = true;
-
-
                 }
             });
 
@@ -64,13 +61,18 @@ export function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: A
 
                 let noteCC = CreateNewEmptyNoteCC();
                 noteCC.mode = Rate_Mode.NEW_;
-                noteCC.appliesDate = appliesDate;
+                noteCC.appliesDate = appliesDate + ".01";
                 noteCC.agent = user;
 
-                noteCC.id = id++; // KASUJ
                 noteListWitnNoStart.push(noteCC);
                 noteCC.coach = getActiveUser();
-                addRateCCToNoteCC(noteCC);
+
+                //Dodanie do noteCC rateCC
+                rateListNoNote.forEach(rateCC => {
+                    if(rateCC.agent.id = user.id){
+                        noteCC.rateCC_Col.push(rateCC);
+                    }
+                })
 
             }
         }
