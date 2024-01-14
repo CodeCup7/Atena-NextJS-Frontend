@@ -22,5 +22,33 @@ export class NoteCC {
     //public rateM_Col: Array<RateM> = [];
     public mode: Rate_Mode = Rate_Mode.NEW_;
 
+	public getRate(): number {
 
+		let rate: number = 0;
+
+		this.rateCC_Col.forEach(e => {
+			rate = rate + e.getRate();
+		});
+
+		return rate;
+	}
 }
+
+
+// Public Function getScore() As Double
+
+//     Dim rateCC As C_RateCC, rateM As C_RateM
+    
+//     If rateCC_Col.count > 0 Or rateM_col.count > 0 Then
+//         For Each rateCC In rateCC_Col
+//             getScore = getScore + rateCC.getRate
+//         Next rateCC
+
+//         For Each rateM In rateM_col
+//             getScore = getScore + rateM.getRate
+//         Next rateM
+        
+//         getScore = getScore / (rateCC_Col.count + rateM_col.count)
+        
+//     End If
+// End Function

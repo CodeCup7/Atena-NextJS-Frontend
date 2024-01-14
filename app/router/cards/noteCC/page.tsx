@@ -1,15 +1,28 @@
 'use client'
-import React from 'react'
+import { Rate_Mode, StatusLabels } from '@/app/classes/enums';
+import { CreateNewEmptyNoteCC } from '@/app/factory/factory_noteCC';
+import React, { useState } from 'react'
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { Arced } from '../../components/chart/rateCC_chart';
 
-const page = () => {
+const NoteCC_Page = () => {
+
+    const [noteCC, setNoteCC] = useState(CreateNewEmptyNoteCC());
+    const [prewievMode, setPreviewMode] = useState(false);
+
     const [noteTab, setOpenNoteTab] = React.useState(1);
     const [rateTab, setOpenRateTab] = React.useState(1);
+
+
+
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
+            <ToastContainer />
 
             {/* Nagłówek */}
-            <div className='grid grid-cols-12 items-center justify-center'>
-                <div className="col-span-5 navbar-start">
+            <div className='grid grid-cols-12'>
+                <div className="col-span-2 navbar-start">
                     <div className="dropdown">
                         <label tabIndex={0} className="btn btn-ghost btn-circle">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
@@ -23,8 +36,14 @@ const page = () => {
                         </ul>
                     </div>
                 </div>
-                <div className='col-span-7 items-center justify-start'>
-                    <h1 className='text-info text-3xl text-start'># Karta Coucha</h1>
+                <div className="col-span-2">
+                    <p className={`justify-center  {rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? 'text-yellow-600' : rateCC.mode === Rate_Mode.NEW_ as Rate_Mode ? 'text-green-500' : 'text-red-700'}`}>Tryb: {noteCC.mode}</p>
+                </div>
+                <div className="col-span-4">
+                    <h1 className='text-info text-3xl text-center justify-center'># Karta Coucha</h1>
+                </div>
+                <div className='col-span-4'>
+                    <p className='text-right mr-2'>id: {noteCC.id}</p>
                 </div>
             </div>
 
@@ -33,47 +52,63 @@ const page = () => {
             <div className='flex sm:flex-col md:flex-row mt-5'>
 
                 <div className='flex flex-col gap-2'>
-                    <div className='flex gap-2 justify-center items-center'>
-
-                        <div className='border border-info'>
-                            <p className='text-center m-2'>id: 12345</p>
-                        </div>
-                        <div className='border border-info'>
-                            <p className='text-center m-2'>Tryb: nowa</p>
-                        </div>
-                        <div className='border border-info'>
-                            <p className='text-center m-2'>Status: Nowa</p>
-                        </div>
-                    </div>
-                    <div className='flex flex-col gap-4  items-center justify-center'>
-
+                    <div className='flex flex-col gap-2 items-center justify-center'>
                         <div>
                             <h1 className='text-center text-4xl'>Informacje</h1>
+                            <p className='text-center'>{StatusLabels[noteCC.status]}</p>
                         </div>
 
+                        {/* Wykres */}
                         <div className="col-span-12 md:col-span-2 md:row-span-2 flex justify-center items-center">
-                            <div className="radial-progress" style={{ "--value": "70", "--size": "12rem", "--thickness": "2px" }}>70%</div>
+                            <div className='mt-5'><Arced value={noteCC.getRate()} /></div>
                         </div>
 
-                        <div className='flex flex-col'>
-                            <label>Coaching za miesiąc</label>
-                            <input type="text" placeholder="" className="input input-bordered w-full max-w-xs" />
-                        </div>
-                        <div className='flex flex-col'>
-                            <label>Data przeprowadzenia coachingu</label>
-                            <input type="date" className="input input-bordered w-full max-w-xs" />
-                        </div>
-                        <div className='flex flex-col'>
-                            <label>Coach</label>
-                            <input type="text" placeholder="" className="input input-bordered w-full max-w-xs" />
-                        </div>
-                        <div className='flex flex-col'>
-                            <label>Agent</label>
-                            <input type="text" placeholder="" className="input input-bordered w-full max-w-xs" />
+                        <div className='flex md:flex-col items-center justify-center'>
+                            <label className="form-control w-full max-w-xs">
+                                <div className="label">
+                                    <span>Coaching za miesiąc</span>
+                                </div>
+                                <input
+                                    className="input input-bordered input-info max-w-md w-72"
+                                    type="date"
+                                    disabled
+                                    defaultValue={noteCC.mode != Rate_Mode.NEW_ as Rate_Mode ? noteCC.appliesDate : new Date().toLocaleDateString('en-CA')} />
+                            </label>
+                            <label className="form-control w-full max-w-xs">
+                                <div className="label">
+                                    <span>Data przeprowadzenia coachingu</span>
+                                </div>
+                                <input
+                                    className="input input-bordered input-info max-w-md w-72"
+                                    type="date"
+                                    disabled={prewievMode}
+                                    defaultValue={noteCC.mode != Rate_Mode.NEW_ as Rate_Mode ? noteCC.coachDate : ""}
+                                    onChange={e => noteCC.coachDate = e.target.value}
+                                />
+                            </label>
+                            <label className="form-control w-full max-w-xs">
+                                <div className="label">
+                                    <span>Coach</span>
+                                </div>
+                                <input
+                                    className="input input-bordered input-info max-w-md w-72"
+                                    value={''}
+                                    type="text"
+                                />
+                            </label>
+                            <label className="form-control w-full max-w-xs">
+                                <div className="label">
+                                    <span>Agent</span>
+                                </div>
+                                <input
+                                    className="input input-bordered input-info max-w-md w-72"
+                                    value={''}
+                                    type="text"
+                                />
+                            </label>
                         </div>
                     </div>
                 </div>
-
                 <div className='flex flex-col ml-10 '>
                     <div className="tabs">
 
@@ -108,18 +143,25 @@ const page = () => {
 
                             <div className='flex sm:flex-col md:flex-row gap-4'>
                                 <div className='flex flex-col mt-2'>
-                                    <label htmlFor="">   Zalecenia (Bieżący Coaching)</label>
-                                    <textarea className="textarea textarea-bordered textarea-lg w-full max-w-7xl" placeholder=""></textarea>
+                                    <label className="form-control w-full max-w-xs">
+                                        <div className="label">
+                                            <span>Zalecenia (Bieżący Coaching)</span>
+                                        </div>
+                                        <textarea className="textarea textarea-bordered textarea-lg w-full max-w-7x"
+                                        />
+                                    </label>
                                 </div>
 
                                 <div className='flex flex-col mt-2'>
-                                    <label htmlFor="">     Zalecenia (Poprzedni Coaching)</label>
-                                    <textarea className="textarea textarea-bordered textarea-lg w-full max-w-xs" placeholder=""></textarea>
+                                    <label className="form-control w-full max-w-xs">
+                                        <div className="label">
+                                            <span>Zalecenia (Poprzedni Coaching)</span>
+                                        </div>
+                                        <textarea className="textarea textarea-bordered textarea-lg w-full max-w-7x"
+                                        />
+                                    </label>
                                 </div>
                             </div>
-
-
-
                         </div>
 
                         {/* # Dashboard TAB */}
@@ -251,4 +293,4 @@ const page = () => {
     )
 }
 
-export default page
+export default NoteCC_Page
