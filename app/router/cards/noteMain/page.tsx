@@ -141,9 +141,7 @@ export const NoteMain = () => {
                         placeholder="Type here"
                         className="input input-bordered w-full max-w-xs" />
                     <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
-                        Pobierz dane
-                        +
-
+                        Pobierz dane+
                     </button>
                 </div>
             </div>
@@ -195,7 +193,9 @@ export const NoteMain = () => {
                                     <tr key={index}
                                         onClick={() => {
                                             setSelectedNoteCC(noteCC);
+                                            console.log('ID :', noteCC.id);
                                             setRowIndex(index)
+                                            
                                         }}
                                         className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
                                             } cursor-pointer`}>
@@ -212,8 +212,15 @@ export const NoteMain = () => {
 
                     <div className={`flex gap-2 mt-2 disabled: ${selectedNoteCC.id > - 1} `}>
 
-                        <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`} href="/router/cards/noteCC" >
-                            <button className="btn btn-outline btn-info btn-sm" disabled={selectedNoteCC.id === -1}>Rozpocznij coaching</button>
+                        <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`} 
+                            href={{
+                                pathname: "/router/cards/noteCC",
+                                query: {noteCCDate: JSON.stringify(selectedNoteCC) }
+                                
+                            }}>
+                            <button className="btn btn-outline btn-info btn-sm" disabled={selectedNoteCC.id === -1}>
+                                {selectedNoteCC.id > 0 ? 'Podgląd' : 'Rozpocznij coaching'}
+                                </button>
                         </Link>
 
                         <button className="btn btn-outline btn-error btn-sm">Usuń</button>

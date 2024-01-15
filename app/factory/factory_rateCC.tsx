@@ -67,3 +67,24 @@ export function CreateNoteCC(typeRate: Type_RateCC, mode: Rate_Mode, id_note: nu
     rateCC.ratePart = allRatePart;
 }
 
+
+export function getRateCC_Rate(rateCC:RateCC): number {
+
+    let rate: number = 0;
+
+    rateCC.ratePart.forEach(e => {
+        rate = rate + e.ocena;
+    });
+
+    rate = rate + (rateCC.extraScore / 100);
+    rate = rate > 1 ? 1 : rate < 0 ? 0 : rate;
+
+    return rate;
+}
+
+export function getRateCC_RateAs100(rateCC:RateCC): number {
+
+    const rate = getRateCC_Rate(rateCC) * 100;
+    return Math.round(rate);
+}
+

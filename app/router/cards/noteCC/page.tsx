@@ -1,23 +1,62 @@
 'use client'
 import { Rate_Mode, StatusLabels } from '@/app/classes/enums';
-import { CreateNewEmptyNoteCC } from '@/app/factory/factory_noteCC';
-import React, { useState } from 'react'
+import { CreateNewEmptyNoteCC, getNoteCC_Rate } from '@/app/factory/factory_noteCC';
+import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Arced } from '../../components/chart/rateCC_chart';
+import { getActiveUserRole } from '@/app/global';
+import { Role } from '@/app/classes/user';
+import { useSearchParams } from 'next/navigation';
+import { NoteCC } from '@/app/classes/noteCC';
 
 const NoteCC_Page = () => {
+
+    // ====== Ustawienie i kontrola active usera ==========================================
+    let isPermit: boolean = false;
+
+    if (getActiveUserRole() === Role.ADMIN_ || getActiveUserRole() === Role.COACH_) {
+        isPermit = true;
+    }
 
     const [noteCC, setNoteCC] = useState(CreateNewEmptyNoteCC());
     const [prewievMode, setPreviewMode] = useState(false);
 
     const [noteTab, setOpenNoteTab] = React.useState(1);
     const [rateTab, setOpenRateTab] = React.useState(1);
+    const [prevNoteHide, setPrevNoteHide] = React.useState(true);
 
+    const searchParams = useSearchParams();
+    const noteCCDate = searchParams.get('noteCCDate');
 
+    useEffect(() => {
+        if (noteCCDate != null) {
+            const parsedNoteCC: NoteCC = JSON.parse(noteCCDate);
+            setNoteCC(parsedNoteCC);
+            setPreviewMode(parsedNoteCC.id > 0);
+        }
+    }, [noteCCDate]);
+
+    function editBtn_Click() {
+
+        if (isPermit) {
+            noteCC.mode = Rate_Mode.EDIT_;
+            setPreviewMode(false)
+            toast.warning("Włączono tryb edycji", {
+                position: toast.POSITION.TOP_RIGHT,
+                theme: "dark"
+            });
+        } else {
+            toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
+        }
+    }
+
+    function getNoteCC_Ratete(noteCC: NoteCC): number {
+        throw new Error('Function not implemented.');
+    }
 
     return (
-        <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
+        <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
 
             {/* Nagłówek */}
@@ -30,7 +69,9 @@ const NoteCC_Page = () => {
                         <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                             <button className="btn btn-outline btn-info btn-sm">Zatwierdź</button>
                             <button className="btn btn-outline btn-info btn-sm">Zamknij BEZ</button>
-                            <button className="btn btn-outline btn-info btn-sm">Włącz edytowanie</button>
+                            <button
+                                className="btn btn-outline btn-info btn-sm"
+                                disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
                             <button className="btn btn-outline btn-info btn-sm">Export do xls</button>
                             <button className="btn btn-outline btn-info btn-sm">Export do mail</button>
                         </ul>
@@ -60,10 +101,10 @@ const NoteCC_Page = () => {
 
                         {/* Wykres */}
                         <div className="col-span-12 md:col-span-2 md:row-span-2 flex justify-center items-center">
-                            <div className='mt-5'><Arced value={noteCC.getRate()} /></div>
+                            <div className='mt-5'><Arced value={getNoteCC_Rate(noteCC)} /></div>
                         </div>
 
-                        <div className='flex md:flex-col items-center justify-center'>
+                        <div className='flex flex-col items-center justify-center'>
                             <label className="form-control w-full max-w-xs">
                                 <div className="label">
                                     <span>Coaching za miesiąc</span>
@@ -92,7 +133,8 @@ const NoteCC_Page = () => {
                                 </div>
                                 <input
                                     className="input input-bordered input-info max-w-md w-72"
-                                    value={''}
+                                    disabled
+                                    defaultValue={noteCC.coach.nameUser}
                                     type="text"
                                 />
                             </label>
@@ -102,14 +144,23 @@ const NoteCC_Page = () => {
                                 </div>
                                 <input
                                     className="input input-bordered input-info max-w-md w-72"
-                                    value={''}
+                                    disabled
+                                    defaultValue={noteCC.agent.nameUser}
                                     type="text"
                                 />
                             </label>
+                            <div className='mt-4'>
+                                <button className="btn btn-outline btn-info btn-md"
+                                    disabled={noteCC.mode != Rate_Mode.PREVIEW_ as Rate_Mode ? true : false}>
+                                    Zatwierdż
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className='flex flex-col ml-10 '>
+
+                {/* Zakładki - Main DIV */}
+                <div className='flex flex-col ml-10 w-full'>
                     <div className="tabs">
 
                         <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (noteTab === 1 ? " tab-active " : "")
@@ -136,31 +187,35 @@ const NoteCC_Page = () => {
                     </div>
 
                     {/* <!-- Tab content --> */}
-                    <div className=" flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
+                    <div className=" flex flex-col break-words mb-6 tab-content tab-space ">
 
                         {/* # Zalecenia TAB */}
                         <div className={noteTab === 1 ? "block" : "hidden"} id="link1">
+                            <div className='flex flex-col mt-2'>
+                                <label className="form-control w-full">
+                                    <div className="label">
+                                        <span>Zalecenia (Bieżący Coaching)</span>
+                                    </div>
+                                    <textarea className="textarea textarea-bordered textarea-lg w-full"
+                                        disabled={prewievMode}
+                                        defaultValue={noteCC.zalecenia}
+                                        onChange={e => noteCC.zalecenia = e.target.value}
+                                    />
+                                </label>
+                            </div>
 
-                            <div className='flex sm:flex-col md:flex-row gap-4'>
-                                <div className='flex flex-col mt-2'>
-                                    <label className="form-control w-full max-w-xs">
-                                        <div className="label">
-                                            <span>Zalecenia (Bieżący Coaching)</span>
-                                        </div>
-                                        <textarea className="textarea textarea-bordered textarea-lg w-full max-w-7x"
-                                        />
-                                    </label>
-                                </div>
-
-                                <div className='flex flex-col mt-2'>
-                                    <label className="form-control w-full max-w-xs">
-                                        <div className="label">
-                                            <span>Zalecenia (Poprzedni Coaching)</span>
-                                        </div>
-                                        <textarea className="textarea textarea-bordered textarea-lg w-full max-w-7x"
-                                        />
-                                    </label>
-                                </div>
+                            <div className='flex flex-col mt-2'>
+                                <label className="form-control w-full">
+                                    <div className="label">
+                                        <span>Zalecenia (Poprzedni Coaching)</span>
+                                        <button className='btn btn-outline btn-info btn-sm'
+                                            onClick={() => setPrevNoteHide(!prevNoteHide)}
+                                        >{prevNoteHide === true ? 'Pokaż' : 'Ukryj'}</button>
+                                    </div>
+                                    <textarea className={`textarea textarea-bordered textarea-lg w-full ${prevNoteHide === true ? 'hidden' : ''}`}
+                                        disabled
+                                    />
+                                </label>
                             </div>
                         </div>
 
@@ -171,7 +226,8 @@ const NoteCC_Page = () => {
 
                         {/* # Odwołanie TAB */}
                         <div className={noteTab === 3 ? "block" : "hidden"} id="link3">
-                            <textarea className="textarea textarea-bordered" placeholder="Bio"></textarea>
+                            <textarea className={`textarea textarea-bordered textarea-lg w-full ${prevNoteHide === true ? 'hidden' : ''}`}
+                                disabled />
                         </div>
 
                     </div>
@@ -195,7 +251,7 @@ const NoteCC_Page = () => {
                     </div>
 
                     {/* <!-- Tab content --> */}
-                    <div className=" flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
+                    <div className=" flex flex-col md:w-96 lg:w-full  break-words mb-6 tab-content tab-space">
 
                         {/* # Rozmowy TAB */}
                         <div className={rateTab === 1 ? "block" : "hidden"} id="link1">
@@ -210,28 +266,21 @@ const NoteCC_Page = () => {
                                             <th>Ocena</th>
                                             <th>Data Oceny</th>
                                             <th>Data udost.</th>
-                                            <th>Coaching id.</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {/* row 1 */}
-                                        <tr className="bg-base-200">
-                                            <td>Cy Ganderton</td>
-                                            <td>Quality Control Specialist</td>
-                                            <td>Blue</td>
-                                        </tr>
-                                        {/* row 2 */}
-                                        <tr>
-                                            <td>Hart Hagerty</td>
-                                            <td>Desktop Support Technician</td>
-                                            <td>Purple</td>
-                                        </tr>
-                                        {/* row 3 */}
-                                        <tr>
-                                            <td>Brice Swyre</td>
-                                            <td>Tax Accountant</td>
-                                            <td>Red</td>
-                                        </tr>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {noteCC.rateCC_Col.map((rateCC, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-200 cursor-pointer">
+                                                    <td>{rateCC.dateCall}</td>
+                                                    <td>{rateCC.queue.nameQueue}</td>
+                                                    <td>{rateCC.rate}</td>
+                                                    <td>{rateCC.dateRate}</td>
+                                                    <td>{rateCC.dateShare}</td>
+                                                </tr>
+                                            )
+                                        })}
+
                                     </tbody>
                                 </table>
                                 <div className='flex gap-2 mt-2'>
@@ -250,29 +299,9 @@ const NoteCC_Page = () => {
                                             <th>Ocena</th>
                                             <th>Data Oceny</th>
                                             <th>Data udost.</th>
-                                            <th>Coaching id.</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {/* row 1 */}
-                                        <tr className="bg-base-200">
-                                            <td>Cy Ganderton</td>
-                                            <td>Quality Control Specialist</td>
-                                            <td>Blue</td>
-                                        </tr>
-                                        {/* row 2 */}
-                                        <tr>
-                                            <td>Hart Hagerty</td>
-                                            <td>Desktop Support Technician</td>
-                                            <td>Purple</td>
-                                        </tr>
-                                        {/* row 3 */}
-                                        <tr>
-                                            <td>Brice Swyre</td>
-                                            <td>Tax Accountant</td>
-                                            <td>Red</td>
-                                        </tr>
-                                    </tbody>
+
                                 </table>
                                 <div className='flex gap-2 mt-2'>
                                     <button className="btn btn-outline btn-info btn-sm">Podgląd</button>
@@ -282,11 +311,6 @@ const NoteCC_Page = () => {
 
 
                     </div>
-
-
-
-
-
                 </div>
             </div>
         </div>

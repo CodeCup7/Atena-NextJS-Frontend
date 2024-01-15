@@ -69,30 +69,8 @@ export class RateCC {
 		};
 	}
 
-	public getRate(): number {
 
-		let rate: number = 0;
-
-		this.ratePart.forEach(e => {
-			rate = rate + e.ocena;
-		});
-
-		rate = rate + (this.extraScore / 100);
-		rate = rate > 1 ? 1 : rate < 0 ? 0 : rate;
-
-		return rate;
-	}
-
-	public getRateAs100(): number {
-
-		const rate = this.getRate() * 100;
-		return Math.round(rate);
-	}
 
 }
 
-
-function UseInterceptors(ClassSerializerInterceptor: any): (target: typeof RateCC, context: ClassDecoratorContext<typeof RateCC>) => void | typeof RateCC {
-	throw new Error("Function not implemented.");
-}
 

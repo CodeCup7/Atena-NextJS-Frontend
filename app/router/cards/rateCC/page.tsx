@@ -4,8 +4,8 @@ import { Queue } from '@/app/classes/queue';
 import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { queueList } from '@/app/factory/factory_queue';
-import { CreateNewEmptyRateCC, } from '@/app/factory/factory_rateCC';
-import { getActiveUser, getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
+import { CreateNewEmptyRateCC, getRateCC_RateAs100, } from '@/app/factory/factory_rateCC';
+import { getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
 import { getWagRateCC, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import { useSearchParams } from 'next/navigation';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { api_rateCC_add } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
+import { getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 
 const RateCC_Page = () => {
 
@@ -55,12 +56,12 @@ const RateCC_Page = () => {
     }, [rateCC])
 
     // RateCC hooks
-    const [wiedzaScore, setWiedzaScore] = useState(rateCC.wiedzaBlock.getRateAs100());
-    const [obsługaScore, setObsługaScore] = useState(rateCC.obslugaBlock.getRateAs100());
-    const [technikaScore, setTechnikaScore] = useState(rateCC.technikaBlock.getRateAs100());
-    const [standardScore, setStandardScore] = useState(rateCC.standardBlock.getRateAs100());
-    const [komunikacjaScore, setKomunikacjaScore] = useState(rateCC.komunikacjaBlock.getRateAs100());
-    const [score, setScore] = useState(rateCC.getRateAs100());
+    const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateCC.wiedzaBlock));
+    const [obsługaScore, setObsługaScore] = useState(getRateBlock_RateAs100(rateCC.obslugaBlock));
+    const [technikaScore, setTechnikaScore] = useState(getRateBlock_RateAs100(rateCC.technikaBlock));
+    const [standardScore, setStandardScore] = useState(getRateBlock_RateAs100(rateCC.standardBlock));
+    const [komunikacjaScore, setKomunikacjaScore] = useState(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
+    const [score, setScore] = useState(getRateCC_RateAs100(rateCC));
 
     // ====== Ustawienie i kontrola active usera ==========================================
     let isPermit: boolean = false;
@@ -89,12 +90,12 @@ const RateCC_Page = () => {
     // Update wartości
     function updateRateCC(rateCC: RateCC) {
         setRateCC(rateCC);
-        setWiedzaScore(rateCC.wiedzaBlock.getRateAs100());
-        setObsługaScore(rateCC.obslugaBlock.getRateAs100());
-        setTechnikaScore(rateCC.technikaBlock.getRateAs100());
-        setStandardScore(rateCC.standardBlock.getRateAs100());
-        setKomunikacjaScore(rateCC.komunikacjaBlock.getRateAs100());
-        setScore(rateCC.getRateAs100());
+        setWiedzaScore(getRateBlock_RateAs100(rateCC.wiedzaBlock));
+        setObsługaScore(getRateBlock_RateAs100(rateCC.obslugaBlock));
+        setTechnikaScore(getRateBlock_RateAs100(rateCC.technikaBlock));
+        setStandardScore(getRateBlock_RateAs100(rateCC.standardBlock));
+        setKomunikacjaScore(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
+        setScore(getRateCC_RateAs100(rateCC));
     }
 
     // ======  Funkcje obsługujące przyciski ==========================================

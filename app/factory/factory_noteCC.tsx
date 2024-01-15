@@ -7,12 +7,12 @@ import { NoteCC } from "../classes/noteCC";
 import { RateCC } from "../classes/rateCC";
 import { RateM } from "../classes/rateM";
 import { Role, User } from "../classes/user";
-import { CreateNewEmptyRateCC } from "./factory_rateCC";
+import { CreateNewEmptyRateCC, getRateCC_Rate } from "./factory_rateCC";
 import { getActiveUser } from "../global";
 import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";
 
 
-export function CreateNewEmptyNoteCC() {
+export function CreateNewEmptyNoteCC(): NoteCC {
 
     let noteCC = new NoteCC();
     noteCC.status = Status_Note.NO_START
@@ -39,6 +39,23 @@ export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach
 
 }
 
+export function getNoteCC_Rate(noteCC: NoteCC): number {
+
+    let rate: number = 0;
+
+    noteCC.rateCC_Col.forEach(e => {
+        rate = rate + getRateCC_Rate(e);
+    });
+
+    return rate;
+}
+
+export function getNoteCC_RateAs100(noteCC: NoteCC): number {
+
+    const rate = getNoteCC_Rate(noteCC) * 100;
+    return Math.round(rate);
+}
+
 export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteList: Array<NoteCC>, appliesDate: string) {
 
     let foundFlag: boolean = false;
@@ -46,7 +63,7 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
     let id: number = 0; // KASUJ
 
     const rateListNoNote = await api_rateCC_getAllRateNoNote();
-    
+
     userList.forEach(user => {
 
         if (user.role === Role.AGENT_ && user.available === true) {
@@ -73,7 +90,7 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
 
                 //Dodanie do noteCC rateCC
                 rateListNoNote.forEach(rateCC => {
-                    if(rateCC.agent.id = user.id){
+                    if (rateCC.agent.id = user.id) {
                         noteCC.rateCC_Col.push(rateCC);
                     }
                 })
@@ -83,21 +100,5 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
     });
 
     return noteListWitnNoStart;
-
-
-
-    function addRateCCToNoteCC(noteCC: NoteCC): void {
-
-        let rateCC = CreateNewEmptyRateCC();
-        rateCC.dateRate = "18.10.2023";
-        rateCC.queue.nameQueue = "test";
-        rateCC.rate = 100;
-        rateCC.dateCall = "19.10.2023";
-        rateCC.dateShare = "20.10.2023";
-
-        noteCC.rateCC_Col.push(rateCC);
-
-    }
-
 
 }
