@@ -16,7 +16,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
 
   return (
     <html lang="en" data-theme="dark">
-      <body className="dark">
+      <body className="dark ">
         <div className="flex flex-col items-center ">
           <header className='flex flex-row bg-neutral-focus w-full max-w-screen-2xl'>
             <div className='basis-1/6 flex flex-row'>
@@ -28,7 +28,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             </div>
           </header>
 
-          <main className='flex w-full'>
+          <main className='flex w-full '>
             {children}
           </main>
 

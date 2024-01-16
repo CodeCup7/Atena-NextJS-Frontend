@@ -17,7 +17,7 @@ export default function Home() {
   }, [currentIndex, images]);
 
   return (
-    <div className="container mx-auto w-full items-center justify-center border-2">
+    <div className="container mx-auto w-full items-center justify-center 2xl:border-x-8 2xl:border-neutral-focus">
 
       <div className="flex flex-row items-center justify-center m-10">
         <Image className='items-center' src={images[currentIndex]} alt="Logo" width={400} height={400} priority />
