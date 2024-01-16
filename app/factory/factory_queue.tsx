@@ -2,6 +2,7 @@
 // '*********************** Queue Factory ****************************************************************************************************
 // '==========================================================================================================================================
 
+import { api_QueueList_getAll } from "../api/queue_api";
 import { Queue } from "../classes/queue";
 
 export function CreateNewEmptyQueue() {
@@ -21,13 +22,14 @@ export function CreateQueue(id: number, nameQueue: string, available: boolean) {
     return queue;
 }
 
-export let queueList: Queue[] = [];
+export let global_queueList: Queue[] = [];
 
-const queue1 = CreateQueue(1, "Zamówienia", true);
-const queue2 = CreateQueue(2, "Cennik", true);
+export async function updateQueueList() {
+    try {
+        global_queueList = await api_QueueList_getAll();
+    } catch (error) {
+        console.error('Błąd pobierania użytkowników:', error);
+    }
 
-const queue3 = CreateQueue(3, "Elektroniczny nadawca", true);
-const queue4 = CreateQueue(4, "E-Sklep", true);
-const queue5 = CreateQueue(5, "Infolinia Eng", true);
-
-queueList.push(queue1, queue2, queue3, queue4, queue5);
+    return global_queueList
+}

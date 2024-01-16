@@ -3,7 +3,7 @@ import { Rate_Mode, Type_RateCC } from '@/app/classes/enums';
 import { Queue } from '@/app/classes/queue';
 import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
-import { queueList } from '@/app/factory/factory_queue';
+import { updateQueueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, getRateCC_RateAs100, } from '@/app/factory/factory_rateCC';
 import { getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
 import { getWagRateCC, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
@@ -24,6 +24,7 @@ const RateCC_Page = () => {
     const [rateCC, setRateCC] = useState(CreateNewEmptyRateCC());
     const [prewievMode, setPreviewMode] = useState(false);
     const [userList, setUserList] = useState<Array<User>>([]);
+    const [queueList, setQueueList] = useState<Array<Queue>>([]);
     const [queue, setQueue] = useState(0);
     const [agent, setAgent] = useState(0);
 
@@ -34,8 +35,10 @@ const RateCC_Page = () => {
         async function fetchData() {
             try {
                 const users = await updateUserList();
+                const queues = await updateQueueList();
                 setRateCC(CreateNewEmptyRateCC());
                 setUserList(users);
+                setQueueList(queues);
             } catch (error) {
                 console.error('Błąd pobierania użytkowników:', error);
             }
@@ -247,7 +250,6 @@ const RateCC_Page = () => {
                     </div>
 
                     <div className="flex flex-col items-center justify-center gap-y-2">
-
                         <select
                             className="select select-info w-72"
                             disabled={prewievMode}
@@ -272,7 +274,8 @@ const RateCC_Page = () => {
                                 setQueue(parseInt(e.target.value));
                             }}>
                             <option value={0} disabled>Wybierz kolejkę ...</option>
-                            {queueList.map((e, index) => (
+                            {queueList.filter(e => e.available === true).map((e, index) => (
+                                
                                 <option key={index} value={e.id}>{e.nameQueue} </option>
                             ))}
                         </select>
