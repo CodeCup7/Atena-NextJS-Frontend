@@ -35,26 +35,6 @@ export async function api_rateCC_add(rateCC: RateCC): Promise<Foo> {
     }
 }
 
-export function api_rateCC_get(): RateCC {
-
-    return new RateCC();
-}
-
-export function api_rateCC_getAll(): [] {
-
-    return [];
-}
-
-export function api_rateCC_deleteRate() {
-
-}
-
-export function api_rateCC_update() {
-
-}
-
-
-
 export async function api_rateCC_getAllRateNoNote(): Promise<RateCC[]> {
     try {
         const response = await fetch('http://localhost:8080/api/rateCC/getAllRateNoNote');

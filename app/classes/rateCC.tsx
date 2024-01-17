@@ -1,8 +1,6 @@
 // '=========================================================================
 // '*********************** C_RateCC CLASS **********************************
 // '=========================================================================
-
-import { CreateNewEmptyRatePart } from "../factory/factory_ratePart";
 import { key_k, key_k1, key_k2, key_k3, key_o, key_o1, key_s, key_s1, key_s2, key_s3, key_s4, key_t, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from "../globalKeys";
 import { Rate_Mode, Type_RateCC } from "./enums";
 import { Queue } from "./queue";
@@ -40,7 +38,6 @@ export class RateCC {
 	toJSON() {
 		return {
 			typeRate: Object.keys(Type_RateCC).find(e => this.typeRate), // Zamiana stringa enum na value enum
-			//typeRate: this.typeRate,
 			id_note: this.id_note,
 			id: this.id,
 			agent: this.agent,
@@ -55,22 +52,14 @@ export class RateCC {
 			extraScoreTxt: this.extraScoreTxt,
 			ratePart: this.ratePart,
 
-			// ratePart: this.ratePart.map((ratePart) => {
-			// 	// Dla każdego obiektu RatePart z listy ratePart, definiujemy, jak chcemy, żeby był serializowany do JSON
-			// 	return {
-			// 		key: ratePart.key,
-			// 		ocena: ratePart.ocena,
-			// 		waga: ratePart.waga,
-			// 		nieprawidlowosci: ratePart.nieprawidlowosci,
-			// 		opis: ratePart.opis,
-			// 		uwagi: ratePart.uwagi,
-			// 	};
-			// }),
+			wiedzaBlock: this.wiedzaBlock,
+			obslugaBlock: this.obslugaBlock,
+			technikaBlock: this.technikaBlock,
+			komunikacjaBlock: this.komunikacjaBlock,
+			standardBlock: this.standardBlock,
+
 		};
 	}
-
-
-
 }
 
 

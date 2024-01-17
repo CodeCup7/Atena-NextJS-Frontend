@@ -15,6 +15,7 @@ import { api_NoteCC_getDate } from '@/app/api/noteCC_api';
 export const NoteMain = () => {
 
     const [rowIndex, setRowIndex] = useState(-1);
+    const [rowRateIndex, setRowRateIndex] = useState(-1);
 
     const [dateValue, setDateValue] = useState('');
     const [openTab, setOpenTab] = useState(1);
@@ -51,9 +52,13 @@ export const NoteMain = () => {
     }, []);
 
     useEffect(() => {
-        const empyNote = new NoteCC();
-        empyNote.id = -1;
-        setSelectedNoteCC(empyNote);
+        const emptyNoteCC = new NoteCC();
+        const emptyRateCC = new RateCC();
+        emptyNoteCC.id = -1;
+        emptyRateCC.id = -1;
+        setSelectedNoteCC(emptyNoteCC);
+        setSelectedRateCC(emptyRateCC)
+        setRowRateIndex(-1);
         setRowIndex(-1);
     }, [noteList]);
 
@@ -68,6 +73,15 @@ export const NoteMain = () => {
             });
         }
     }
+
+    const [checkedRateCC, setCheckedRateCC] = useState<Record<number, boolean>>({});
+
+    const handleCheckboxChange = (id: number) => {
+        setCheckedRateCC((prev) => ({
+            ...prev,
+            [id]: !prev[id] // Zmiana stanu na przeciwny do obecnego
+        }));
+    };
 
     function getCoaching(dateValue: string) {
 
@@ -141,7 +155,10 @@ export const NoteMain = () => {
                         placeholder="Type here"
                         className="input input-bordered w-full max-w-xs" />
                     <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
-                        Pobierz dane+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        Pobierz dane
                     </button>
                 </div>
             </div>
@@ -182,7 +199,12 @@ export const NoteMain = () => {
                                     </select>
                                 </th>
                                 <th>
-                                    <button className='btn' onClick={filterService}>Filtruj</button>
+                                    <button className='btn' onClick={filterService}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                        </svg>
+                                        Filtruj
+                                    </button>
                                 </th>
 
                             </tr>
@@ -193,9 +215,7 @@ export const NoteMain = () => {
                                     <tr key={index}
                                         onClick={() => {
                                             setSelectedNoteCC(noteCC);
-                                            console.log('ID :', noteCC.id);
                                             setRowIndex(index)
-                                            
                                         }}
                                         className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
                                             } cursor-pointer`}>
@@ -212,18 +232,38 @@ export const NoteMain = () => {
 
                     <div className={`flex gap-2 mt-2 disabled: ${selectedNoteCC.id > - 1} `}>
 
-                        <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`} 
+                        <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`}
                             href={{
                                 pathname: "/router/cards/noteCC",
-                                query: {noteCCDate: JSON.stringify(selectedNoteCC) }
-                                
+                                query: { noteCCDate: JSON.stringify(selectedNoteCC) }
+
                             }}>
-                            <button className="btn btn-outline btn-info btn-sm" disabled={selectedNoteCC.id === -1}>
-                                {selectedNoteCC.id > 0 ? 'Podgląd' : 'Rozpocznij coaching'}
+                            {selectedNoteCC.id > 0 ?
+                                <button className="btn btn-outline btn-info btn-sm"
+                                    disabled={selectedNoteCC.id === -1}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                    Podgląd
                                 </button>
+                                :
+                                <button className="btn btn-outline btn-info btn-sm"
+                                    disabled={selectedNoteCC.id === -1}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                                    </svg>
+                                    Rozpocznij coaching
+                                </button>
+                            }
                         </Link>
 
-                        <button className="btn btn-outline btn-error btn-sm">Usuń</button>
+                        <button className="btn btn-outline btn-error btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                            Usuń
+                        </button>
                     </div>
 
                 </div>
@@ -258,24 +298,57 @@ export const NoteMain = () => {
                                     {/* head */}
                                     <thead>
                                         <tr>
+                                            <th><input type="checkbox" className="checkbox" /></th>
                                             <th>Data rozmowy</th>
                                             <th>Kolejka</th>
                                             <th>Ocena</th>
                                             <th>Data Oceny</th>
                                             <th>Data udost.</th>
                                             <th>Coaching id.</th>
+                                            <th>Szczegóły</th>
                                         </tr>
                                     </thead>
                                     <tbody className="table-auto overflow-scroll w-full">
                                         {selectedNoteCC.rateCC_Col.map((rateCC, index) => {
                                             return (
-                                                <tr key={index} className="hover:bg-base-200 cursor-pointer">
+                                                <tr key={index}
+                                                    onClick={() => {
+                                                        setSelectedRateCC(rateCC);
+                                                        setRowRateIndex(index)
+                                                        handleCheckboxChange(index) // Obsługa zaznaczenia checkboxa
+                                                    }}
+                                                    className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>
+                                                        <input type="checkbox" className="checkbox checkbox-info"
+                                                            checked={checkedRateCC[index] || false}
+                                                            onChange={()=>{}}
+                                                        />
+                                                    </td>
                                                     <td>{rateCC.dateCall}</td>
                                                     <td>{rateCC.queue.nameQueue}</td>
                                                     <td>{rateCC.rate}</td>
                                                     <td>{rateCC.dateRate}</td>
                                                     <td>{rateCC.dateShare}</td>
                                                     <td>{selectedNoteCC.id}</td>
+                                                    <td>
+                                                        <Link className="group link link-info link-hover text-lg"
+                                                            href={{
+                                                                pathname: "/router/cards/rateCC",
+                                                                query: { rateData: JSON.stringify(selectedRateCC) }
+                                                                
+                                                            }}>
+                                                            <button className="btn btn-outline btn-info btn-sm"
+                                                            onClick={()=>{
+                                                                console.log(JSON.stringify(selectedRateCC));
+                                                            }}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                                </svg>
+                                                                Podgląd
+                                                            </button>
+                                                        </Link>
+                                                    </td>
                                                 </tr>
                                             )
                                         })}
@@ -283,16 +356,37 @@ export const NoteMain = () => {
                                     </tbody>
                                 </table>
                                 <div className='flex gap-2 mt-2'>
-                                    <button className="btn btn-outline btn-info btn-sm">Nowa</button>
-                                    <button className="btn btn-outline btn-info btn-sm">Podgląd</button>
-                                    <button className="btn btn-outline btn-info btn-sm">Udost. Rozmowy</button>
-                                    <button className="btn btn-outline btn-info btn-sm">Dołącz rozłącz</button>
-                                    <button className="btn btn-outline btn-info btn-sm">Aktualizuj</button>
+
+                                    <Link className="group link link-info link-hover text-lg" href="/router/cards/rateCC">
+                                        <button className="group btn btn-outline btn-info btn-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 group-hover:stroke-blue-50">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            </svg>
+                                            Nowa
+                                        </button>
+                                    </Link>
+
+                                    <button className="btn btn-outline btn-info btn-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                                        </svg>
+                                        Udost. Rozmowy
+                                    </button>
+                                    <button className="btn btn-outline btn-info btn-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                                        </svg>
+                                        Dołącz rozłącz
+                                    </button>
+                                    <button className="btn btn-outline btn-info btn-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                        </svg>
+                                        Aktualizuj
+                                    </button>
                                 </div>
                             </div>
                         </div>
-
-
                         {/* # Maile TAB */}
                         <div className={openTab === 2 ? "block" : "hidden"} id="link2">
 
@@ -310,21 +404,15 @@ export const NoteMain = () => {
                                     <tbody>
                                         {/* row 1 */}
                                         <tr className="bg-base-200">
-                                            <td>Cy Ganderton</td>
-                                            <td>Quality Control Specialist</td>
-                                            <td>Blue</td>
+
                                         </tr>
                                         {/* row 2 */}
                                         <tr>
-                                            <td>Hart Hagerty</td>
-                                            <td>Desktop Support Technician</td>
-                                            <td>Purple</td>
+
                                         </tr>
                                         {/* row 3 */}
                                         <tr>
-                                            <td>Brice Swyre</td>
-                                            <td>Tax Accountant</td>
-                                            <td>Red</td>
+
                                         </tr>
                                     </tbody>
                                 </table>
@@ -344,7 +432,7 @@ export const NoteMain = () => {
                 </div>
             </div>
 
-        </div>
+        </div >
     )
 }
 

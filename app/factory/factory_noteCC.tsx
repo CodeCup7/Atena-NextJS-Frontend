@@ -90,7 +90,7 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
 
                 //Dodanie do noteCC rateCC
                 rateListNoNote.forEach(rateCC => {
-                    if (rateCC.agent.id = user.id) {
+                    if (rateCC.agent.id === user.id) {
                         noteCC.rateCC_Col.push(rateCC);
                     }
                 })

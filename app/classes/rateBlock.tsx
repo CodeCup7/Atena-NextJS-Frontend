@@ -4,7 +4,6 @@
 
 import { RatePart } from "./ratePart";
 
-
 export class RateBlock {
 
     public id: number = 0;
@@ -14,7 +13,4 @@ export class RateBlock {
     constructor(key_: string) {
         this.key = key_
     }
-
-
-
 }

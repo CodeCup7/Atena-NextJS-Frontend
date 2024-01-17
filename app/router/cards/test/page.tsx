@@ -6,9 +6,17 @@ import { useEffect, useState } from "react";
 
 export const Test = () => {
 
+  let rateList;
 
-  const rateList = api_rateCC_getAllRateNoNote();
-  console.log('rateList :', rateList);
+  getData();
+
+  async function getData(){
+    rateList = await api_rateCC_getAllRateNoNote();
+    console.log('rateList :', rateList);
+  }
+
+  
+  
   
 
 
