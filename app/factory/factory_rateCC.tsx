@@ -47,13 +47,15 @@ export function getRateCC_Rate(rateCC:RateCC): number {
     let rate: number = 0;
 
     rateCC.ratePart.forEach(e => {
-        rate = rate + e.ocena;
+        rate = rate + e.ocena * (e.waga / 100);
     });
 
     rate = rate + (rateCC.extraScore / 100);
     rate = rate > 1 ? 1 : rate < 0 ? 0 : rate;
 
+    console.log('rate :', rate);
     return rate;
+    
 }
 
 export function getRateCC_RateAs100(rateCC:RateCC): number {

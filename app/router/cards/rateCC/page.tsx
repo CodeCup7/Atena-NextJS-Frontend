@@ -28,6 +28,7 @@ const RateCC_Page = () => {
     const [queueList, setQueueList] = useState<Array<Queue>>([]);
     const [queue, setQueue] = useState(0);
     const [agent, setAgent] = useState(0);
+    const [extraScore, setExtraScore] = useState(0);
     const [newRateModal, setOpenNewRateModal] = useState(false);
 
     // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
@@ -73,6 +74,9 @@ const RateCC_Page = () => {
     const [standardScore, setStandardScore] = useState(getRateBlock_RateAs100(rateCC.standardBlock));
     const [komunikacjaScore, setKomunikacjaScore] = useState(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
     const [score, setScore] = useState(getRateCC_RateAs100(rateCC));
+    console.log('score :', score);
+
+    
 
     // ====== Ustawienie dodatkowej oceny i tytułu stony ==========================================
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
@@ -101,8 +105,8 @@ const RateCC_Page = () => {
         setScore(getRateCC_RateAs100(rateCC));
         setAgent(rateCC.agent.id)
         setQueue(rateCC.queue.id)
+        setExtraScore(rateCC.extraScore)
     }
-
     function validate(): boolean {
         if (rateCC.agent.id != 0 && rateCC.queue.id != 0 && rateCC.dateCall != "" && rateCC.idCall != "")
             return true;
@@ -251,7 +255,7 @@ const RateCC_Page = () => {
                                     setAgent(parseInt(e.target.value));
                                 }}>
                                 <option value={0} disabled>Wybierz agenta ...</option>
-                                {userList.filter(user => user.role === Role.AGENT_).map((user, index) => (
+                                {userList.filter(user => user.role === Role.AGENT_).map((user) => (
                                     <option key={user.id} value={user.id}>{user.nameUser}</option>
                                 ))}
                             </select>
@@ -268,7 +272,7 @@ const RateCC_Page = () => {
                                     setQueue(parseInt(e.target.value));
                                 }}>
                                 <option value={0} disabled>Wybierz kolejkę ...</option>
-                                {queueList.filter(queue => queue.available === true).map((queue, index) => (
+                                {queueList.filter(queue => queue.available === true).map((queue) => (
                                     <option key={queue.id} value={queue.id}>{queue.nameQueue}</option>
                                 ))}
                             </select>
@@ -293,7 +297,7 @@ const RateCC_Page = () => {
                                 className="input input-bordered input-info max-w-md gap-y-2 w-72"
                                 value={rateCC.coach.nameUser}
                                 disabled
-                                type="text"/>
+                                type="text" />
                         </div>
                     </div>
                     <div className="flex flex-col">
@@ -307,7 +311,7 @@ const RateCC_Page = () => {
                 </div>
                 {/* Wykres */}
                 <div className="col-span-12 md:col-span-2 md:row-span-2 flex justify-center items-center">
-                    <div className='sm:my-5 md:mt-0 mx:ml-4 '><Arced value={score} /></div>
+                    <div className='sm:my-5 md:mt-0 mx:ml-4 '><Arced value={score}/></div>
                 </div>
                 {/* Rate blocks */}
                 <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
@@ -417,11 +421,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -490,11 +494,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -563,11 +567,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t1 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t1 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -633,11 +637,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t2 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t2 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -703,11 +707,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t3 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t3 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -771,11 +775,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t4 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.technikaBlock.ratePart.find(part => part.key === key_t4 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -848,11 +852,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -919,11 +923,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -990,11 +994,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -1064,11 +1068,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s1 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s1 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -1133,11 +1137,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s2 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s2 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -1200,11 +1204,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s3 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s3 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -1271,11 +1275,11 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.ocena : "1"}
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.ocena}
                                             disabled={prewievMode}
                                             onChange={e => {
-                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? part.ocena = parseInt(e.target.value) : 0);
+                                                rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? part.ocena = parseInt(e.target.value) : '0');
                                                 updateRateCC(rateCC);
                                             }}>
                                             {valueOfRatePartCC().map((value, index) => (
@@ -1316,7 +1320,6 @@ const RateCC_Page = () => {
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     {/* # Dodatkowa punktacja TAB */}
@@ -1334,19 +1337,15 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScore : 0}
-
-                                            className="select select-bordered xl:select-lg text-center m-2"
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
+                                            value={extraScore}
                                             onChange={e => {
                                                 rateCC.extraScore = parseInt(e.target.value)
                                                 updateRateCC(rateCC);
                                             }}>
-
                                             {extraScoreScale.map((value, index) => (
-                                                <option key={index} value={value}>
-                                                    {value}
-                                                </option>
+                                                <option key={index} value={value}>{value}</option>
                                             ))}
                                         </select>
                                     </div>
