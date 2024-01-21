@@ -1,29 +1,26 @@
 //================================================================
 //*********************** Global Varible *************************
 //================================================================
-import { Role, User } from "./classes/user";
-import { global_userList } from "./factory/factory_user";
+import { api_UserList_getByLogin } from "./api/user_api";
+import { User } from "./classes/user";
 
 export const app_name: String = "Atena";
 export const app_version: String = "0.0.1";
 
-let activeUser: User = global_userList.find(user => user.nameUser = "Szymon") || new User();
+export async function getActiveUser(login: string): Promise<User> {
 
-export function setActiveUser() {
-    activeUser = global_userList.find(user => user.nameUser = "Szymon") || new User();
-}
+    const activeUser: User = new User();
 
-export function getActiveUser(): User {
-    let activeUser: User = global_userList.find(user => user.nameUser = "Szymon") || new User();
+    try {
+        const activeUser = await api_UserList_getByLogin(login);
+        return activeUser;
+    } catch (error) {
+        console.error('Błąd pobierania użytkowników:', error);
+    }
+
     return activeUser;
 }
 
-export function getActiveUserRole(): Role | null {
-    if (activeUser.role !== undefined) {
-        return activeUser.role;
-    }
-    return null;
-}
 
 // '==========================================================================================================================================
 // '*********************** Wartości ocen ****************************************************************************************************

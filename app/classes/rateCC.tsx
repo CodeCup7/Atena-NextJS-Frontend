@@ -51,15 +51,9 @@ export class RateCC {
 			extraScore: this.extraScore,
 			extraScoreTxt: this.extraScoreTxt,
 			ratePart: this.ratePart,
-
-			wiedzaBlock: this.wiedzaBlock,
-			obslugaBlock: this.obslugaBlock,
-			technikaBlock: this.technikaBlock,
-			komunikacjaBlock: this.komunikacjaBlock,
-			standardBlock: this.standardBlock,
-
 		};
 	}
+
 }
 
 

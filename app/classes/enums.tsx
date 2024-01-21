@@ -26,5 +26,4 @@ export enum Rate_Mode {
     EDIT_ = "Edycja",
     PREVIEW_ = "Podgląd",
     LOAD_ = "Załadowany",
-    ONLY_PREV = "Tylko podgląd",
 };

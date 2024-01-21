@@ -5,58 +5,66 @@ import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { updateQueueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, getRateCC_RateAs100, } from '@/app/factory/factory_rateCC';
-import { getActiveUserRole, setActiveUser, valueOfRatePartCC } from '@/app/global';
+import { getActiveUser, valueOfRatePartCC } from '@/app/global';
 import { getWagRateCC, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Arced } from '../../components/chart/rateCC_chart';
-import { useSearchParams } from 'next/navigation';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { api_rateCC_add } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
-import { getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
+import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 
 const RateCC_Page = () => {
 
-    setActiveUser();
-    // Sprawdzenie czy to nowa ocena czy podgląd / edycja
-    const [rateCC, setRateCC] = useState(CreateNewEmptyRateCC());
+    // ====== Ustawienie i kontrola active usera ==========================================
+    const [isPermit, setIsPermit] = useState(false);
+    const [refresh, setRefresh] = useState(false);
+
+    const [rateCC, setRateCC] = useState(new RateCC());
     const [prewievMode, setPreviewMode] = useState(false);
     const [userList, setUserList] = useState<Array<User>>([]);
     const [queueList, setQueueList] = useState<Array<Queue>>([]);
     const [queue, setQueue] = useState(0);
     const [agent, setAgent] = useState(0);
+    const [newRateModal, setOpenNewRateModal] = useState(false);
 
-    const searchParams = useSearchParams();
-    const rateData = searchParams.get('rateData');
-
+    // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
+
         async function fetchData() {
+
+            const activeUser = await getActiveUser('Admin');
+            const isPermit: boolean = activeUser.role === Role.ADMIN_ || activeUser.role === Role.COACH_;
+            setIsPermit(isPermit);
             try {
                 const users = await updateUserList();
                 const queues = await updateQueueList();
-                setRateCC(CreateNewEmptyRateCC());
                 setUserList(users);
                 setQueueList(queues);
+
+                const rateCC_prev = localStorage.getItem('rateCC_prev');
+
+                if (rateCC_prev != null) {
+                    const previewRateCC = JSON.parse(rateCC_prev);
+                    previewRateCC.mode = Rate_Mode.PREVIEW_;
+                    updateRateCC(previewRateCC);
+                } else {
+                    const newRateCC = CreateNewEmptyRateCC(users.find(user => user.nameUser === 'Admin') || new User());
+                    updateRateCC(newRateCC);
+                }
+
             } catch (error) {
-                console.error('Błąd pobierania użytkowników:', error);
+                console.log('Błąd useEffect', error);
             }
         }
         fetchData();
-    }, []);
-
-    // Sprawdzenie czy jako parametr nie została wysłana ocena - jeżeli tak ustawienie jej jako obiekt do podglądu / edycji
-    useEffect(() => {
-        if (rateData != null) {
-            const parsedRate = JSON.parse(rateData);
-            setRateCC(parsedRate);
-        }
-    }, [rateData]);
+    }, [refresh]);
 
     useEffect(() => {
         rateCC.mode === Rate_Mode.NEW_ ? setPreviewMode(false) : setPreviewMode(true);
-    }, [rateCC])
+    }, [rateCC.mode])
 
     // RateCC hooks
     const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateCC.wiedzaBlock));
@@ -65,13 +73,6 @@ const RateCC_Page = () => {
     const [standardScore, setStandardScore] = useState(getRateBlock_RateAs100(rateCC.standardBlock));
     const [komunikacjaScore, setKomunikacjaScore] = useState(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
     const [score, setScore] = useState(getRateCC_RateAs100(rateCC));
-
-    // ====== Ustawienie i kontrola active usera ==========================================
-    let isPermit: boolean = false;
-
-    if (getActiveUserRole() === Role.ADMIN_ || getActiveUserRole() === Role.COACH_) {
-        isPermit = true;
-    }
 
     // ====== Ustawienie dodatkowej oceny i tytułu stony ==========================================
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
@@ -89,8 +90,7 @@ const RateCC_Page = () => {
         cardName = 'Tajemniczy Klient';
     }
 
-    // ====== Funkcje ==========================================
-    // Update wartości
+    // ====== FUNKCJE ==========================================
     function updateRateCC(rateCC: RateCC) {
         setRateCC(rateCC);
         setWiedzaScore(getRateBlock_RateAs100(rateCC.wiedzaBlock));
@@ -99,9 +99,26 @@ const RateCC_Page = () => {
         setStandardScore(getRateBlock_RateAs100(rateCC.standardBlock));
         setKomunikacjaScore(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
         setScore(getRateCC_RateAs100(rateCC));
+        setAgent(rateCC.agent.id)
+        setQueue(rateCC.queue.id)
     }
 
-    // ======  Funkcje obsługujące przyciski ==========================================
+    function validate(): boolean {
+        if (rateCC.agent.id != 0 && rateCC.queue.id != 0 && rateCC.dateCall != "" && rateCC.idCall != "")
+            return true;
+        else {
+            return false;
+        }
+    }
+
+    function newBtn_Click() {
+        setOpenNewRateModal(true);
+        localStorage.removeItem('rateCC_prev');
+        const newRateCC = CreateNewEmptyRateCC(userList.find(user => user.nameUser === 'Admin') || new User());
+        updateRateCC(newRateCC);
+    }
+
+    // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {
 
         if (validate()) {
@@ -142,46 +159,15 @@ const RateCC_Page = () => {
         }
     }
 
-    // Pozostałe funkcje
-    function validate(): boolean {
-
-        if (rateCC.agent.id != 0 && rateCC.queue.id != 0 && rateCC.dateCall != "" && rateCC.idCall != "")
-            return true;
-        else {
-            return false;
-        }
-    }
-
-    const [newRateModal, setOpenNewRateModal] = useState(false);
-
-    function newBtn_Click() {
-        setOpenNewRateModal(true);
-        setRateCC(CreateNewEmptyRateCC());
-    }
-    function handlenNewRateOkClick(refresh: boolean) {
-
-        // W przypadku przejścia ze stony z parametrem onPrev szukamy tego parametru i go usuwamy
-        const currentURL = new URL(window.location.href);// Pobieramy aktualny URL
-        const newSearchParams = new URLSearchParams(currentURL.search); // Tworzymy nowy obiekt URLSearchParams na podstawie aktualnego URL
-        newSearchParams.delete('onPrev');// Usuwamy niechciany parametr (np. "key")
-        const newURL = currentURL.origin + currentURL.pathname + '?' + newSearchParams.toString();// Aktualizujemy adres URL bez niechcianego parametru
-        window.history.replaceState(null, '', newURL);// Ustawiamy nowy adres URL
-        if (refresh) {
-            window.location.reload();
-        }
-    }
-
-    // Kontrola odświeżenia strony. 
-    useEffect(() => {
-        if (window.performance) {
-            handlenNewRateOkClick(false);
-        }
-    }, []);
-
+    // ====================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
-            <ConfirmDialog open={newRateModal} onClose={() => setOpenNewRateModal(false)} onConfirm={() => handlenNewRateOkClick(true)} title='Potwierdź decyzję' content='Czy napewno chcesz otworzyć nową ocenę ?' />
+            <ConfirmDialog open={newRateModal} onClose={() => setOpenNewRateModal(false)} onConfirm={() => {
+                window.location.reload();
+                setRefresh(!refresh)
+            }}
+                title='Potwierdź decyzję' content='Czy napewno chcesz otworzyć nową ocenę ?' />
             {/* Nagłówek */}
             <div className='grid grid-cols-12'>
                 <div className="col-span-2 navbar-start">
@@ -198,22 +184,21 @@ const RateCC_Page = () => {
                             </button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
+                                disabled={isPermit ? prewievMode ? false : true : true} onClick={editBtn_Click}>Włącz edytowanie</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={isPermit && prewievMode} onClick={rateBtn_Click}>Oceń</button>
+                                disabled={isPermit ? prewievMode ? true : false : true} onClick={rateBtn_Click}>Oceń</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit}>Zapisz</button>
+                                disabled={isPermit ? prewievMode ? true : false : true}>Zapisz</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit}>Wczytaj</button>
+                                disabled={isPermit ? prewievMode ? true : false : true}>Wczytaj</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit}>Spr. Pisownie</button>
+                                disabled={isPermit ? prewievMode ? true : false : true}>Spr. Pisownie</button>
                             <button
-                                className="btn btn-outline btn-info btn-sm">
-                                Export do xls</button>
+                                className="btn btn-outline btn-info btn-sm">Export do xls</button>
                         </ul>
                     </div>
                 </div>
@@ -230,77 +215,90 @@ const RateCC_Page = () => {
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
 
             {/* Main */}
-            <div className='grid md:grid-cols-12 md:grid-rows-2 gap-x-2 gap-y-2 mt-5 justify-center items-center'>
+            <div className='grid md:grid-cols-12 md:grid-rows-2 gap-x-2 mt-4 justify-center items-center'>
 
                 {/* Podstawowe informacje */}
                 <div className="col-span-10 grid md:grid-cols-2 2xl:grid-cols-4 gap-2">
-
-                    <div className="flex md:flex-col gap-2 items-center justify-center" >
-                        <input type="date"
-                            className="input input-bordered input-info min-w-fit"
-                            disabled={prewievMode}
-                            defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.dateRate : new Date().toLocaleDateString('en-CA')} />
-                        <input
-                            type="date"
-                            className="input input-bordered input-info min-w-fit"
-                            disabled={prewievMode}
-                            defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.dateCall : ""}
-                            onChange={e => rateCC.dateCall = e.target.value}
-                        />
+                    <div className="flex md:flex-col items-center justify-center" >
+                        <div className="flex flex-col">
+                            <span className="label-text">Data oceny</span>
+                            <input type="date"
+                                className="input input-bordered input-info min-w-fit"
+                                disabled
+                                defaultValue={rateCC.dateRate} />
+                        </div>
+                        <div className="flex flex-col mt-2">
+                            <span className="label-text">Data rozmowy</span>
+                            <input
+                                type="date"
+                                className="input input-bordered input-info min-w-fit"
+                                disabled={prewievMode}
+                                defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.dateCall : ""}
+                                onChange={e => rateCC.dateCall = e.target.value}
+                            />
+                        </div>
                     </div>
 
-                    <div className="flex flex-col items-center justify-center gap-y-2">
-                        <select
-                            className="select select-info w-72"
-                            disabled={prewievMode}
-                            value={agent}
-                            onChange={e => {
-                                rateCC.agent = userList.find(user => user.id = parseInt(e.target.value)) || new User()
-                                setAgent(parseInt(e.target.value));
-                            }}>
-                            <option value={0} disabled>Wybierz agenta ...</option>
-                            {userList.filter(user => user.role === Role.AGENT_).map((user, index) => (
-                                <option key={user.id} value={user.id}>{user.nameUser}</option>
-                            ))}
+                    <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col mt-2">
+                            <span className="label-text">Agent</span>
+                            <select
+                                className="select select-info w-72"
+                                disabled={prewievMode}
+                                value={agent}
+                                onChange={e => {
+                                    rateCC.agent = userList.find(user => user.id === parseInt(e.target.value)) || new User()
+                                    setAgent(parseInt(e.target.value));
+                                }}>
+                                <option value={0} disabled>Wybierz agenta ...</option>
+                                {userList.filter(user => user.role === Role.AGENT_).map((user, index) => (
+                                    <option key={user.id} value={user.id}>{user.nameUser}</option>
+                                ))}
+                            </select>
+                        </div>
 
-                        </select>
-
-                        <select
-                            className="select select-info  w-72 "
-                            disabled={prewievMode}
-                            value={queue}
-                            onChange={e => {
-                                rateCC.queue = queueList.find(queue => queue.id = parseInt(e.target.value)) || new Queue()
-                                setQueue(parseInt(e.target.value));
-                            }}>
-                            <option value={0} disabled>Wybierz kolejkę ...</option>
-                            {queueList.filter(e => e.available === true).map((e, index) => (
-                                
-                                <option key={index} value={e.id}>{e.nameQueue} </option>
-                            ))}
-                        </select>
-
+                        <div className="flex flex-col mt-2">
+                            <span className="label-text">Kolejka</span>
+                            <select
+                                className="select select-info w-72"
+                                disabled={prewievMode}
+                                value={queue}
+                                onChange={e => {
+                                    rateCC.queue = queueList.find(queue => queue.id === parseInt(e.target.value)) || new Queue()
+                                    setQueue(parseInt(e.target.value));
+                                }}>
+                                <option value={0} disabled>Wybierz kolejkę ...</option>
+                                {queueList.filter(queue => queue.available === true).map((queue, index) => (
+                                    <option key={queue.id} value={queue.id}>{queue.nameQueue}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col w-full items-center justify-center gap-y-2">
-                        <input
-                            className="input input-bordered input-info max-w-md gap-y-2 w-72"
-                            defaultValue={rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? rateCC.idCall : ""}
-                            disabled={prewievMode}
-                            type="text"
-                            placeholder="ID Rozmowy"
-                            onChange={e => rateCC.idCall = e.target.value} />
-                        <input
-                            className="input input-bordered input-info max-w-md gap-y-2 w-72"
-                            defaultValue={rateCC.coach.nameUser}
-                            disabled
-                            type="text"
-                            placeholder="Coach" />
-                    </div>
+                    <div className="flex flex-col items-center justify-center">
 
-                    <div className="flex flex-col items-center justify-center gap-y-2">
+                        <div className="flex flex-col mt-2">
+                            <span className="label-text">ID rozmowy</span>
+                            <input
+                                className="input input-bordered input-info max-w-md gap-y-2 w-72"
+                                defaultValue={rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? rateCC.idCall : ""}
+                                disabled={prewievMode}
+                                type="text"
+                                onChange={e => rateCC.idCall = e.target.value} />
+                        </div>
+
+                        <div className="flex flex-col mt-2">
+                            <span className="label-text">Coach</span>
+                            <input
+                                className="input input-bordered input-info max-w-md gap-y-2 w-72"
+                                value={rateCC.coach.nameUser}
+                                disabled
+                                type="text"/>
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="label-text">Temat:</span>
                         <textarea
-                            placeholder="Temat"
                             disabled={prewievMode}
                             defaultValue={rateCC.topic}
                             className="textarea textarea-info max-w-md gap-y-2 w-full h-full"
@@ -419,7 +417,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -438,7 +436,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -449,7 +447,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.uwagi = e.target.value : "")} />
@@ -492,7 +490,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -511,7 +509,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -522,7 +520,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1 ? part.uwagi = e.target.value : "")} />
@@ -565,7 +563,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -584,7 +582,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t1 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -595,7 +593,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t1 ? part.uwagi = e.target.value : "")} />
@@ -635,7 +633,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -654,7 +652,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t2 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -665,7 +663,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t2 ? part.uwagi = e.target.value : "")} />
@@ -705,7 +703,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -724,7 +722,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t3 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -735,7 +733,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t3 ? part.uwagi = e.target.value : "")} />
@@ -773,7 +771,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -792,7 +790,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t4 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -803,7 +801,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.technikaBlock.ratePart.find(part => part.key === key_t4 ? part.uwagi = e.target.value : "")} />
@@ -850,7 +848,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -869,7 +867,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -880,7 +878,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1 ? part.uwagi = e.target.value : "")} />
@@ -921,7 +919,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -940,9 +938,10 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode} />
+                                    disabled={prewievMode}
+                                    onChange={e => rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2 ? part.nieprawidlowosci = e.target.value : "")} />
                             </div>
 
                             <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
@@ -950,7 +949,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2 ? part.uwagi = e.target.value : "")} />
@@ -991,7 +990,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -1010,7 +1009,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -1021,7 +1020,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3 ? part.uwagi = e.target.value : "")} />
@@ -1065,7 +1064,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -1084,7 +1083,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s1 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -1095,7 +1094,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s1 ? part.uwagi = e.target.value : "")} />
@@ -1134,7 +1133,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -1153,7 +1152,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s2 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -1164,7 +1163,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s2 ? part.uwagi = e.target.value : "")} />
@@ -1201,7 +1200,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -1220,7 +1219,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s3 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -1231,7 +1230,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s3 ? part.uwagi = e.target.value : "")} />
@@ -1272,7 +1271,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.ocena : "1"}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.ocena : "1"}
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
                                             onChange={e => {
@@ -1291,7 +1290,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.nieprawidlowosci : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.nieprawidlowosci : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? part.nieprawidlowosci = e.target.value : "")} />
@@ -1302,7 +1301,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Uwagi</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.uwagi : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.uwagi : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? part.uwagi = e.target.value : "")} />
@@ -1335,7 +1334,7 @@ const RateCC_Page = () => {
                                         <label className="label">
                                             <span className="label-text xl:text-2xl">Ocena</span>
                                         </label>
-                                        <select defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScore : 0}
+                                        <select value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScore : 0}
 
                                             className="select select-bordered xl:select-lg text-center m-2"
                                             disabled={prewievMode}
@@ -1358,7 +1357,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Opis</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScoreTxt : ""}
+                                <textarea value={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScoreTxt : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? rateCC.extraScoreTxt = e.target.value : "")} />
