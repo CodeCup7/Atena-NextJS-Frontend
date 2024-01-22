@@ -5,17 +5,17 @@ import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Arced } from '../../components/chart/rateCC_chart';
-import { getActiveUserRole } from '@/app/global';
 import { Role } from '@/app/classes/user';
 import { useSearchParams } from 'next/navigation';
 import { NoteCC } from '@/app/classes/noteCC';
+import { getActiveUser } from '@/app/auth';
 
 const NoteCC_Page = () => {
 
     // ====== Ustawienie i kontrola active usera ==========================================
     let isPermit: boolean = false;
 
-    if (getActiveUserRole() === Role.ADMIN_ || getActiveUserRole() === Role.COACH_) {
+    if (getActiveUser().role === Role.ADMIN_ || getActiveUser().role === Role.COACH_) {
         isPermit = true;
     }
 

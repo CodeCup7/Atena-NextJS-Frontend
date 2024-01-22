@@ -7,10 +7,9 @@ import { NoteCC } from "../classes/noteCC";
 import { RateCC } from "../classes/rateCC";
 import { RateM } from "../classes/rateM";
 import { Role, User } from "../classes/user";
-import { CreateNewEmptyRateCC, getRateCC_Rate } from "./factory_rateCC";
-import { getActiveUser } from "../global";
+import { getRateCC_Rate } from "./factory_rateCC";
 import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";
-
+import { getActiveUser } from "../auth";
 
 export function CreateNewEmptyNoteCC(): NoteCC {
 

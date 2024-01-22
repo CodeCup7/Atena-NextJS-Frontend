@@ -1,26 +1,8 @@
 //================================================================
 //*********************** Global Varible *************************
 //================================================================
-import { api_UserList_getByLogin } from "./api/user_api";
-import { User } from "./classes/user";
-
 export const app_name: String = "Atena";
 export const app_version: String = "0.0.1";
-
-export async function getActiveUser(login: string): Promise<User> {
-
-    const activeUser: User = new User();
-
-    try {
-        const activeUser = await api_UserList_getByLogin(login);
-        return activeUser;
-    } catch (error) {
-        console.error('Błąd pobierania użytkowników:', error);
-    }
-
-    return activeUser;
-}
-
 
 // '==========================================================================================================================================
 // '*********************** Wartości ocen ****************************************************************************************************

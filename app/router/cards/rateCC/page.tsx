@@ -5,7 +5,7 @@ import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { updateQueueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, getRateCC_RateAs100, } from '@/app/factory/factory_rateCC';
-import { getActiveUser, valueOfRatePartCC } from '@/app/global';
+import { valueOfRatePartCC } from '@/app/global';
 import { getWagRateCC, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { api_rateCC_add } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
 import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
+import { getActiveUser } from '@/app/auth';
 
 const RateCC_Page = () => {
 
@@ -36,8 +37,7 @@ const RateCC_Page = () => {
 
         async function fetchData() {
 
-            const activeUser = await getActiveUser('Admin');
-            const isPermit: boolean = activeUser.role === Role.ADMIN_ || activeUser.role === Role.COACH_;
+            const isPermit: boolean = getActiveUser().role === Role.ADMIN_ || getActiveUser().role === Role.COACH_;
             setIsPermit(isPermit);
             try {
                 const users = await updateUserList();
@@ -52,7 +52,7 @@ const RateCC_Page = () => {
                     previewRateCC.mode = Rate_Mode.PREVIEW_;
                     updateRateCC(previewRateCC);
                 } else {
-                    const newRateCC = CreateNewEmptyRateCC(users.find(user => user.nameUser === 'Admin') || new User());
+                    const newRateCC = CreateNewEmptyRateCC(getActiveUser());
                     updateRateCC(newRateCC);
                 }
 
@@ -74,9 +74,6 @@ const RateCC_Page = () => {
     const [standardScore, setStandardScore] = useState(getRateBlock_RateAs100(rateCC.standardBlock));
     const [komunikacjaScore, setKomunikacjaScore] = useState(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
     const [score, setScore] = useState(getRateCC_RateAs100(rateCC));
-    console.log('score :', score);
-
-    
 
     // ====== Ustawienie dodatkowej oceny i tytułu stony ==========================================
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
@@ -118,7 +115,7 @@ const RateCC_Page = () => {
     function newBtn_Click() {
         setOpenNewRateModal(true);
         localStorage.removeItem('rateCC_prev');
-        const newRateCC = CreateNewEmptyRateCC(userList.find(user => user.nameUser === 'Admin') || new User());
+        const newRateCC = CreateNewEmptyRateCC(getActiveUser());
         updateRateCC(newRateCC);
     }
 
