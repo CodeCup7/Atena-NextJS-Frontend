@@ -16,14 +16,14 @@ export const StatusLabels: Record<Status_Note, string> = {
 
 export enum Type_RateCC {
 
-    RATTING_ = "Karta Oceny",
-    CURRENT_ = "Bieżący Odsłuch",
-    MYSTERY_ = "Tajemniczy Klient",
+    RATTING_,
+    CURRENT_,
+    MYSTERY_,
 };
 
 export enum Rate_Mode {
-    NEW_ = "Nowa",
-    EDIT_ = "Edycja",
-    PREVIEW_ = "Podgląd",
-    LOAD_ = "Załadowany",
+    NEW_,
+    EDIT_,
+    PREVIEW_,
+    LOAD_,
 };

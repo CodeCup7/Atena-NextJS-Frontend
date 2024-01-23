@@ -1,42 +1,61 @@
 'use client'
 
-import { api_rateCC_getAllRateNoNote } from "@/app/api/rateCC_api";
+import { api_NoteCC_add } from "@/app/api/noteCC_api";
+import { api_rateCC_add, api_rateCC_getAllRateNoNote } from "@/app/api/rateCC_api";
+import { NoteCC } from "@/app/classes/noteCC";
 import { RateCC } from "@/app/classes/rateCC";
 import { Role, User } from "@/app/classes/user";
+import { CreateNewEmptyRatePart } from "@/app/factory/factory_ratePart";
+import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "@/app/globalKeys";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export const Test = () => {
 
-  let rateList = [];
-  let selectedRateCC
-  let toJSON;
-  let fromJSON;
+  let noteCC: NoteCC = new NoteCC();
+  noteCC.agent.id = 8
+  noteCC.coach.id = 2
 
-  getData();
+  let rateCC: RateCC = new RateCC();
+  rateCC.agent.id = 8
+  rateCC.coach.id = 2
+  rateCC.queue.id = 1
+  //rateCC.noteCC.id = 1;
+
+  rateCC.dateRate = new Date().toLocaleDateString('en-CA');
+
+  rateCC.wiedzaBlock.ratePart.push(CreateNewEmptyRatePart(key_w1));
+  rateCC.obslugaBlock.ratePart.push(CreateNewEmptyRatePart(key_o1));
+  rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t1));
+  rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t2));
+  rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t3));
+  rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t4));
+  rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k1));
+  rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k2));
+  rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k3));
+  rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s1));
+  rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s2));
+  rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s3));
+  rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s4));
 
   async function getData() {
-    rateList = await api_rateCC_getAllRateNoNote();
-    selectedRateCC = rateList.find(rate => rate.queue.nameQueue === "Kolejka 2")
-    localStorage.setItem('rateCC_prev', JSON.stringify(selectedRateCC));
-    
+
+    //api_NoteCC_add(noteCC)
+    api_rateCC_add(rateCC)
+    console.log('rateCC :', rateCC);
+
+
+    //rateList = await api_rateCC_getAllRateNoNote();
+    //selectedRateCC = rateList.find(rate => rate.queue.nameQueue === "Kolejka 1")
+    //console.log('selectedRateCC :', selectedRateCC);
+    //
+    // localStorage.setItem('rateCC_prev', JSON.stringify(selectedRateCC));
+
   }
 
   return (
     <div>
-      <Link className="group link link-info link-hover text-lg"
-        href={{
-          pathname: "/router/cards/rateCC",
-          query: { rateData: JSON.stringify(selectedRateCC) }
-
-        }}>
-        <div className="flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 stroke-info group-hover:stroke-blue-50">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-          </svg>
-          <span className="ml-2">Karta rozmowy</span>
-        </div>
-      </Link>
+      <button className="btn btn-info" onClick={getData}>PRZYCISK</button>
     </div>
   );
 };

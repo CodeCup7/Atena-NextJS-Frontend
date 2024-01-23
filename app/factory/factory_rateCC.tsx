@@ -8,7 +8,6 @@ import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3,
 import { CreateNewEmptyRatePart } from "./factory_ratePart";
 
 export function CreateNewEmptyRateCC(coach:User) {
-console.log('coach :', coach);
 
     let rateCC = new RateCC();
 
@@ -29,11 +28,6 @@ console.log('coach :', coach);
     rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s3));
     rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s4));
 
-    rateCC.ratePart.push(...rateCC.wiedzaBlock.ratePart)
-    rateCC.ratePart.push(...rateCC.komunikacjaBlock.ratePart)
-    rateCC.ratePart.push(...rateCC.obslugaBlock.ratePart)
-    rateCC.ratePart.push(...rateCC.standardBlock.ratePart)
-    rateCC.ratePart.push(...rateCC.technikaBlock.ratePart)
     return rateCC;
 
 }
@@ -42,9 +36,9 @@ export function getRateCC_Rate(rateCC:RateCC): number {
 
     let rate: number = 0;
 
-    rateCC.ratePart.forEach(e => {
-        rate = rate + e.ocena * (e.waga / 100);
-    });
+    // rateCC.ratePart.forEach(e => {
+    //     rate = rate + e.ocena * (e.waga / 100);
+    // });
 
     rate = rate + (rateCC.extraScore / 100);
     rate = rate > 1 ? 1 : rate < 0 ? 0 : rate;

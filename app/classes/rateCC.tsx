@@ -3,6 +3,7 @@
 // '=========================================================================
 import { key_k, key_k1, key_k2, key_k3, key_o, key_o1, key_s, key_s1, key_s2, key_s3, key_s4, key_t, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from "../globalKeys";
 import { Rate_Mode, Type_RateCC } from "./enums";
+import { NoteCC } from "./noteCC";
 import { Queue } from "./queue";
 import { RateBlock } from "./rateBlock";
 import { RatePart } from "./ratePart";
@@ -13,9 +14,8 @@ export class RateCC {
 	public typeRate: Type_RateCC = Type_RateCC.RATTING_;
 	public mode: Rate_Mode = Rate_Mode.NEW_;
 
-	public id_note: number = 0;
+	public noteCC:NoteCC = new NoteCC();
 	public id: number = 0;
-	public rate: number = 0;
 	public agent: User = new User();
 	public coach: User = new User();
 	public dateRate: string = "";
@@ -33,26 +33,6 @@ export class RateCC {
 	public komunikacjaBlock: RateBlock = new RateBlock(key_k);
 	public standardBlock: RateBlock = new RateBlock(key_s);
 
-	public ratePart: Array<RatePart> = [];
-
-	toJSON() {
-		return {
-			typeRate: Object.keys(Type_RateCC).find(e => this.typeRate), // Zamiana stringa enum na value enum
-			id_note: this.id_note,
-			id: this.id,
-			agent: this.agent,
-			coach: this.coach,
-			dateRate: this.dateRate,
-			dateCall: this.dateCall,
-			dateShare: this.dateShare,
-			idCall: this.idCall,
-			queue: this.queue,
-			topic: this.topic,
-			extraScore: this.extraScore,
-			extraScoreTxt: this.extraScoreTxt,
-			ratePart: this.ratePart,
-		};
-	}
 
 }
 
