@@ -2,12 +2,13 @@
 // '*********************** RateCC Factory ***************************************************************************************************
 // '==========================================================================================================================================
 
+import { RateBlock } from "../classes/rateBlock";
 import { RateCC } from "../classes/rateCC";
 import { User } from "../classes/user";
 import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "../globalKeys";
 import { CreateNewEmptyRatePart } from "./factory_ratePart";
 
-export function CreateNewEmptyRateCC(coach:User) {
+export function CreateNewEmptyRateCC(coach: User) {
 
     let rateCC = new RateCC();
 
@@ -32,22 +33,25 @@ export function CreateNewEmptyRateCC(coach:User) {
 
 }
 
-export function getRateCC_Rate(rateCC:RateCC): number {
+export function getRateCC_Rate(rateCC: RateCC): number {
 
     let rate: number = 0;
+    const rateBlockCol = new Array<RateBlock>(rateCC.wiedzaBlock, rateCC.obslugaBlock, rateCC.komunikacjaBlock, rateCC.standardBlock, rateCC.technikaBlock);
 
-    // rateCC.ratePart.forEach(e => {
-    //     rate = rate + e.ocena * (e.waga / 100);
-    // });
+    rateBlockCol.forEach(block => {
+        block.ratePart.forEach(part => {
+            rate = rate + part.ocena * (part.waga / 100);
+        })
+    });
 
     rate = rate + (rateCC.extraScore / 100);
     rate = rate > 1 ? 1 : rate < 0 ? 0 : rate;
 
     return rate;
-    
+
 }
 
-export function getRateCC_RateAs100(rateCC:RateCC): number {
+export function getRateCC_RateAs100(rateCC: RateCC): number {
 
     const rate = getRateCC_Rate(rateCC) * 100;
     return Math.round(rate);

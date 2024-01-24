@@ -1,35 +1,20 @@
 'use client'
-import { useEffect } from "react";
-import { api_UserList_getByLogin } from "./api/user_api";
 import { User } from "./classes/user";
 
 const login = 'Admin';
 
-let activeUser: User = new User();
-export function getActiveUser(): User {
+export async function getActiveUser(): Promise<User> {
+    try {
+        const response = await fetch(`http://localhost:8080/api/user/getUserLogin/${login}`, {
+            cache: 'force-cache', // Ustawienie pamięci podręcznej na 'force-cache'
+        });
 
-    if (activeUser.id !== 0) {
-        return activeUser;
-    } else {
-        try {
-            setActiveUser();
-        } catch (error) {
-            console.error('Błąd pobierania użytkowników:', error);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-        return activeUser;
-    }
-}
 
-async function setActiveUser(): Promise<User> {
-
-    if (activeUser.id !== 0) {
-        return activeUser;
-    } else {
-        try {
-            activeUser = await api_UserList_getByLogin(login);
-        } catch (error) {
-            console.error('Błąd pobierania użytkowników:', error);
-        }
-        return activeUser;
+        return await response.json();
+    } catch (error) {
+        return new User(); // Możesz dostosować to do swoich potrzeb
     }
 }

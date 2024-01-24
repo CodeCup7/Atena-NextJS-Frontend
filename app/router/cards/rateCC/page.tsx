@@ -1,5 +1,5 @@
 'use client'
-import { Rate_Mode, Type_RateCC } from '@/app/classes/enums';
+import { ModeLabels, Rate_Mode, TypeLabels, Type_RateCC } from '@/app/classes/enums';
 import { Queue } from '@/app/classes/queue';
 import { RateCC } from '@/app/classes/rateCC';
 import { Role, User } from '@/app/classes/user';
@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Arced } from '../../components/chart/rateCC_chart';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
-import { api_rateCC_add } from '@/app/api/rateCC_api';
+import { api_rateCC_add, api_rateCC_update } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
 import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
@@ -22,7 +22,7 @@ const RateCC_Page = () => {
     // ====== Ustawienie i kontrola active usera ==========================================
     const [isPermit, setIsPermit] = useState(false);
     const [refresh, setRefresh] = useState(false);
-
+    const [activeUser, setActiveUser] = useState(new User());
     const [rateCC, setRateCC] = useState(new RateCC());
     const [prewievMode, setPreviewMode] = useState(false);
     const [userList, setUserList] = useState<Array<User>>([]);
@@ -36,14 +36,16 @@ const RateCC_Page = () => {
     useEffect(() => {
 
         async function fetchData() {
-
-            const isPermit: boolean = getActiveUser().role === Role.ADMIN_ || getActiveUser().role === Role.COACH_;
-            setIsPermit(isPermit);
             try {
                 const users = await updateUserList();
                 const queues = await updateQueueList();
+                const user = await getActiveUser();
+                setActiveUser(user);
                 setUserList(users);
                 setQueueList(queues);
+
+                const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
+                setIsPermit(isPermit);
 
                 const rateCC_prev = localStorage.getItem('rateCC_prev');
 
@@ -52,7 +54,7 @@ const RateCC_Page = () => {
                     previewRateCC.mode = Rate_Mode.PREVIEW_;
                     updateRateCC(previewRateCC);
                 } else {
-                    const newRateCC = CreateNewEmptyRateCC(getActiveUser());
+                    const newRateCC = CreateNewEmptyRateCC(user);
                     updateRateCC(newRateCC);
                 }
 
@@ -62,10 +64,6 @@ const RateCC_Page = () => {
         }
         fetchData();
     }, [refresh]);
-
-    useEffect(() => {
-        rateCC.mode === Rate_Mode.NEW_ ? setPreviewMode(false) : setPreviewMode(true);
-    }, [rateCC.mode])
 
     // RateCC hooks
     const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateCC.wiedzaBlock));
@@ -82,14 +80,6 @@ const RateCC_Page = () => {
     for (let i = -10; i <= 10; i++) {
         extraScoreScale.push(i);
     }
-    let cardName = "";
-    if (rateCC.typeRate = Type_RateCC.RATTING_) {
-        cardName = 'Karta Oceny';
-    } else if (rateCC.typeRate = Type_RateCC.CURRENT_) {
-        cardName = 'Bieżący odsłuch';
-    } else if (rateCC.typeRate = Type_RateCC.MYSTERY_) {
-        cardName = 'Tajemniczy Klient';
-    }
 
     // ====== FUNKCJE ==========================================
     function updateRateCC(rateCC: RateCC) {
@@ -103,6 +93,7 @@ const RateCC_Page = () => {
         setAgent(rateCC.agent.id)
         setQueue(rateCC.queue.id)
         setExtraScore(rateCC.extraScore)
+        rateCC.mode === Rate_Mode.PREVIEW_ ? setPreviewMode(true) : setPreviewMode(false);
     }
     function validate(): boolean {
         if (rateCC.agent.id != 0 && rateCC.queue.id != 0 && rateCC.dateCall != "" && rateCC.idCall != "")
@@ -115,7 +106,7 @@ const RateCC_Page = () => {
     function newBtn_Click() {
         setOpenNewRateModal(true);
         localStorage.removeItem('rateCC_prev');
-        const newRateCC = CreateNewEmptyRateCC(getActiveUser());
+        const newRateCC = CreateNewEmptyRateCC(activeUser);
         updateRateCC(newRateCC);
     }
 
@@ -123,21 +114,39 @@ const RateCC_Page = () => {
     function rateBtn_Click() {
 
         if (validate()) {
-            rateCC.mode = Rate_Mode.PREVIEW_;
-            setPreviewMode(true)
-            api_rateCC_add(rateCC).then((foo => {
-                if (foo.isOK === true) {
-                    toast.info(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT,
-                        theme: "dark"
-                    });
-                } else {
-                    toast.error(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT,
-                        theme: "dark"
-                    });
-                }
-            }));
+            if (rateCC.id === 0) {
+                api_rateCC_add(rateCC).then((foo => {
+                    if (foo.isOK === true) {
+
+                        rateCC.mode = Rate_Mode.PREVIEW_;
+                        updateRateCC(rateCC)
+
+                        toast.info(foo.callback, {
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                        });
+                    } else {
+                        toast.error(foo.callback, {
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                        });
+                    }
+                }));
+            } else {
+                api_rateCC_update(rateCC).then((foo => {
+                    if (foo.isOK === true) {
+
+                        rateCC.mode = Rate_Mode.PREVIEW_;
+                        updateRateCC(rateCC)
+
+                        toast.info(foo.callback, {
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                        });
+                    } else {
+                        toast.error(foo.callback, {
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                        });
+                    }
+                }));
+            }
         } else {
             toast.error("Nie uzupełniono wszystkich wymaganych pól", {
                 position: toast.POSITION.TOP_RIGHT,
@@ -150,7 +159,7 @@ const RateCC_Page = () => {
 
         if (isPermit) {
             rateCC.mode = Rate_Mode.EDIT_;
-            setPreviewMode(false)
+            updateRateCC(rateCC)
             toast.warning("Włączono tryb edycji", {
                 position: toast.POSITION.TOP_RIGHT,
                 theme: "dark"
@@ -188,7 +197,7 @@ const RateCC_Page = () => {
                                 disabled={isPermit ? prewievMode ? false : true : true} onClick={editBtn_Click}>Włącz edytowanie</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={isPermit ? prewievMode ? true : false : true} onClick={rateBtn_Click}>Oceń</button>
+                                disabled={isPermit ? prewievMode ? true : false : true} onClick={rateBtn_Click}>{rateCC.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Oceń'}</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={isPermit ? prewievMode ? true : false : true}>Zapisz</button>
@@ -204,10 +213,10 @@ const RateCC_Page = () => {
                     </div>
                 </div>
                 <div className="col-span-2">
-                    <p className={`justify-center  {rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? 'text-yellow-600' : rateCC.mode === Rate_Mode.NEW_ as Rate_Mode ? 'text-green-500' : 'text-red-700'}`}>Tryb: {rateCC.mode}</p>
+                    <p className={`justify-center  {rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? 'text-yellow-600' : rateCC.mode === Rate_Mode.NEW_ as Rate_Mode ? 'text-green-500' : 'text-red-700'}`}>Tryb: {ModeLabels[rateCC.mode]}</p>
                 </div>
                 <div className="col-span-4">
-                    <h1 className='text-info text-3xl text-center justify-center'>{cardName}</h1>
+                    <h1 className='text-info text-3xl text-center justify-center'>{TypeLabels[rateCC.typeRate]}</h1>
                 </div>
                 <div className='col-span-4'>
                     <p className='text-right mr-2'>id: {rateCC.id}</p>
@@ -282,7 +291,7 @@ const RateCC_Page = () => {
                             <span className="label-text">ID rozmowy</span>
                             <input
                                 className="input input-bordered input-info max-w-md gap-y-2 w-72"
-                                defaultValue={rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? rateCC.idCall : ""}
+                                defaultValue={rateCC.idCall}
                                 disabled={prewievMode}
                                 type="text"
                                 onChange={e => rateCC.idCall = e.target.value} />
@@ -308,7 +317,7 @@ const RateCC_Page = () => {
                 </div>
                 {/* Wykres */}
                 <div className="col-span-12 md:col-span-2 md:row-span-2 flex justify-center items-center">
-                    <div className='sm:my-5 md:mt-0 mx:ml-4 '><Arced value={score}/></div>
+                    <div className='sm:my-5 md:mt-0 mx:ml-4 '><Arced value={score} /></div>
                 </div>
                 {/* Rate blocks */}
                 <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>

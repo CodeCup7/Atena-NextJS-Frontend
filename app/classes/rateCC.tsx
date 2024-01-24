@@ -14,7 +14,6 @@ export class RateCC {
 	public typeRate: Type_RateCC = Type_RateCC.RATTING_;
 	public mode: Rate_Mode = Rate_Mode.NEW_;
 
-	public noteCC:NoteCC = new NoteCC();
 	public id: number = 0;
 	public agent: User = new User();
 	public coach: User = new User();

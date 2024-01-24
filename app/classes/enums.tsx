@@ -21,9 +21,23 @@ export enum Type_RateCC {
     MYSTERY_,
 };
 
+export const TypeLabels: Record<Type_RateCC, string> = {
+    [Type_RateCC.RATTING_]: "Karta Oceny",
+    [Type_RateCC.CURRENT_]: "Bierzący Odsłuch",
+    [Type_RateCC.MYSTERY_]: "Tajemniczy Klient",
+};
+
+
 export enum Rate_Mode {
     NEW_,
     EDIT_,
     PREVIEW_,
     LOAD_,
+};
+
+export const ModeLabels: Record<Rate_Mode, string> = {
+    [Rate_Mode.NEW_]: "Nowy",
+    [Rate_Mode.EDIT_]: "Edycja",
+    [Rate_Mode.PREVIEW_]: "Podgląd",
+    [Rate_Mode.LOAD_]: "Załadowany",
 };

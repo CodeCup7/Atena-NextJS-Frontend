@@ -11,8 +11,11 @@ import { global_userList, updateUserList } from '@/app/factory/factory_user';
 import { User } from '@/app/classes/user';
 import { api_NoteCC_getDate } from '@/app/api/noteCC_api';
 import { getActiveUser } from '@/app/auth';
+import { getRateCC_Rate, getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 
 export const NoteMain = () => {
+
+    const [activeUser, setActiveUser] = useState(new User());
 
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
@@ -35,7 +38,13 @@ export const NoteMain = () => {
         async function fetchData() {
             try {
                 const users = await updateUserList();
+                const user = await getActiveUser();
                 setUserList(users);
+                setActiveUser(user);
+
+                const currentDate = new Date();
+                const formattedDate = currentDate.toISOString().slice(0, 7); // YYYY-MM
+                setDateValue(formattedDate);
 
             } catch (error) {
                 console.error('Błąd pobierania użytkowników:', error);
@@ -43,12 +52,6 @@ export const NoteMain = () => {
         }
         fetchData();
 
-    }, []);
-
-    useEffect(() => {
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().slice(0, 7); // YYYY-MM
-        setDateValue(formattedDate);
     }, []);
 
     useEffect(() => {
@@ -123,9 +126,9 @@ export const NoteMain = () => {
         if (agentFilter === 'ALL' && statusFilter === 'ALL') {// Filtr wszystko
             setNoteList(downloadList)
         } else if (agentFilter === 'MY' && statusFilter === 'ALL') { // Filtr dla MOICH i wszytskich statusów
-            setNoteList(downloadList.filter(note => note.agent.coachId === getActiveUser().id));
+            setNoteList(downloadList.filter(note => note.agent.coachId === activeUser.id));
         } else if (agentFilter === 'MY' && statusFilter != 'ALL') { // Filtr dla MOICH i wybranego statusu)
-            setNoteList(downloadList.filter(note => note.agent.coachId === getActiveUser().id && note.status === statusFilter));
+            setNoteList(downloadList.filter(note => note.agent.coachId === activeUser.id && note.status === statusFilter));
         } else if (agentFilter === 'ALL' && statusFilter != 'ALL') { // Filtr dla wszystkich i wybranego statusu
             setNoteList(downloadList.filter(note => note.status === statusFilter));
         }
@@ -326,7 +329,7 @@ export const NoteMain = () => {
                                                     </td>
                                                     <td>{rateCC.dateCall}</td>
                                                     <td>{rateCC.queue.nameQueue}</td>
-                                                    <td>{rateCC.rate}</td>
+                                                    <td>{getRateCC_RateAs100(rateCC)}</td>
                                                     <td>{rateCC.dateRate}</td>
                                                     <td>{rateCC.dateShare}</td>
                                                     <td>{selectedNoteCC.id}</td>

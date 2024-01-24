@@ -38,6 +38,46 @@ export async function api_rateCC_add(rateCC: RateCC): Promise<Foo> {
     }
 }
 
+export async function api_rateCC_update(rateCC: RateCC): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false };
+
+        const response = await fetch('http://localhost:8080/api/rateCC/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateCC)
+        });
+
+        if (response.ok) {
+            foo.callback = 'Ocena została edytowana';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Ocena nie została edytowana';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd edytowana oceny ' + error, isOK: false };
+    }
+}
+
+export async function api_rateCC_getById(id:number): Promise<RateCC> {
+    try {
+        const response = await fetch('http://localhost:8080/api/rateCC/getById/' + id);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Błąd pobierania ocen RateCC:', error);
+        return new RateCC();
+    }
+}
+
 export async function api_rateCC_getAllRateNoNote(): Promise<RateCC[]> {
     try {
         const response = await fetch('http://localhost:8080/api/rateCC/getAllRateNoNote');
@@ -46,38 +86,6 @@ export async function api_rateCC_getAllRateNoNote(): Promise<RateCC[]> {
         }
 
         const rateList: Array<RateCC> = await response.json();
-
-        rateList.forEach(rateCC => {
-
-            rateCC.wiedzaBlock = new RateBlock(key_w);
-            rateCC.obslugaBlock = new RateBlock(key_o);
-            rateCC.technikaBlock = new RateBlock(key_t);
-            rateCC.komunikacjaBlock = new RateBlock(key_k);
-            rateCC.standardBlock = new RateBlock(key_s);
-
-            const ratePartList: Array<RatePart> = rateCC.ratePart
-
-            ratePartList.forEach(ratePart => {
-
-                switch (ratePart.key.substring(0, 5)) { // Pierwsze  liter z KEY
-                    case key_w:
-                        rateCC.wiedzaBlock.ratePart.push(ratePart);
-                        break;
-                    case key_o:
-                        rateCC.obslugaBlock.ratePart.push(ratePart);
-                        break;
-                    case key_s:
-                        rateCC.standardBlock.ratePart.push(ratePart);
-                        break;
-                    case key_t:
-                        rateCC.technikaBlock.ratePart.push(ratePart);
-                        break;
-                    case key_k:
-                        rateCC.komunikacjaBlock.ratePart.push(ratePart);
-                        break;
-                }
-            })
-        });
 
         return rateList;
     } catch (error) {
