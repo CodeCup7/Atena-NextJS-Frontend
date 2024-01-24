@@ -37,10 +37,12 @@ export const Test = () => {
   async function puntNewNoteCC(){
 
     let note:NoteCC = new NoteCC();
-    const rateCC = await api_rateCC_getById(1);
+    const rateCC = await api_rateCC_getById(2);
+    rateCC.idCall = 'NOTE RATE SRATE'
     note.agent.id = 8;
     note.coach.id = 2;
-    note.rateCC_Col.push(rateCC);
+    //note.rateCC_Col.push(rateCC);
+    note.rateCC_Col.push(putNewRateCC());
 
     return note;
 
