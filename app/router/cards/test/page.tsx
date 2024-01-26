@@ -37,12 +37,12 @@ export const Test = () => {
   async function puntNewNoteCC(){
 
     let note:NoteCC = new NoteCC();
-    const rateCC = await api_rateCC_getById(2);
+    const rateCC = await api_rateCC_getById(1);
     rateCC.idCall = 'NOTE RATE SRATE'
     note.agent.id = 8;
     note.coach.id = 2;
-    //note.rateCC_Col.push(rateCC);
-    note.rateCC_Col.push(putNewRateCC());
+    note.rateCC_Col.push(rateCC);
+    //note.rateCC_Col.push(putNewRateCC());
 
     return note;
 
@@ -51,17 +51,10 @@ export const Test = () => {
 
   async function getData() {
 
-    await api_NoteCC_add(await puntNewNoteCC())
-
+   // await api_NoteCC_add(await puntNewNoteCC())
     //await api_rateCC_update(rateCC)
-    //api_NoteCC_add(noteCC)
-    //api_rateCC_add(putNewRateCC())
-    //console.log('rateCC :', rateCC);
-
-    //rateList = await api_rateCC_getAllRateNoNote();
-    //selectedRateCC = rateList.find(rate => rate.queue.nameQueue === "Kolejka 1")
-    //console.log('selectedRateCC :', selectedRateCC);
-    //localStorage.setItem('rateCC_prev', JSON.stringify(selectedRateCC));
+    api_rateCC_add(putNewRateCC())
+    console.log('rateCC :', putNewRateCC());
 
   }
 

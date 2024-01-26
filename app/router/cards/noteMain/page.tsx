@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { StatusLabels, Status_Note } from '@/app/classes/enums';
+import { Rate_Mode, StatusLabels, Status_Note } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/noteCC';
 import { Get_NoteList_With_NoStartNote } from '@/app/factory/factory_noteCC';
 import { RateCC } from '@/app/classes/rateCC';
@@ -9,9 +9,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { global_userList, updateUserList } from '@/app/factory/factory_user';
 import { User } from '@/app/classes/user';
-import { api_NoteCC_getDate } from '@/app/api/noteCC_api';
+import { api_NoteCC_deleteNote, api_NoteCC_getDate } from '@/app/api/noteCC_api';
 import { getActiveUser } from '@/app/auth';
 import { getRateCC_Rate, getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
+import { format } from 'date-fns';
+import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 
 export const NoteMain = () => {
 
@@ -19,6 +21,7 @@ export const NoteMain = () => {
 
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
+    const [newRateModal, setOpenNewRateModal] = useState(false);
 
     const [dateValue, setDateValue] = useState('');
     const [openTab, setOpenTab] = useState(1);
@@ -65,27 +68,21 @@ export const NoteMain = () => {
         setRowIndex(-1);
     }, [noteList]);
 
-    function downloadDate_Click() {
+    const [choiseRateCC, setChoiseRateCC] = useState<Array<RateCC>>([]);
 
-        if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
-            getCoaching(dateValue);
+    function checkboxRateCCHandler(rateCC: RateCC) {
+
+        const isSelected = choiseRateCC.find(r => r.id === rateCC.id)
+
+        if (isSelected) {
+            const updatedChoiseRateCC = choiseRateCC.filter((r) => r.id !== rateCC.id);
+            setChoiseRateCC(updatedChoiseRateCC);
         } else {
-            toast.error("Wybierz datę!", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            setChoiseRateCC((prevChoiseRateCC) => [...prevChoiseRateCC, rateCC]);
         }
     }
 
-    const [checkedRateCC, setCheckedRateCC] = useState<Record<number, boolean>>({});
-
-    const handleCheckboxChange = (id: number) => {
-        setCheckedRateCC((prev) => ({
-            ...prev,
-            [id]: !prev[id] // Zmiana stanu na przeciwny do obecnego
-        }));
-    };
-
+    // ====== FUNKCJE ==========================================
     function getCoaching(dateValue: string) {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
@@ -99,16 +96,11 @@ export const NoteMain = () => {
                     const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
 
                     const date = new Date(year, month, 1);
-
                     // Ustawienie daty na pierwszy dzień miesiąca
                     const startDate = new Date(year, month, 1);
-
                     // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
                     const endDate = new Date(year, month + 1, 0);
-
-                    setUserList(global_userList);
-
-                    const getExistNoteList = await api_NoteCC_getDate(startDate.toLocaleDateString(), endDate.toLocaleDateString());
+                    const getExistNoteList = await api_NoteCC_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
                     const noteList = await Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
 
                     setNoteList(noteList);
@@ -134,9 +126,74 @@ export const NoteMain = () => {
         }
     }
 
+    const [notePath, setNotePath] = useState('/router/cards/noteCC');
+
+    // Karta coucha aktywna tylko wtedy gdy użytkownik przypisze oceny do coachingu lub gdy coaching jest w trybie podglądu
+    useEffect(() => {
+        setNotePath(choiseRateCC.length !== 0 || selectedNoteCC.mode === Rate_Mode.PREVIEW_  ? '/router/cards/noteCC' : ''); 
+    }, [choiseRateCC.length, selectedNoteCC.mode]);
+
+
+    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    function downloadDate_Click() {
+
+        if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
+            getCoaching(dateValue);
+        } else {
+            toast.error("Wybierz datę!", {
+                position: toast.POSITION.TOP_RIGHT,
+                theme: "dark"
+            });
+        }
+    }
+    function coaching_Click() {
+
+        if (selectedNoteCC.mode === Rate_Mode.NEW_) { // Nowy Coaching
+            //Sprawdzenie czy wybrano rozmowy do coachingu
+            if (choiseRateCC.length === 0) {
+                toast.error("Nie wybrano żadnych rozmów do coachingu", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    theme: "dark"
+                });
+                return false;
+            } else {
+                selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie rozmów wybrnaych do coachingu
+                localStorage.removeItem('noteCC_prev');
+                localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
+                return true;
+            }
+        } else { //Podgląd coachingu
+            localStorage.removeItem('noteCC_new');
+            localStorage.setItem('noteCC_prev', JSON.stringify(selectedNoteCC))
+            return true;
+        }
+    }
+
+    //Usuwanie coachingu - usuwa coaching z bazy i rozwiązuje powiązane z nim oceny ustawiajac pole noteCC_id w DB jako NULL
+    function deleteCoaching_Click() {
+        setOpenNewRateModal(false);
+
+        api_NoteCC_deleteNote(selectedNoteCC).then((foo => {
+            if (foo.isOK === true) {
+                getCoaching(dateValue);
+                toast.info(foo.callback, {
+                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                });
+            } else {
+                toast.error(foo.callback, {
+                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                });
+            }
+        }));
+    }
+    
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
+            <ConfirmDialog open={newRateModal} onClose={() => setOpenNewRateModal(false)} onConfirm={() => {
+                deleteCoaching_Click
+            }}
+                title='Potwierdź decyzję' content={'Czy napewno chcesz usunąć coaching agenta ' + selectedNoteCC.agent.nameUser + ' ?'}/>
             <div className='flex items-center justify-center'>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="text-info w-12 h-12">
                     <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
@@ -237,31 +294,21 @@ export const NoteMain = () => {
 
                         <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`}
                             href={{
-                                pathname: "/router/cards/noteCC",
-                                query: { noteCCDate: JSON.stringify(selectedNoteCC) }
-
+                                pathname: notePath
                             }}>
-                            {selectedNoteCC.id > 0 ?
-                                <button className="btn btn-outline btn-info btn-sm"
-                                    disabled={selectedNoteCC.id === -1}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                    </svg>
-                                    Podgląd
-                                </button>
-                                :
-                                <button className="btn btn-outline btn-info btn-sm"
-                                    disabled={selectedNoteCC.id === -1}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
-                                    </svg>
-                                    Rozpocznij coaching
-                                </button>
-                            }
+                            <button className="btn btn-outline btn-info btn-sm"
+                                disabled={selectedNoteCC.id === -1}
+                                onClick={coaching_Click}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                                </svg>
+                                {selectedNoteCC.id === 0 ? "Rozpocznij coaching" : "Podgląd"}
+                            </button>
                         </Link>
 
-                        <button className="btn btn-outline btn-error btn-sm">
+                        <button className="btn btn-outline btn-error btn-sm"
+                        disabled={selectedNoteCC.status === Status_Note.NO_START}
+                        onClick={deleteCoaching_Click}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                             </svg>
@@ -301,7 +348,16 @@ export const NoteMain = () => {
                                     {/* head */}
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" className="checkbox" /></th>
+
+                                            <th>
+                                                <input
+                                                    type="checkbox"
+                                                    className="checkbox"
+                                                    onClick={(e) => {
+                                                        const target = e.target as HTMLInputElement;
+                                                        target.checked ? setChoiseRateCC(selectedNoteCC.rateCC_Col) : setChoiseRateCC([])
+                                                    }} />
+                                            </th>
                                             <th>Data rozmowy</th>
                                             <th>Kolejka</th>
                                             <th>Ocena</th>
@@ -318,12 +374,12 @@ export const NoteMain = () => {
                                                     onClick={() => {
                                                         setSelectedRateCC(rateCC);
                                                         setRowRateIndex(index)
-                                                        handleCheckboxChange(index) // Obsługa zaznaczenia checkboxa
+                                                        checkboxRateCCHandler(rateCC) // Obsługa zaznaczenia checkboxa
                                                     }}
                                                     className="hover:bg-base-300  hover:text-white cursor-pointe">
                                                     <td>
                                                         <input type="checkbox" className="checkbox checkbox-info"
-                                                            checked={checkedRateCC[index] || false}
+                                                            checked={choiseRateCC.some((r) => r.id === rateCC.id)}
                                                             onChange={() => { }}
                                                         />
                                                     </td>

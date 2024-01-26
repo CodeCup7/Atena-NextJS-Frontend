@@ -74,15 +74,17 @@ export async function api_NoteCC_update(noteCC: NoteCC): Promise<Foo> {
     }
 }
 
-export async function api_NoteCC_deleteNote(noteId: number): Promise<Foo> {
+export async function api_NoteCC_deleteNote(noteCC: NoteCC): Promise<Foo> {
+
     try {
         let foo: Foo = { callback: '', isOK: false };
-
-        const response = await fetch('http://localhost:8080/api/noteCC/delete/' + noteId, {
+        
+        const response = await fetch('http://localhost:8080/api/noteCC/delete', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(noteCC),
         });
 
         if (response.ok) {

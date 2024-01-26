@@ -9,7 +9,7 @@ interface ArcedProps {
 const START_ANGLE = 45;
 const END_ANGLE = 315;
 
-export function RateCC_chart(props: ArcedProps) {
+export function NoteCC_Chart(props: ArcedProps) {
   const { value } = props;
   const gauge = useGauge({
     domain: [0, 100],

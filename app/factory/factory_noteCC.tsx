@@ -11,10 +11,11 @@ import { getRateCC_Rate } from "./factory_rateCC";
 import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";
 import { getActiveUser } from "../auth";
 
-export function CreateNewEmptyNoteCC(): NoteCC {
+export function CreateNewEmptyNoteCC(coach: User): NoteCC {
 
     let noteCC = new NoteCC();
     noteCC.status = Status_Note.NO_START
+    noteCC.coach = coach;
 
     return noteCC;
 }
@@ -46,6 +47,7 @@ export function getNoteCC_Rate(noteCC: NoteCC): number {
         rate = rate + getRateCC_Rate(e);
     });
 
+    rate = rate / noteCC.rateCC_Col.length
     return rate;
 }
 
@@ -60,8 +62,9 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
     let foundFlag: boolean = false;
     let noteListWitnNoStart: Array<NoteCC> = new Array();
     let id: number = 0; // KASUJ
-
+    const activeUser = await getActiveUser();
     const rateListNoNote = await api_rateCC_getAllRateNoNote();
+
 
     userList.forEach(user => {
 
@@ -79,17 +82,18 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
 
             if (foundFlag === false) {
 
-                let noteCC = CreateNewEmptyNoteCC();
+                let noteCC = CreateNewEmptyNoteCC(activeUser);
                 noteCC.mode = Rate_Mode.NEW_;
-                noteCC.appliesDate = appliesDate + ".01";
+                noteCC.appliesDate = appliesDate + "-01";
                 noteCC.agent = user;
 
                 noteListWitnNoStart.push(noteCC);
-                noteCC.coach = getActiveUser();
+                noteCC.coach = activeUser;
 
                 //Dodanie do noteCC rateCC
                 rateListNoNote.forEach(rateCC => {
                     if (rateCC.agent.id === user.id) {
+                        rateCC.mode = Rate_Mode.PREVIEW_;
                         noteCC.rateCC_Col.push(rateCC);
                     }
                 })
