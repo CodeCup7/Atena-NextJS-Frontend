@@ -83,15 +83,11 @@ export const Browser = () => {
 
             const rateList = await api_RateCC_search(criteriaList);
             setRateCC_List(rateList);
-
-
-
         } else {
             toast.error("Uzupełnij poprawnie daty", {
                 position: toast.POSITION.TOP_RIGHT, theme: "dark"
             });
         }
-
     }
 
     return (
