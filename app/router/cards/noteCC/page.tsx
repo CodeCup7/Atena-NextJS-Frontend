@@ -18,6 +18,7 @@ const NoteCC_Page = () => {
     // ====== Ustawienie i kontrola active usera ==========================================
     const [activeUser, setActiveUser] = useState(new User());
     const [isPermit, setIsPermit] = useState(false);
+    const [isPermitAgent, setIsPermitAgent] = useState(false);
 
     const [noteCC, setNoteCC] = useState(CreateNewEmptyNoteCC(activeUser));
     const [prewievMode, setPreviewMode] = useState(false);
@@ -26,7 +27,7 @@ const NoteCC_Page = () => {
     const [rateTab, setOpenRateTab] = React.useState(1);
     const [prevNoteHide, setPrevNoteHide] = React.useState(true);
     const [score, setScore] = useState(0);
-    
+
     useEffect(() => {
         async function fetchData() {
             try {
@@ -41,6 +42,10 @@ const NoteCC_Page = () => {
                 if (noteCC_prev != null) {
                     const note: NoteCC = JSON.parse(noteCC_prev);
                     note.mode = Rate_Mode.PREVIEW_;
+
+                    const isPermitAgent: boolean = user.role === Role.AGENT_ && note.agent.id === user.id; // Sprawdzenie czy agent ma uprawnienia do karty (swojej)
+                    setIsPermitAgent(isPermitAgent)
+
                     updateNoteCC(note)
                 } else if (noteCC_new != null) {
                     const note: NoteCC = JSON.parse(noteCC_new);
@@ -71,7 +76,7 @@ const NoteCC_Page = () => {
             return false;
         }
     }
- 
+
 
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {
@@ -81,8 +86,9 @@ const NoteCC_Page = () => {
                 api_NoteCC_add(noteCC).then((foo => {
                     if (foo.isOK === true) {
 
-                        noteCC.mode = Rate_Mode.PREVIEW_;
-                        updateNoteCC(noteCC)
+                        const note: NoteCC = foo.noteCC; // Aktualizacja oceny o ID z DB
+                        note.mode = Rate_Mode.PREVIEW_;
+                        updateNoteCC(note)
 
                         toast.info(foo.callback, {
                             position: toast.POSITION.TOP_RIGHT, theme: "dark"
@@ -115,7 +121,7 @@ const NoteCC_Page = () => {
                 position: toast.POSITION.TOP_RIGHT,
                 theme: "dark"
             });
-        }
+        }  
     }
 
     function editBtn_Click() {
@@ -131,8 +137,26 @@ const NoteCC_Page = () => {
             toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
         }
     }
+    function odwolanie_click() {
 
-    console.log(isPermit)
+        if (isPermitAgent) {
+            api_NoteCC_update(noteCC).then((foo => {
+                if (foo.isOK === true) {
+
+                    noteCC.mode = Rate_Mode.PREVIEW_;
+                    updateNoteCC(noteCC)
+
+                    toast.info("Odwołanie zostało poprawnie zamieszczone", {
+                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                    });
+                } else {
+                    toast.error("Błąd wysyłania odwołania", {
+                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                    });
+                }
+            }));
+        }
+    }
 
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -152,7 +176,8 @@ const NoteCC_Page = () => {
                                     noteCC.status = Status_Note.CLOSE
                                     rateBtn_Click();
                                 }}>
-                                Zatwierdź</button>
+                                {noteCC.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Zatwierdź'}
+                            </button>
                             <button className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && prewievMode)}
                                 onClick={e => {
@@ -162,7 +187,7 @@ const NoteCC_Page = () => {
                                 Zamknij BEZ</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
+                                disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
                             <button className="btn btn-outline btn-info btn-sm">Export do xls</button>
                             <button className="btn btn-outline btn-info btn-sm">Export do mail</button>
                         </ul>
@@ -282,7 +307,7 @@ const NoteCC_Page = () => {
                                         <span>Zalecenia (Bieżący Coaching)</span>
                                     </div>
                                     <textarea className="textarea textarea-bordered textarea-lg w-full"
-                                        disabled={prewievMode}
+                                        disabled={!isPermit || (isPermit && prewievMode)}
                                         defaultValue={noteCC.zalecenia}
                                         onChange={e => noteCC.zalecenia = e.target.value}
                                     />
@@ -304,12 +329,30 @@ const NoteCC_Page = () => {
                             </div>
                         </div>
 
-                        {/* # Dashboard TAB */}
+                        {/* # Odwołanie TAB */}
                         <div className={noteTab === 2 ? "block" : "hidden"} id="link2">
+                            <div className='flex flex-col mt-2 justify-center items-center'>
+                                <label className="form-control w-full">
+                                    <div className="label">
+                                        <span>Odwołanie agenta</span>
+                                    </div>
+                                    <div className='flex flex-row mt-2 justify-center items-center' >
+                                        <textarea className="textarea textarea-bordered textarea-lg w-full"
+                                            disabled={!isPermitAgent}
+                                            defaultValue={noteCC.odwolanie}
+                                            onChange={e => noteCC.odwolanie = e.target.value} />
+                                        <button className='btn btn-outline btn-info btn-sm m-2'
+                                            disabled={!isPermitAgent}
+                                            onClick={odwolanie_click}>
+                                            Wyślij odwołanie</button>
+                                    </div>
 
+                                </label>
+
+                            </div>
                         </div>
 
-                        {/* # Odwołanie TAB */}
+                        {/* # Dashboard TAB */}
                         <div className={noteTab === 3 ? "block" : "hidden"} id="link3">
 
                         </div>

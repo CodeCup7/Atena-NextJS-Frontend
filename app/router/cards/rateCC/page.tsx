@@ -74,9 +74,9 @@ const RateCC_Page = () => {
     const [komunikacjaScore, setKomunikacjaScore] = useState(getRateBlock_RateAs100(rateCC.komunikacjaBlock));
     const [score, setScore] = useState(getRateCC_RateAs100(rateCC));
 
-    // ====== Ustawienie dodatkowej oceny i tytułu stony ==========================================
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
 
+    // ====== Ustawienie dodatkowej oceny ==========================================
     const extraScoreScale = [];
     for (let i = -10; i <= 10; i++) {
         extraScoreScale.push(i);
@@ -118,9 +118,9 @@ const RateCC_Page = () => {
             if (rateCC.id === 0) {
                 api_rateCC_add(rateCC).then((foo => {
                     if (foo.isOK === true) {
-
-                        rateCC.mode = Rate_Mode.PREVIEW_;
-                        updateRateCC(rateCC)
+                        const rate: RateCC = foo.rateCC; // Aktualizacja oceny o ID z DB
+                        rate.mode = Rate_Mode.PREVIEW_;
+                        updateRateCC(rate)
 
                         toast.info(foo.callback, {
                             position: toast.POSITION.TOP_RIGHT, theme: "dark"

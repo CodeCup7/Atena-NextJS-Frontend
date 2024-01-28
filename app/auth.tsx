@@ -1,6 +1,7 @@
 'use client'
 import { User } from "./classes/user";
 
+//const login = 'user12';
 const login = 'Admin';
 
 export async function getActiveUser(): Promise<User> {
