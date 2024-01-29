@@ -42,12 +42,11 @@ export const Search = () => {
     fetchData();
   }, []);
 
-
-
-
   function clearCoaching_Click() {
 
   }
+
+  console.log(filtr)
 
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -94,7 +93,7 @@ export const Search = () => {
                 <div className='flex flex-col lg:flex-row '>
                   <div className='flex flex-col items-center justify-center'>
                     {/* Szukanie po miesiącu */}
-                    <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                    <div className='flex flex-col border-2 border-info border-opahttp://localhost:3000/router/common/browser?fromSearch=truecity-50 mt-2 justify-center items-center m-2 w-full'>
                       <h1 className='text-info text-lg text-center ml-3'> Dotyczy miesiąca</h1>
                       <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
 
@@ -104,7 +103,7 @@ export const Search = () => {
                           <input
                             className="input input-bordered w-full max-w-xs"
                             defaultValue={filtr.appliesDateStart}
-                            onChange={e => { filtr.appliesDateStart = e.currentTarget.value + '-01' }}
+                            onChange={e => { setFiltr({ ...filtr, appliesDateStart: e.target.value }) }}
                             type="month"
                           />
                         </div>
@@ -113,14 +112,7 @@ export const Search = () => {
                           <input
                             className="input input-bordered w-full max-w-xs"
                             defaultValue={filtr.appliesDateEnd}
-                            onChange={e => {
-                              const [year, month] = e.currentTarget.value.split("-");
-                              const firstDayOfMonth = new Date(parseInt(year), parseInt(month) - 1, 1);
-                              const firstDayOfNextMonth = new Date(firstDayOfMonth.getFullYear(), firstDayOfMonth.getMonth() + 1, 1);
-                              const lastDayOfMonth = new Date(firstDayOfNextMonth.getTime() - 1);
-                              const lastDay = lastDayOfMonth.getDate();
-                              filtr.appliesDateEnd = e.currentTarget.value + '-' + lastDay
-                            }}
+                            onChange={e => { setFiltr({ ...filtr, appliesDateEnd: e.target.value }) }}
                             type="month"
                           />
                         </div>
@@ -137,7 +129,7 @@ export const Search = () => {
                           <input
                             className="input input-bordered w-full max-w-xs"
                             defaultValue={filtr.coachDateStart}
-                            onChange={e => { filtr.coachDateStart = e.currentTarget.value }}
+                            onChange={e => { setFiltr({ ...filtr, coachDateStart: e.target.value }) }}
                             type="date"
                           />
                         </div>
@@ -146,7 +138,7 @@ export const Search = () => {
                           <input
                             className="input input-bordered w-full max-w-xs"
                             defaultValue={filtr.coachDateEnd}
-                            onChange={e => { filtr.coachDateEnd = e.currentTarget.value }}
+                            onChange={e => { setFiltr({ ...filtr, coachDateEnd: e.target.value }) }}
                             type="date"
                           />
                         </div>
@@ -162,7 +154,7 @@ export const Search = () => {
                       <input
                         className="input input-bordered input-info max-w-md gap-y-2 w-72 m-2"
                         defaultValue={filtr.zalecenia}
-                        onChange={e => filtr.zalecenia = e.target.value}
+                        onChange={e => { setFiltr({ ...filtr, zalecenia: e.target.value }) }}
                         type="text" />
                     </div>
                     {/* Odwołanie */}
@@ -172,8 +164,15 @@ export const Search = () => {
                       <input
                         className="input input-bordered input-info max-w-md gap-y-2 w-72 m-2"
                         defaultValue={filtr.odwolanie}
-                        onChange={e => filtr.odwolanie = e.target.value}
+                        onChange={e => { setFiltr({ ...filtr, odwolanie: e.target.value }) }}
                         type="text" />
+                      <div className="flex">
+                        <label className="label cursor-pointer">
+                          <input type="checkbox" className="checkbox checkbox-info mr-2" 
+                          onChange={e => { setFiltr({ ...filtr, allOdwolania: e.target.checked }) }}/>
+                          <span className="label-text mask-triangle-2"> Wszystkie odwołania</span>
+                        </label>
+                      </div>
                     </div>
 
                     {/* ID, Status */}
@@ -191,18 +190,21 @@ export const Search = () => {
                         <input
                           className="input input-bordered input-info max-w-md w-24 m-2"
                           defaultValue={filtr.id}
-                          onChange={e => filtr.id = parseInt(e.target.value)}
+                          onChange={e => { setFiltr({ ...filtr, id: parseInt(e.target.value) }) }}
                           min='0'
                           step='1'
                           type="number" />
                       </div>
                       <div className='flex flex-col items-center justify-start'>
                         <select className="select select-bordered select-sm w-fit max-w-xs h-14"
-                          defaultValue={'DEFAULT'}>
-                          <option value="DEFAULT">Wszystkie</option>
-                          <option> {StatusLabels[Status_Note.NO_START]} </option>
-                          <option> {StatusLabels[Status_Note.CLOSE]} </option>
-                          <option> {StatusLabels[Status_Note.CLOSE_WITHOUT]} </option>
+                          defaultValue={Status_Note.ALL}
+                          onChange={e => {
+                            setFiltr({ ...filtr, status: Object.values(Status_Note).find(status => status === e.target.value) as Status_Note || Status_Note.NO_START });
+                          }}>
+                          <option value={Status_Note.ALL}>{StatusLabels[Status_Note.ALL]}</option>
+                          {/* <option value={Status_Note.NO_START}>{StatusLabels[Status_Note.NO_START]}</option> */}
+                          <option value={Status_Note.CLOSE}>{StatusLabels[Status_Note.CLOSE]}</option>
+                          <option value={Status_Note.CLOSE_WITHOUT}>{StatusLabels[Status_Note.CLOSE_WITHOUT]}</option>
                         </select>
                       </div>
                     </div>
@@ -220,14 +222,8 @@ export const Search = () => {
                         query: { fromSearch: true }
                       }}>
                       <button onClick={() => {
-
-                        const fetchData = async () => {
-                          const noteCCList = await createSearchCriteriaByFiltrNoteCC(filtr);
-                          localStorage.setItem('noteCCList_search', JSON.stringify(noteCCList))
-                        };
-
-                        fetchData();
-
+                          const criteriaList = createSearchCriteriaByFiltrNoteCC(filtr);
+                          localStorage.setItem('noteCCList_criteriaList', JSON.stringify(criteriaList));
                       }} className="btn btn-outline btn-info mx-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />

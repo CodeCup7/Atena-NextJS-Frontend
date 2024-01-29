@@ -3,12 +3,14 @@
 // '==========================================================================================================================================
 
 export enum Status_Note {
-    NO_START = "NO_START",
-    CLOSE = "CLOSE",
-    CLOSE_WITHOUT = "CLOSE_WITHOUT",
+    ALL,
+    NO_START,
+    CLOSE,
+    CLOSE_WITHOUT,
 };
 
 export const StatusLabels: Record<Status_Note, string> = {
+    [Status_Note.ALL]: "Wszystkie",
     [Status_Note.NO_START]: "Nie rozpoczęty",
     [Status_Note.CLOSE]: "Zamknięty",
     [Status_Note.CLOSE_WITHOUT]: "Zamknięty BEZ",

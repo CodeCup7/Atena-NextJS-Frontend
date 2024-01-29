@@ -60,16 +60,18 @@ export const Browser = () => {
 
         const fetchData = async () => {
             if (fromSearch != null) {
-              const noteList = localStorage.getItem('noteCCList_search');
-              if (noteList !== null) {
-                setNoteCC_List(JSON.parse(noteList));
-              }
+                const criteriaList = localStorage.getItem('noteCCList_criteriaList');
+
+                if (criteriaList !== null) {
+                    const notelist = await api_NoteCC_search(JSON.parse(criteriaList))
+                    setNoteCC_List(notelist);
+                }
             }
-            localStorage.removeItem('noteCCList_search');
-          };
-        
-          fetchData(); // Wywołanie funkcji asynchronicznej
-    
+            localStorage.removeItem('noteCCList_criteriaList');
+        };
+
+        fetchData(); // Wywołanie funkcji asynchronicznej
+
     }, [fromSearch]);
 
     async function downloadDate_Click() {
