@@ -11,6 +11,7 @@ import { getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
 import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -31,12 +32,9 @@ export const Browser = () => {
     // const [rateM_List, setRateM_List] = useState<Array<RateM>>([]);
     // const [test_list, setTest_list] = useState<Array<User>>([]);
     // const [fb_List, setFb_List] = useState<Array<User>>([]);
-
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
 
-    // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
-
         async function fetchData() {
             try {
                 const users = await updateUserList();
@@ -54,10 +52,29 @@ export const Browser = () => {
         fetchData();
     }, []);
 
+    // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
+    const searchParams = useSearchParams();
+    const fromSearch = searchParams.get('fromSearch');
+
+    useEffect(() => {
+
+        const fetchData = async () => {
+            if (fromSearch != null) {
+              const noteList = localStorage.getItem('noteCCList_search');
+              if (noteList !== null) {
+                setNoteCC_List(JSON.parse(noteList));
+              }
+            }
+            localStorage.removeItem('noteCCList_search');
+          };
+        
+          fetchData(); // Wywołanie funkcji asynchronicznej
+    
+    }, [fromSearch]);
 
     async function downloadDate_Click() {
 
-        if(dateStart !== '' && dateEnd !== '' && dateStart <= dateEnd){
+        if (dateStart !== '' && dateEnd !== '' && dateStart <= dateEnd) {
 
             const criteriaList: SearchCriteria[] = []
 
@@ -68,14 +85,14 @@ export const Browser = () => {
 
             criteriaList.push(dateCriteria)
 
-            if(agent !== 0){
+            if (agent !== 0) {
                 const agentCriteria = new SearchCriteria();
                 agentCriteria.key = 'agent'
                 agentCriteria.operation = ':'
                 agentCriteria.value = agent.toString();
                 criteriaList.push(agentCriteria)
             }
-            
+
             const noteList = await api_NoteCC_search(criteriaList);
             setNoteCC_List(noteList);
 
@@ -116,7 +133,7 @@ export const Browser = () => {
                     </div>
 
                     <div className="flex flex-col mr-2 ml-4">
-                    <span className="label-text">Data do: <span className="label-text text-red-600">*</span></span>
+                        <span className="label-text">Data do: <span className="label-text text-red-600">*</span></span>
                         <input
                             className="input input-bordered w-full max-w-xs"
                             value={dateEnd}
