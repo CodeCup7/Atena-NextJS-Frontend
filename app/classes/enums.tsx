@@ -3,10 +3,10 @@
 // '==========================================================================================================================================
 
 export enum Status_Note {
-    ALL,
-    NO_START,
-    CLOSE,
-    CLOSE_WITHOUT,
+    ALL = '0',
+    NO_START = '1',
+    CLOSE = '2',
+    CLOSE_WITHOUT = '3',
 };
 
 export const StatusLabels: Record<Status_Note, string> = {
@@ -17,11 +17,11 @@ export const StatusLabels: Record<Status_Note, string> = {
 };
 
 export enum Type_RateCC {
-    ALL,
-    RATTING_,
-    CURRENT_,
-    MYSTERY_,
-};
+    ALL = '0',
+    RATTING_ = '1',
+    CURRENT_ = '2',
+    MYSTERY_ = '3',
+  };
 
 export const TypeLabels: Record<Type_RateCC, string> = {
     [Type_RateCC.ALL]: "Wszystkie",
@@ -32,10 +32,10 @@ export const TypeLabels: Record<Type_RateCC, string> = {
 
 
 export enum Rate_Mode {
-    NEW_,
-    EDIT_,
-    PREVIEW_,
-    LOAD_,
+    NEW_ = '0',
+    EDIT_ = '1',
+    PREVIEW_ = '2',
+    LOAD_ = '3',
 };
 
 export const ModeLabels: Record<Rate_Mode, string> = {

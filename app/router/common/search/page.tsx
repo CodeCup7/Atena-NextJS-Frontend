@@ -6,7 +6,7 @@ import { FiltrNoteCC } from '@/app/classes/filtrNoteCC';
 import { FiltrRateCC } from '@/app/classes/filtrRateCC';
 import { Queue } from '@/app/classes/queue';
 import { Role, User } from '@/app/classes/user';
-import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
+import { createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC } from '@/app/factory/factory_searchCriteria';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
@@ -56,6 +56,22 @@ export const Search = () => {
     setFiltrRateCC(new FiltrRateCC())
   }
 
+  const [choiseUser, setChoiseUser] = useState<Array<User>>([]);
+
+
+  function checkboxUserHandler(user: User) {
+
+    const isSelected = choiseUser.find(r => r.id === user.id)
+
+    if (isSelected) {
+        const updatedChoiseUser = choiseUser.filter((r) => r.id !== user.id);
+        setChoiseUser(updatedChoiseUser);
+    } else {
+        setChoiseUser((prevChoiseUser) => [...prevChoiseUser, user]);
+    }
+}
+
+
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
       <ToastContainer />
@@ -67,9 +83,11 @@ export const Search = () => {
       </div>
       <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
 
-      <div className='flex justify-center items-center w-full'>
-        <div className='flex flex-col col-span-8 mt-10 '>
-          <div className="tabs justify-center items-center w-full">
+      <div className='flex justify-center '>
+
+        {/* Tabs Main */}
+        <div className='flex flex-col mt-10 '>
+          <div className="tabs justify-center items-center ">
 
             <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 1 ? " tab-active " : "")
             }
@@ -94,14 +112,14 @@ export const Search = () => {
           </div>
 
           {/* <!-- Tab content --> */}
-          <div className=" flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
+          <div className=" flex flex-col min-w-0 break-words mb-6 tab-content tab-space">
             {/* NoteCC TAB */}
             <div className={openTab === 1 ? "block" : "hidden"} id="link1">
               <div className='flex flex-col items-center justify-center mt-2'>
-                <div className='flex flex-col lg:flex-row '>
+                <div className='flex flex-col 2xl:flex-row '>
                   <div className='flex flex-col items-center justify-center'>
                     {/* Szukanie po miesiącu */}
-                    <div className='flex flex-col border-2 border-info border-opahttp://localhost:3000/router/common/browser?fromSearch=truecity-50 mt-2 justify-center items-center m-2 w-full'>
+                    <div className='flex flex-col border-2 border-info border-opa mt-2 justify-center items-center m-2 w-full'>
                       <h1 className='text-info text-lg text-center ml-3'> Dotyczy miesiąca</h1>
                       <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
 
@@ -186,7 +204,7 @@ export const Search = () => {
                       </div>
                     </div>
                   </div>
-                  <div className='flex flex-col items-center justify-center h-full lg:ml-10 w-full'>
+                  <div className='flex flex-col items-center justify-center h-full 2xl:ml-10 w-full'>
                     {/* Zalecenia */}
                     <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
                       <h1 className='text-info text-lg text-center ml-3'>Zalecenia (fraza)</h1>
@@ -252,7 +270,7 @@ export const Search = () => {
             <div className={openTab === 2 ? "block" : "hidden"} id="link1">
               <div className='flex items-center justify-center'>
                 <div className='flex flex-col items-center justify-center mt-2'>
-                  <div className='flex flex-col lg:flex-row '>
+                  <div className='flex flex-col 2xl:flex-row '>
                     <div className='flex flex-col items-center justify-center'>
                       {/* Szukanie po miesiącu */}
                       <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
@@ -316,8 +334,8 @@ export const Search = () => {
                             <h1 className='text-sm text-center'>Minimalna ocena</h1>
                             <input
                               className="input input-bordered input-info max-w-md w-24 m-2"
-                              value={filtrRateCC.rate}
-                              onChange={e => { setFiltrRateCC({ ...filtrRateCC, rate: parseInt(e.target.value) }) }}
+                              value={filtrRateCC.rateStart}
+                              onChange={e => { setFiltrRateCC({ ...filtrRateCC, rateStart: e.target.value }) }}
                               min='0'
                               step='1'
                               type="number" />
@@ -327,8 +345,8 @@ export const Search = () => {
                             <h1 className='text-sm text-center'>Maksymalna ocena</h1>
                             <input
                               className="input input-bordered input-info max-w-md w-24 m-2"
-                              value={filtrRateCC.id}
-                              onChange={e => { setFiltrRateCC({ ...filtrRateCC, rate: parseInt(e.target.value) }) }}
+                              value={filtrRateCC.rateEnd}
+                              onChange={e => { setFiltrRateCC({ ...filtrRateCC, rateEnd: e.target.value }) }}
                               min='0'
                               step='1'
                               type="number" />
@@ -336,8 +354,8 @@ export const Search = () => {
                         </div>
                       </div>
                     </div>
-                    <div className='flex flex-col items-center justify-center h-full lg:ml-10 w-full gap-2'>
-                      <div className='flex items-center justify-center h-full lg:ml-10 w-full gap-2'>
+                    <div className='flex flex-col items-center justify-center h-full 2xl:ml-10 w-full gap-2'>
+                      <div className='flex items-center justify-center h-full w-full gap-2'>
                         {/* ID */}
                         <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center w-full'>
                           <h1 className='text-info text-lg text-center ml-3'>Id</h1>
@@ -356,25 +374,29 @@ export const Search = () => {
                           <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
                           <input
                             className="input input-bordered input-info max-w-md w-24 m-2"
-                            value={filtrRateCC.id}
-                            onChange={e => { setFiltrRateCC({ ...filtrRateCC, id: parseInt(e.target.value) }) }}
-                            min='0'
-                            step='1'
-                            type="number" />
+                            value={filtrRateCC.idCall}
+                            onChange={e => { setFiltrRateCC({ ...filtrRateCC, idCall: e.target.value }) }}
+                            type="text" />
                         </div>
                       </div>
-                      <div className='flex items-center justify-center h-full lg:ml-10 w-full gap-2'>
+
+                      <div className='flex items-center justify-center h-full  w-full gap-2'>
                         {/* Typ rozmowy */}
                         <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center w-full'>
                           <h1 className='text-info text-lg text-center ml-3'>Typ rozmowy</h1>
                           <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
 
                           <div className='flex flex-col items-center justify-start mb-4'>
-                            <select className="select select-bordered select-sm w-fit max-w-xs h-14"
-                              value={Type_RateCC.ALL}
+                            <select
+                              className="select select-bordered select-sm w-fit max-w-xs h-14"
+                              value={filtrRateCC.typeRate}
                               onChange={e => {
-                                setFiltrRateCC({ ...filtrRateCC, typeRate: Object.values(Type_RateCC).find(typeRate => typeRate === e.target.value) as Type_RateCC || Type_RateCC.ALL });
-                              }}>
+                                setFiltrRateCC({
+                                  ...filtrRateCC,
+                                  typeRate: Object.values(Type_RateCC).find(typeRate => typeRate === e.target.value) as Type_RateCC || Type_RateCC.ALL
+                                });
+                              }}
+                            >
                               <option value={Type_RateCC.ALL}>{TypeLabels[Type_RateCC.ALL]}</option>
                               <option value={Type_RateCC.RATTING_}>{TypeLabels[Type_RateCC.RATTING_]}</option>
                               <option value={Type_RateCC.MYSTERY_}>{TypeLabels[Type_RateCC.MYSTERY_]}</option>
@@ -389,9 +411,9 @@ export const Search = () => {
 
                           <div className='flex flex-col items-center justify-start mb-4'>
                             <select className="select select-bordered select-sm w-fit max-w-lg h-14"
-                              value={Status_Note.ALL}
+                              value={filtrRateCC.queueId}
                               onChange={e => {
-                                setFiltrRateCC({ ...filtrRateCC, queueId: parseInt(e.target.value) })
+                                setFiltrRateCC({ ...filtrRateCC, queueId: e.target.value })
                               }}>
                               <option value={0} disabled>Wybierz kolejkę ...</option>
                               {queueList.filter(queue => queue.available === true).map((queue) => (
@@ -415,8 +437,8 @@ export const Search = () => {
                           query: { fromSearch: true }
                         }}>
                         <button onClick={() => {
-                          const criteriaList = createSearchCriteriaByFiltrNoteCC(filtrNoteCC);
-                          localStorage.setItem('noteCCList_criteriaList', JSON.stringify(criteriaList));
+                          const criteriaList = createSearchCriteriaByFiltrRateCC(filtrRateCC);
+                          localStorage.setItem('rateCCList_criteriaList', JSON.stringify(criteriaList));
                         }} className="btn btn-outline btn-info mx-2">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -443,25 +465,40 @@ export const Search = () => {
           </div>
         </div>
 
-        {/* <div className='flex flex-col col-span-4 ml-20 mt-2 border-l-2 border-info border-opacity-50 justify-center items-center border-2'>
-          <h1 className='text-info text-lg text-center ml-3'> Lista użytkowników</h1>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Imię i nazwisko</th>
-              </tr>
-            </thead>
-            <tbody className="table-auto overflow-scroll w-full">
-              {userList.map((user, index) => {
-                return (
-                  <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
-                    <td>{user.nameUser}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div> */}
+        {/* User Tabel */}
+        <div className='flex flex-col sm:ml-2 md:ml-10 mt-2 border-info border-opacity-50 border-2 items-center '>
+          <h1 className='text-info text-lg text-center ml-3 '> Lista agentów</h1>
+          <div className="2xl:max-h-[650px] overflow-y-auto w-fit">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th className='w-32' >Zaznacz</th>
+                  <th className='w-full'>Imię i nazwisko</th>
+                </tr>
+              </thead>
+              <tbody className="table-auto overflow-scroll w-full">
+                {userList.filter(user => user.role === Role.AGENT_).map((user, index) => {
+                  return (
+                    <tr className="hover:bg-base-300  hover:text-white cursor-pointe"
+                      key={index}
+                      onClick={() => {
+                        checkboxUserHandler(user) // Obsługa zaznaczenia checkboxa
+                        filtrNoteCC.userCol = choiseUser;
+                        filtrRateCC.userCol = choiseUser;
+                      }}>
+                      <td>
+                        <input type="checkbox" className="checkbox checkbox-info"
+                          checked={choiseUser.some((r) => r.id == user.id)}
+                          onChange={() => { }}
+                        />
+                      </td>
+                      <td>{user.nameUser}</td>
+                    </tr>)
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div >
     </div >
   )

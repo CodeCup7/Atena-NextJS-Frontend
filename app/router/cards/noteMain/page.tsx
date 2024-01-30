@@ -80,6 +80,8 @@ export const NoteMain = () => {
         } else {
             setChoiseRateCC((prevChoiseRateCC) => [...prevChoiseRateCC, rateCC]);
         }
+
+        console.log(choiseRateCC)
     }
 
     // ====== FUNKCJE ==========================================

@@ -60,17 +60,24 @@ export const Browser = () => {
 
         const fetchData = async () => {
             if (fromSearch != null) {
-                const criteriaList = localStorage.getItem('noteCCList_criteriaList');
+                const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
+                const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
 
-                if (criteriaList !== null) {
-                    const notelist = await api_NoteCC_search(JSON.parse(criteriaList))
+                if (criteriaListNoteCC !== null) {
+                    const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC))
                     setNoteCC_List(notelist);
+                    localStorage.removeItem('noteCCList_criteriaList');
+                } else if (criteriaListRateCC !== null) {
+                    const ratelist = await api_RateCC_search(JSON.parse(criteriaListRateCC))
+                    setRateCC_List(ratelist);
+                    setOpenTab(2)
+                    localStorage.removeItem('rateCCList_criteriaList');
                 }
             }
-            localStorage.removeItem('noteCCList_criteriaList');
+            
         };
 
-        fetchData(); // Wywołanie funkcji asynchronicznej
+        fetchData(); 
 
     }, [fromSearch]);
 
