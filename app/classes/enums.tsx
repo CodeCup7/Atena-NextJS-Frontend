@@ -17,13 +17,14 @@ export const StatusLabels: Record<Status_Note, string> = {
 };
 
 export enum Type_RateCC {
-
+    ALL,
     RATTING_,
     CURRENT_,
     MYSTERY_,
 };
 
 export const TypeLabels: Record<Type_RateCC, string> = {
+    [Type_RateCC.ALL]: "Wszystkie",
     [Type_RateCC.RATTING_]: "Karta Oceny",
     [Type_RateCC.CURRENT_]: "Bierzący Odsłuch",
     [Type_RateCC.MYSTERY_]: "Tajemniczy Klient",
