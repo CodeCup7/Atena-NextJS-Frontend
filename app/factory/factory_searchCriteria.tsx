@@ -2,10 +2,10 @@
 // '*********************** SearchCriteria Factory *******************************************************************************************
 // '==========================================================================================================================================
 
-import { api_NoteCC_search } from "../api/noteCC_api";
-import { StatusLabels, Status_Note, Type_RateCC } from "../classes/enums";
+import { Status_Note, Type_RateCC } from "../classes/enums";
 import { FiltrNoteCC } from "../classes/filtrNoteCC";
 import { FiltrRateCC } from "../classes/filtrRateCC";
+import { FiltrRateM } from "../classes/filtrRateM";
 import { SearchCriteria } from "../classes/searchCriteria";
 
 export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
@@ -63,11 +63,53 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
         criteriaList.push(queue)
     }
     if(filtr.userCol.length > 0){
-        const userList = new SearchCriteria();
-        userList.key = 'agent'
-        userList.operation = ':'
-        userList.value = ''
-        criteriaList.push(userList)
+        filtr.userCol.forEach(user=>{
+            const userCriteria = new SearchCriteria();
+            userCriteria.key = 'agent'
+            userCriteria.operation = ':'
+            userCriteria.value = user.id.toString();
+            criteriaList.push(userCriteria)
+        })
+    }
+    console.log('criteriaList RATE:', criteriaList);
+    return criteriaList;
+
+}
+
+export function createSearchCriteriaByFiltrRateM(filtr: FiltrRateM) {
+
+    const criteriaList: SearchCriteria[] = []
+
+    if (filtr.dateRateStart !== '' && filtr.dateRateEnd !== '') {
+        const dateCriteria = new SearchCriteria();
+        dateCriteria.key = 'dateRate'
+        dateCriteria.operation = 'BETWEEN'
+        dateCriteria.value = filtr.dateRateStart + " AND " + filtr.dateRateEnd
+        criteriaList.push(dateCriteria)
+    }
+
+    if (filtr.id > 0) {
+        const id = new SearchCriteria();
+        id.key = 'id'
+        id.operation = ':'
+        id.value = filtr.id.toString()
+        criteriaList.push(id)
+    }
+    if (filtr.rateEnd !== '') {
+        const rate = new SearchCriteria();
+        rate.key = 'rate'
+        rate.operation = 'BETWEEN'
+        rate.value = filtr.rateStart + " AND " + filtr.rateStart
+        criteriaList.push(rate)
+    }
+    if(filtr.userCol.length > 0){
+        filtr.userCol.forEach(user=>{
+            const userCriteria = new SearchCriteria();
+            userCriteria.key = 'agent'
+            userCriteria.operation = ':'
+            userCriteria.value = user.id.toString();
+            criteriaList.push(userCriteria)
+        })
     }
     console.log('criteriaList RATE:', criteriaList);
     return criteriaList;
@@ -136,11 +178,14 @@ export function createSearchCriteriaByFiltrNoteCC(filtr: FiltrNoteCC) {
         criteriaList.push(allOdwolania)
     }
     if(filtr.userCol.length > 0){
-        const userList = new SearchCriteria();
-        userList.key = 'agent'
-        userList.operation = ':'
-        userList.value = ''
-        criteriaList.push(userList)
+        filtr.userCol.forEach(user=>{
+            const userCriteria = new SearchCriteria();
+            userCriteria.key = 'agent'
+            userCriteria.operation = ':'
+            userCriteria.value = user.id.toString();
+            criteriaList.push(userCriteria)
+        })
+
     }
     console.log('criteriaList NOTE:', criteriaList);
     return criteriaList;

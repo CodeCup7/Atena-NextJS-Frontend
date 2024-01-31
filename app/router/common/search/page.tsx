@@ -56,21 +56,27 @@ export const Search = () => {
     setFiltrRateCC(new FiltrRateCC())
   }
 
-  const [choiseUser, setChoiseUser] = useState<Array<User>>([]);
+  const [choiseUsers, setSelectedUsers] = useState<Array<User>>([]);
 
-
-  function checkboxUserHandler(user: User) {
-
-    const isSelected = choiseUser.find(r => r.id === user.id)
+  const handleCheckboxChange = (selectUser: User) => {
+    const isSelected = choiseUsers.some(user => user.id === selectUser.id)
 
     if (isSelected) {
-        const updatedChoiseUser = choiseUser.filter((r) => r.id !== user.id);
-        setChoiseUser(updatedChoiseUser);
+      setSelectedUsers(choiseUsers.filter((user) => user !== selectUser));
     } else {
-        setChoiseUser((prevChoiseUser) => [...prevChoiseUser, user]);
+      setSelectedUsers([...choiseUsers, selectUser]);
     }
-}
 
+  }
+
+  useEffect(() => {
+    setFiltrNoteCC((prevFiltrNoteCC) => ({ ...prevFiltrNoteCC, userCol: choiseUsers }));
+    setFiltrRateCC((prevFiltrRateCC) => ({ ...prevFiltrRateCC, userCol: choiseUsers }));
+  }, [choiseUsers]);
+
+  useEffect(() => {
+    console.log(filtrNoteCC);
+  }, [filtrNoteCC]);
 
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -482,14 +488,14 @@ export const Search = () => {
                     <tr className="hover:bg-base-300  hover:text-white cursor-pointe"
                       key={index}
                       onClick={() => {
-                        checkboxUserHandler(user) // Obsługa zaznaczenia checkboxa
-                        filtrNoteCC.userCol = choiseUser;
-                        filtrRateCC.userCol = choiseUser;
+                        handleCheckboxChange(user)
                       }}>
                       <td>
-                        <input type="checkbox" className="checkbox checkbox-info"
-                          checked={choiseUser.some((r) => r.id == user.id)}
+                        <input
+                          type="checkbox"
+                          className="checkbox checkbox-info"
                           onChange={() => { }}
+                          checked={choiseUsers.some(userInList => userInList.id === user.id)}
                         />
                       </td>
                       <td>{user.nameUser}</td>

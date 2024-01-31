@@ -67,6 +67,35 @@ export function getWagRateCC(key: string) {
         }
     }
 }
+export function getWagRateM(key: string) {
+
+    switch (key) {
+        case key_w1: {
+            return 25;
+        }
+        case key_o1: {
+            return 10;
+        }
+        case key_t1: {
+            return 20;
+        }
+        case key_t2: {
+            return 15;
+        }
+        case key_s1: {
+            return 10;
+        }
+        case key_s2: {
+            return 10;
+        }
+        case key_s3: {
+            return 10;
+        }
+        default: {
+            return 0;
+        }
+    }
+}
 
 export function getKeyAsName(key: string) {
 

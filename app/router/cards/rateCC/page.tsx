@@ -97,7 +97,7 @@ const RateCC_Page = () => {
         rateCC.mode === Rate_Mode.PREVIEW_ ? setPreviewMode(true) : setPreviewMode(false);
     }
     function validate(): boolean {
-        if (rateCC.agent.id != 0 && rateCC.queue.id != 0 && rateCC.dateCall != "" && rateCC.idCall != "")
+        if (rateCC.agent.id !== 0 && rateCC.queue.id !== 0 && rateCC.dateCall !== "" && rateCC.idCall !== "")
             return true;
         else {
             return false;
@@ -317,11 +317,11 @@ const RateCC_Page = () => {
                     </div>
                 </div>
                 {/* Wykres */}
-                <div className="col-span-12 md:col-span-2 md:row-span-2 flex justify-center items-center">
+                <div className="col-span-3 md:col-span-2 md:row-span-2 flex justify-center items-center">
                     <div className='sm:my-5 md:mt-0 mx:ml-4 '><RateCC_chart value={score} /></div>
                 </div>
                 {/* Rate blocks */}
-                <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
+                <div className='col-span-9 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
 
                     <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>
