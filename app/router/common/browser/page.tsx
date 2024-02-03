@@ -1,14 +1,17 @@
 'use client'
 import { api_NoteCC_getDate, api_NoteCC_search } from '@/app/api/noteCC_api';
 import { api_RateCC_search } from '@/app/api/rateCC_api';
+import { api_RateM_search } from '@/app/api/rateM_api';
 import { getActiveUser } from '@/app/auth';
 import { StatusLabels } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/noteCC';
 import { RateCC } from '@/app/classes/rateCC';
+import { RateM } from '@/app/classes/rateM';
 import { SearchCriteria } from '@/app/classes/searchCriteria';
 import { Role, User } from '@/app/classes/user';
 import { getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
 import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
+import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -29,7 +32,7 @@ export const Browser = () => {
     // Pobrane dane
     const [noteCC_List, setNoteCC_List] = useState<Array<NoteCC>>([]);
     const [rateCC_List, setRateCC_List] = useState<Array<RateCC>>([]);
-    // const [rateM_List, setRateM_List] = useState<Array<RateM>>([]);
+    const [rateM_List, setRateM_List] = useState<Array<RateM>>([]);
     // const [test_list, setTest_list] = useState<Array<User>>([]);
     // const [fb_List, setFb_List] = useState<Array<User>>([]);
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
@@ -62,6 +65,7 @@ export const Browser = () => {
             if (fromSearch != null) {
                 const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
                 const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
+                const criteriaListRateM = localStorage.getItem('rateMList_criteriaList');
 
                 if (criteriaListNoteCC !== null) {
                     const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC))
@@ -72,12 +76,17 @@ export const Browser = () => {
                     setRateCC_List(ratelist);
                     setOpenTab(2)
                     localStorage.removeItem('rateCCList_criteriaList');
+                } else if (criteriaListRateM !== null) {
+                    const ratelist = await api_RateM_search(JSON.parse(criteriaListRateM))
+                    setRateM_List(ratelist);
+                    setOpenTab(3)
+                    localStorage.removeItem('rateMList_criteriaList');
                 }
             }
-            
+
         };
 
-        fetchData(); 
+        fetchData();
 
     }, [fromSearch]);
 
@@ -107,8 +116,12 @@ export const Browser = () => {
 
             dateCriteria.key = 'dateRate'
 
-            const rateList = await api_RateCC_search(criteriaList);
-            setRateCC_List(rateList);
+            const rateCCList = await api_RateCC_search(criteriaList);
+            setRateCC_List(rateCCList);
+
+            const rateMList = await api_RateM_search(criteriaList);
+            setRateM_List(rateMList);
+
         } else {
             toast.error("Uzupełnij poprawnie daty", {
                 position: toast.POSITION.TOP_RIGHT, theme: "dark"
@@ -316,8 +329,45 @@ export const Browser = () => {
 
                 </div>
                 <div className={openTab === 3 ? "block" : "hidden"} id="link1">
-                    <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
-                        E-Mail
+                    <div className='flex items-center justify-center'>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Data Oceny</th>
+                                    <th>Coach</th>
+                                    <th>Agent</th>
+                                    <th>Ocena</th>
+                                </tr>
+                            </thead>
+                            <tbody className="table-auto overflow-scroll w-full">
+                                {rateM_List.map((rateM, index) => {
+                                    return (
+                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                            <td>{rateM.dateRate}</td>
+                                            <td>{rateM.coach.nameUser}</td>
+                                            <td>{rateM.agent.nameUser}</td>
+                                            <td>{getRateM_RateAs100(rateM)}</td>
+                                            <td>
+                                                <Link className="group link link-info link-hover text-lg"
+                                                    href='/router/cards/rateM'>
+                                                    <button className="btn btn-outline btn-info btn-sm"
+                                                        onClick={() => {
+                                                            localStorage.removeItem('rateM_prev');
+                                                            localStorage.setItem('rateM_prev', JSON.stringify(rateM));
+                                                        }}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        </svg>
+                                                        Podgląd
+                                                    </button>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>

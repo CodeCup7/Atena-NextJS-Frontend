@@ -11,17 +11,21 @@ interface Foo {
     rateM: RateM
 }
 
-export async function api_rateM_add(rateM: RateM): Promise<Foo> {
+export async function api_rateM_add(rateM: RateM, attachment: File): Promise<Foo> {
 
     try {
         let foo: Foo = { callback: '', isOK: false, rateM: rateM };
 
+        const formData = new FormData();
+        formData.append('rateM', JSON.stringify(rateM));
+        formData.append('file', attachment);
+
         const response = await fetch('http://localhost:8080/api/rateM/add', {
             method: 'POST',
+            body: formData,
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
-            body: JSON.stringify(rateM)
         });
 
         if (response.ok) {
@@ -39,18 +43,21 @@ export async function api_rateM_add(rateM: RateM): Promise<Foo> {
     }
 }
 
-
-export async function api_rateM_update(rateM: RateM): Promise<Foo> {
+export async function api_rateM_update(rateM: RateM, attachment: File): Promise<Foo> {
 
     try {
         let foo: Foo = { callback: '', isOK: false, rateM: rateM };
 
+        const formData = new FormData();
+        formData.append('rateM', JSON.stringify(rateM));
+        formData.append('file', attachment);
+
         const response = await fetch('http://localhost:8080/api/rateM/update', {
             method: 'POST',
+            body: formData,
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
-            body: JSON.stringify(rateM)
         });
 
         if (response.ok) {
@@ -66,7 +73,7 @@ export async function api_rateM_update(rateM: RateM): Promise<Foo> {
     }
 }
 
-export async function api_RateM_search(searchCriteria:SearchCriteria[]): Promise<RateM[]> {
+export async function api_RateM_search(searchCriteria: SearchCriteria[]): Promise<RateM[]> {
 
     try {
         const response = await fetch('http://localhost:8080/api/rateM/search', {
@@ -110,4 +117,18 @@ export async function api_rateM_getAllRateNoNote(): Promise<RateM[]> {
         console.error('Błąd pobierania ocen RateM:', error);
         return [];
     }
+}
+
+export async function api_rateM_getAttachment(fileName: string): Promise<File> {
+    const response = await fetch(`http://localhost:8080/api/rateM/getAttachment?fileName=${encodeURIComponent(fileName)}`);
+
+    const blob = await response.blob();
+    const file = new File([blob], fileName);
+
+    return file;
+
+}
+
+export async function api_rateM_downloadAttachment(fileName: string) {
+    window.location.href = `http://localhost:8080/api/rateM/getAttachment?fileName=${encodeURIComponent(fileName)}`;
 }

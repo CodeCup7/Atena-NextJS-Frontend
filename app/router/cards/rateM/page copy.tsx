@@ -46,11 +46,10 @@ const RateM_Page = () => {
                 if (rateM_prev != null) {
                     const previewRateM = JSON.parse(rateM_prev);
                     previewRateM.mode = Rate_Mode.PREVIEW_;
-                    
+
                     // pobranie załącznika do sprawy
-                    const attachmentFile: File = await api_rateM_getAttachment(rateM.attachmentPath)
-                    console.log('rateM.attachmentPath :', rateM.attachmentPath);
-                    
+                    const fileName = rateM.attachmentPath.match(regex)?.[0] || ''
+                    const attachmentFile: File = await api_rateM_getAttachment(fileName)
                     setAttachment(attachmentFile)
                     updateRateM(previewRateM);
                 } else {
@@ -64,9 +63,6 @@ const RateM_Page = () => {
         }
         fetchData();
     }, [refresh]);
-
-    //console.log(attachment)
-    console.log(rateM)
 
     // RateM hooks
     const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateM.wiedzaBlock));
@@ -178,7 +174,7 @@ const RateM_Page = () => {
         }
     }
 
-    
+    console.log(rateM)
 
     function editBtn_Click() {
 
@@ -297,7 +293,7 @@ const RateM_Page = () => {
                         <div className="flex flex-col">
                             <span className="label-text">Załącznik</span>
 
-                            {attachment === null ?
+                            {rateM.attachmentPath === '' ?
                                 <div className='flex gap-2'>
                                     <input type="file" className="file-input file-input-bordered file-input-info w-full max-w-xs"
                                         onChange={handleFileChange}
@@ -306,7 +302,7 @@ const RateM_Page = () => {
                                 :
                                 <div className='flex gap-2'>
                                     <input type="text" className="file-input file-input-bordered file-input-info w-full max-w-xs text-center text-xs"
-                                        value={attachment.name}
+                                        value={rateM.attachmentPath.match(regex)?.[0]}
                                         onChange={() => { }} />
 
                                     <div className="dropdown w-max">

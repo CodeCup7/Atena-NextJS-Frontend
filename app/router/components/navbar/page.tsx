@@ -134,6 +134,7 @@ export const Navbar = () => {
                     <li>
                         <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/rateM">
                             <button className="group" onClick={() => {
+                                localStorage.removeItem('rateM_prev');
                                 setMenuHiden(true)
                             }}>
                                 <div className="flex items-center">

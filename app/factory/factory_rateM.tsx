@@ -6,7 +6,7 @@ import { RateBlock } from "../classes/rateBlock";
 import { RateM } from "../classes/rateM";
 import { User } from "../classes/user";
 import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "../globalKeys";
-import { CreateNewEmptyRatePart } from "./factory_ratePart";
+import { CreateNewEmptyRatePartM } from "./factory_ratePart";
 
 export function CreateNewEmptyRateM(coach: User) {
 
@@ -15,19 +15,16 @@ export function CreateNewEmptyRateM(coach: User) {
     rateM.coach = coach;
     rateM.dateRate = new Date().toLocaleDateString('en-CA');
 
-    rateM.wiedzaBlock.ratePart.push(CreateNewEmptyRatePart(key_w1));
-    rateM.obslugaBlock.ratePart.push(CreateNewEmptyRatePart(key_o1));
-    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t1));
-    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t2));
-    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t3));
-    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t4));
-    rateM.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k1));
-    rateM.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k2));
-    rateM.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k3));
-    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s1));
-    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s2));
-    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s3));
-    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s4));
+    rateM.wiedzaBlock.ratePart.push(CreateNewEmptyRatePartM(key_w1));
+    rateM.obslugaBlock.ratePart.push(CreateNewEmptyRatePartM(key_o1));
+    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePartM(key_t1));
+    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePartM(key_t2));
+    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePartM(key_t3));
+    rateM.technikaBlock.ratePart.push(CreateNewEmptyRatePartM(key_t4));
+    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePartM(key_s1));
+    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePartM(key_s2));
+    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePartM(key_s3));
+    rateM.standardBlock.ratePart.push(CreateNewEmptyRatePartM(key_s4));
 
     return rateM;
 
@@ -36,7 +33,7 @@ export function CreateNewEmptyRateM(coach: User) {
 export function getRateM_Rate(rateM: RateM): number {
 
     let rate: number = 0;
-    const rateBlockCol = new Array<RateBlock>(rateM.wiedzaBlock, rateM.obslugaBlock, rateM.komunikacjaBlock, rateM.standardBlock, rateM.technikaBlock);
+    const rateBlockCol = new Array<RateBlock>(rateM.wiedzaBlock, rateM.obslugaBlock, rateM.standardBlock, rateM.technikaBlock);
 
     rateBlockCol.forEach(block => {
         block.ratePart.forEach(part => {

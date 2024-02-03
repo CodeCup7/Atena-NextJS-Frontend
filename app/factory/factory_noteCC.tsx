@@ -10,6 +10,8 @@ import { Role, User } from "../classes/user";
 import { getRateCC_Rate } from "./factory_rateCC";
 import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";
 import { getActiveUser } from "../auth";
+import { getRateM_Rate } from "./factory_rateM";
+import { api_rateM_getAllRateNoNote } from "../api/rateM_api";
 
 export function CreateNewEmptyNoteCC(coach: User): NoteCC {
 
@@ -21,7 +23,7 @@ export function CreateNewEmptyNoteCC(coach: User): NoteCC {
 }
 
 export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach: User, coachDate: string, appliesDate: string,
-    zalecenia: string, odwolanie: string, rateCC_Col: Array<RateCC>, mode: Rate_Mode) {
+    zalecenia: string, odwolanie: string, rateCC_Col: Array<RateCC>,  rateM_Col: Array<RateM>, mode: Rate_Mode) {
 
     let noteCC = new NoteCC();
     noteCC.id = id;
@@ -33,6 +35,7 @@ export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach
     noteCC.zalecenia = zalecenia;
     noteCC.odwolanie = odwolanie;
     noteCC.rateCC_Col = rateCC_Col;
+    noteCC.rateM_Col = rateM_Col;
     noteCC.mode = mode;
 
     return noteCC;
@@ -46,8 +49,11 @@ export function getNoteCC_Rate(noteCC: NoteCC): number {
     noteCC.rateCC_Col.forEach(e => {
         rate = rate + getRateCC_Rate(e);
     });
+    noteCC.rateM_Col.forEach(e => {
+        rate = rate + getRateM_Rate(e);
+    });
 
-    rate = rate / noteCC.rateCC_Col.length
+    rate = rate / (noteCC.rateCC_Col.length + noteCC.rateM_Col.length)
     return rate;
 }
 
@@ -63,7 +69,8 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
     let noteListWitnNoStart: Array<NoteCC> = new Array();
     let id: number = 0; // KASUJ
     const activeUser = await getActiveUser();
-    const rateListNoNote = await api_rateCC_getAllRateNoNote();
+    const rateCCListNoNote = await api_rateCC_getAllRateNoNote();
+    const rateMListNoNote = await api_rateM_getAllRateNoNote();
 
 
     userList.forEach(user => {
@@ -91,10 +98,17 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
                 noteCC.coach = activeUser;
 
                 //Dodanie do noteCC rateCC
-                rateListNoNote.forEach(rateCC => {
+                rateCCListNoNote.forEach(rateCC => {
                     if (rateCC.agent.id === user.id) {
                         rateCC.mode = Rate_Mode.PREVIEW_;
                         noteCC.rateCC_Col.push(rateCC);
+                    }
+                })
+                //Dodanie do noteCC rateM
+                rateMListNoNote.forEach(rateM => {
+                    if (rateM.agent.id === user.id) {
+                        rateM.mode = Rate_Mode.PREVIEW_;
+                        noteCC.rateM_Col.push(rateM);
                     }
                 })
 

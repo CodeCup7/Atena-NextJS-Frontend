@@ -4,9 +4,10 @@ import { getActiveUser } from '@/app/auth';
 import { StatusLabels, Status_Note, TypeLabels, Type_RateCC } from '@/app/classes/enums';
 import { FiltrNoteCC } from '@/app/classes/filtrNoteCC';
 import { FiltrRateCC } from '@/app/classes/filtrRateCC';
+import { FiltrRateM } from '@/app/classes/filtrRateM';
 import { Queue } from '@/app/classes/queue';
 import { Role, User } from '@/app/classes/user';
-import { createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC } from '@/app/factory/factory_searchCriteria';
+import { createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC, createSearchCriteriaByFiltrRateM } from '@/app/factory/factory_searchCriteria';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
@@ -27,6 +28,7 @@ export const Search = () => {
 
   const [filtrNoteCC, setFiltrNoteCC] = useState(new FiltrNoteCC())
   const [filtrRateCC, setFiltrRateCC] = useState(new FiltrRateCC())
+  const [filtrRateM, setFiltrRateM] = useState(new FiltrRateM())
 
   useEffect(() => {
 
@@ -55,6 +57,9 @@ export const Search = () => {
   function clearRateCC_Click() {
     setFiltrRateCC(new FiltrRateCC())
   }
+  function clearRateM_Click() {
+    setFiltrRateM(new FiltrRateM())
+  }
 
   const [choiseUsers, setSelectedUsers] = useState<Array<User>>([]);
 
@@ -72,11 +77,8 @@ export const Search = () => {
   useEffect(() => {
     setFiltrNoteCC((prevFiltrNoteCC) => ({ ...prevFiltrNoteCC, userCol: choiseUsers }));
     setFiltrRateCC((prevFiltrRateCC) => ({ ...prevFiltrRateCC, userCol: choiseUsers }));
+    setFiltrRateCC((prevFiltrRateM) => ({ ...prevFiltrRateM, userCol: choiseUsers }));
   }, [choiseUsers]);
-
-  useEffect(() => {
-    console.log(filtrNoteCC);
-  }, [filtrNoteCC]);
 
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -464,9 +466,116 @@ export const Search = () => {
               </div>
             </div>
             <div className={openTab === 3 ? "block" : "hidden"} id="link1">
-              <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
-                E-Mail
+              <div className='flex items-center justify-center'>
+                <div className='flex flex-col items-center justify-center mt-2'>
+                  <div className='flex flex-col 2xl:flex-row '>
+                    <div className='flex flex-col items-center justify-center'>
+                      {/* Szukanie po miesiącu */}
+                      <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                        <h1 className='text-info text-lg text-center ml-3'>Data wystawienia oceny</h1>
+                        <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+
+                        <div className='flex mt-2'>
+                          <div className="flex flex-col m-2">
+                            <span className="label-text">Data od:</span>
+                            <input
+                              className="input input-bordered w-full max-w-xs"
+                              value={filtrRateM.dateRateStart}
+                              onChange={e => { setFiltrRateM({ ...filtrRateM, dateRateStart: e.target.value }) }}
+                              type="date"
+                            />
+                          </div>
+                          <div className="flex flex-col mr-2 ml-4 m-2">
+                            <span className="label-text">Data do:</span>
+                            <input
+                              className="input input-bordered w-full max-w-xs"
+                              value={filtrRateM.dateRateEnd}
+                              onChange={e => { setFiltrRateM({ ...filtrRateM, dateRateEnd: e.target.value }) }}
+                              type="date"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Zakres ocen*/}
+                      <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                        <h1 className='text-info text-lg text-center ml-3'>Zakres ocen</h1>
+                        <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+
+                        <div className='flex items-center justify-start mb-4 gap-4'>
+                          <div className='flex flex-col'>
+                            <h1 className='text-sm text-center'>Minimalna ocena</h1>
+                            <input
+                              className="input input-bordered input-info max-w-md w-24 m-2"
+                              value={filtrRateM.rateStart}
+                              onChange={e => { setFiltrRateM({ ...filtrRateM, rateStart: e.target.value }) }}
+                              min='0'
+                              step='1'
+                              type="number" />
+                          </div>
+                          <hr className="w-2 h-1 border-0 rounded bg-white"></hr>
+                          <div className='flex flex-col'>
+                            <h1 className='text-sm text-center'>Maksymalna ocena</h1>
+                            <input
+                              className="input input-bordered input-info max-w-md w-24 m-2"
+                              value={filtrRateM.rateEnd}
+                              onChange={e => { setFiltrRateM({ ...filtrRateM, rateEnd: e.target.value }) }}
+                              min='0'
+                              step='1'
+                              type="number" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='flex flex-col items-center justify-center h-full 2xl:ml-10 w-full gap-2'>
+                      <div className='flex items-center justify-center h-full w-full gap-2'>
+                        {/* ID */}
+                        <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center w-full'>
+                          <h1 className='text-info text-lg text-center ml-3'>Id</h1>
+                          <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+                          <input
+                            className="input input-bordered input-info max-w-md w-24 m-2"
+                            value={filtrRateM.id}
+                            onChange={e => { setFiltrRateM({ ...filtrRateM, id: parseInt(e.target.value) }) }}
+                            min='0'
+                            step='1'
+                            type="number" />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  {/* Przyciski */}
+                  <div>
+                    <hr className="w-full h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+                    <div className='flex gap-2 mt-5'>
+                      <Link
+                        className="flex items-center group"
+                        href={{
+                          pathname: "/router/common/browser",
+                          query: { fromSearch: true }
+                        }}>
+                        <button onClick={() => {
+                          const criteriaList = createSearchCriteriaByFiltrRateM(filtrRateM);
+                          localStorage.setItem('rateMList_criteriaList', JSON.stringify(criteriaList));
+                        }} className="btn btn-outline btn-info mx-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                          </svg>
+                          Szukaj maili
+                        </button>
+                      </Link>
+                      <button onClick={clearRateCC_Click} className="btn btn-outline btn-info mx-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                        Wyczyść filtr
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
+
             </div>
           </div>
         </div>

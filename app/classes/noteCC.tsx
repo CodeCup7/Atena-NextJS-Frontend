@@ -19,7 +19,7 @@ export class NoteCC {
     public odwolanie: string = ""
 
     public rateCC_Col: Array<RateCC> = [];
-    //public rateM_Col: Array<RateM> = [];
+    public rateM_Col: Array<RateM> = [];
     public mode: Rate_Mode = Rate_Mode.NEW_;
 
 

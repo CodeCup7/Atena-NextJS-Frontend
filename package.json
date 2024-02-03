@@ -26,6 +26,7 @@
     "use-gauge": "^0.7.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -38,5 +39,10 @@
     "tailwindcss": "^3",
     "typescript": "^5",
     "usehooks-ts": "2.6.0"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   }
 }

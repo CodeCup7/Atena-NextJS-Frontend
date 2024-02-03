@@ -22,7 +22,6 @@ export class RateM {
 	public wiedzaBlock: RateBlock = new RateBlock(key_w);
 	public obslugaBlock: RateBlock = new RateBlock(key_o);
 	public technikaBlock: RateBlock = new RateBlock(key_t);
-	public komunikacjaBlock: RateBlock = new RateBlock(key_k);
 	public standardBlock: RateBlock = new RateBlock(key_s);
 
 }

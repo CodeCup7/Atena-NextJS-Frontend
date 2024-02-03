@@ -4,13 +4,23 @@
 
 import { Adamina } from "next/font/google";
 import { RatePart } from "../classes/ratePart";
-import { getWagRateCC } from "../globalKeys";
+import { getWagRateCC, getWagRateM } from "../globalKeys";
 
-export function CreateNewEmptyRatePart(key_: string) {
+export function CreateNewEmptyRatePartCC(key_: string) {
 
     let ratePart = new RatePart();
     ratePart.key = key_;
     ratePart.waga = getWagRateCC(key_);
+    ratePart.ocena = 1;
+    return ratePart;
+
+}
+
+export function CreateNewEmptyRatePartM(key_: string) {
+
+    let ratePart = new RatePart();
+    ratePart.key = key_;
+    ratePart.waga = getWagRateM(key_);
     ratePart.ocena = 1;
     return ratePart;
 
