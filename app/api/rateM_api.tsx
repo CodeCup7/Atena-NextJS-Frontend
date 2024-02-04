@@ -43,14 +43,16 @@ export async function api_rateM_add(rateM: RateM, attachment: File): Promise<Foo
     }
 }
 
-export async function api_rateM_update(rateM: RateM, attachment: File): Promise<Foo> {
+export async function api_rateM_update(rateM: RateM, attachment?: File | null): Promise<Foo> {
 
     try {
         let foo: Foo = { callback: '', isOK: false, rateM: rateM };
 
         const formData = new FormData();
         formData.append('rateM', JSON.stringify(rateM));
-        formData.append('file', attachment);
+        if (attachment != null) {
+            formData.append('file', attachment);
+        }
 
         const response = await fetch('http://localhost:8080/api/rateM/update', {
             method: 'POST',
@@ -120,6 +122,8 @@ export async function api_rateM_getAllRateNoNote(): Promise<RateM[]> {
 }
 
 export async function api_rateM_getAttachment(fileName: string): Promise<File> {
+    console.log('fileName :', fileName);
+
     const response = await fetch(`http://localhost:8080/api/rateM/getAttachment?fileName=${encodeURIComponent(fileName)}`);
 
     const blob = await response.blob();

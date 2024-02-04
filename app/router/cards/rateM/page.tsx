@@ -46,13 +46,12 @@ const RateM_Page = () => {
                 if (rateM_prev != null) {
                     const previewRateM = JSON.parse(rateM_prev);
                     previewRateM.mode = Rate_Mode.PREVIEW_;
-                    
+
                     // pobranie załącznika do sprawy
-                    const attachmentFile: File = await api_rateM_getAttachment(rateM.attachmentPath)
-                    console.log('rateM.attachmentPath :', rateM.attachmentPath);
-                    
-                    setAttachment(attachmentFile)
+                    const attachmentFile: File = await api_rateM_getAttachment(previewRateM.attachmentPath)
                     updateRateM(previewRateM);
+                    setAttachment(attachmentFile)
+
                 } else {
                     const newRateM = CreateNewEmptyRateM(user);
                     updateRateM(newRateM);
@@ -121,16 +120,7 @@ const RateM_Page = () => {
     };
 
     function download() {
-        if (attachment !== null) {
-            const fileName = rateM.attachmentPath.match(regex)?.[0] || ''
-            if (fileName !== '') {
-                api_rateM_downloadAttachment(fileName);
-            } else {
-                toast.error("Brak załącznika do tej oceny", {
-                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                });
-            }
-        }
+        api_rateM_downloadAttachment(rateM.attachmentPath);
     }
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {
@@ -152,23 +142,21 @@ const RateM_Page = () => {
                     }
                 }));
             } else {
-                if (attachment !== null) {
-                    api_rateM_update(rateM, attachment).then((foo => {
-                        if (foo.isOK === true) {
+                api_rateM_update(rateM, attachment || null).then((foo => {
+                    if (foo.isOK === true) {
 
-                            rateM.mode = Rate_Mode.PREVIEW_;
-                            updateRateM(rateM)
+                        rateM.mode = Rate_Mode.PREVIEW_;
+                        updateRateM(rateM)
 
-                            toast.info(foo.callback, {
-                                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                            });
-                        } else {
-                            toast.error(foo.callback, {
-                                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                            });
-                        }
-                    }));
-                }
+                        toast.info(foo.callback, {
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                        });
+                    } else {
+                        toast.error(foo.callback, {
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                        });
+                    }
+                }));
             }
         } else {
             toast.error("Nie wybrano agenta lub załącznika", {
@@ -178,7 +166,7 @@ const RateM_Page = () => {
         }
     }
 
-    
+
 
     function editBtn_Click() {
 
@@ -300,6 +288,7 @@ const RateM_Page = () => {
                             {attachment === null ?
                                 <div className='flex gap-2'>
                                     <input type="file" className="file-input file-input-bordered file-input-info w-full max-w-xs"
+                                        value={''}
                                         onChange={handleFileChange}
                                         ref={fileInputRef} />
                                 </div>
@@ -308,7 +297,6 @@ const RateM_Page = () => {
                                     <input type="text" className="file-input file-input-bordered file-input-info w-full max-w-xs text-center text-xs"
                                         value={attachment.name}
                                         onChange={() => { }} />
-
                                     <div className="dropdown w-max">
                                         <label tabIndex={0} className="group btn btn-md hover:text-warning">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-6 h-6 hover:text-warning">
@@ -329,7 +317,7 @@ const RateM_Page = () => {
                                                 <button
                                                     className='btn btn-info btn-sm hover:btn-error m-1 h-10 items-center justify-start'
                                                     onClick={() => {
-                                                        updateRateM({ ...rateM, attachmentPath: '' });
+                                                        setAttachment(null);
                                                     }}
                                                     disabled={prewievMode}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
