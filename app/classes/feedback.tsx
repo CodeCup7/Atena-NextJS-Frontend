@@ -4,9 +4,9 @@
 import { User } from "./user";
 
 export enum Feedback_type {
-    ALL_ = "Wszystkie",
-    POSITIVE_ = "Pochwała",
-    NEGATIVE_ = "Skarga",
+    ALL_ = "ALL_",
+    POSITIVE_ = "POSITIVE_",
+    NEGATIVE_ = "NEGATIVE_",
 }
 
 export const FeedbackLabels: Record<Feedback_type, string> = {

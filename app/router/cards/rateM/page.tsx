@@ -95,9 +95,9 @@ const RateM_Page = () => {
         rateM.mode === Rate_Mode.PREVIEW_ ? setPreviewMode(true) : setPreviewMode(false);
     }
     function validate(): boolean {
-        if (rateM.agent.id !== 0 && attachment !== null)
+        if (rateM.agent.id !== 0 && attachment !== null) {
             return true;
-        else {
+        } else {
             return false;
         }
     }
@@ -142,7 +142,7 @@ const RateM_Page = () => {
                     }
                 }));
             } else {
-                api_rateM_update(rateM, attachment || null).then((foo => {
+                api_rateM_update(rateM, attachment).then((foo => {
                     if (foo.isOK === true) {
 
                         rateM.mode = Rate_Mode.PREVIEW_;

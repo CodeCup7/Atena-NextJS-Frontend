@@ -1,20 +1,13 @@
 'use client'
-import { ModeLabels, Rate_Mode, StatusLabels, Status_Note } from '@/app/classes/enums';
-import { CreateNewEmptyNoteCC, getNoteCC_Rate, getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
 import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Role, User } from '@/app/classes/user';
-import { NoteCC } from '@/app/classes/noteCC';
 import { getActiveUser } from '@/app/auth';
-import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
-import { NoteCC_Chart } from '../../components/chart/noteCC_chart';
-import { api_NoteCC_add, api_NoteCC_update } from '@/app/api/noteCC_api';
-import { RateCC } from '@/app/classes/rateCC';
-import Link from 'next/link';
 import { updateUserList } from '@/app/factory/factory_user';
-import { api_Feedback_getDate } from '@/app/api/feedback_api';
+import { api_Feedback_add, api_Feedback_delete, api_Feedback_getDate } from '@/app/api/feedback_api';
 import { Feedback, FeedbackLabels, Feedback_type } from '@/app/classes/feedback';
+import { format } from 'date-fns';
 
 const Feedback_Page = () => {
 
@@ -28,6 +21,7 @@ const Feedback_Page = () => {
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
     const [dateValue, setDateValue] = useState('');
+    const [agentId, setAgentId] = useState(0);
 
     useEffect(() => {
         async function fetchData() {
@@ -36,6 +30,7 @@ const Feedback_Page = () => {
                 const user = await getActiveUser();
                 setUserList(users);
                 setActiveUser(user);
+                setFeedback(new Feedback())
 
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
                 setIsPermit(isPermit);
@@ -51,12 +46,78 @@ const Feedback_Page = () => {
     function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
+
+            async function fetchData() {
+                try {
+                    const parts = dateValue.split('-'); // Rozbijanie daty na części
+
+                    // Tworzenie daty z części daty
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
+
+                    const date = new Date(year, month, 1);
+                    // Ustawienie daty na pierwszy dzień miesiąca
+                    const startDate = new Date(year, month, 1);
+                    // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
+                    const endDate = new Date(year, month + 1, 0);
+                    const feedbackList = await api_Feedback_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    setFeedbackList(feedbackList);
+
+                } catch (error) {
+                    console.error('Błąd pobierania feedbacków:', error);
+                }
+            }
+            fetchData();
+
         } else {
             toast.error("Wybierz datę!", {
                 position: toast.POSITION.TOP_RIGHT,
                 theme: "dark"
             });
         }
+    }
+
+    function addFeedback_click(): boolean {
+
+        if (validate()) {
+
+            api_Feedback_add(feedback).then((foo => {
+                if (foo.isOK === true) {
+
+                    setFeedbackList((prevFeedbackList) => [...prevFeedbackList, foo.feedback]);
+                    toast.info(foo.callback, {
+                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                    });
+                    return true;
+                } else {
+                    toast.error(foo.callback, {
+                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                    });
+                }
+            }));
+
+        } else {
+            toast.error("Uzupełnij poprawnie wszystkie pola", {
+                position: toast.POSITION.TOP_RIGHT, theme: "dark"
+            });
+        }
+        return false;
+    }
+
+    function deleteFeedback_click(feedback_: Feedback) {
+        api_Feedback_delete(feedback_).then((foo => {
+            if (foo.isOK === true) {
+                setFeedbackList((prevFeedbackList) => prevFeedbackList.filter((feedback) => feedback.id !== feedback_.id));
+                toast.info(foo.callback, {
+                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                });
+                return true;
+            } else {
+                toast.error(foo.callback, {
+                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                });
+            }
+        }));
     }
 
     // ====== OBSŁUGA MODALA =========================================================
@@ -75,10 +136,11 @@ const Feedback_Page = () => {
     };
 
 
-    function validate(){
-        if(feedback.agent.id !== 0 && feedback.dateFeedback !== '' && feedback.feedback !== Feedback_type.ALL_){
+    // ====== FUNKCJE ==============================================================
+    function validate(): boolean {
+        if (feedback.agent.id !== 0 && feedback.dateFeedback !== '' && feedback.feedback !== Feedback_type.ALL_) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -87,7 +149,7 @@ const Feedback_Page = () => {
 
 
 
-
+    console.log(feedback)
 
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -144,7 +206,8 @@ const Feedback_Page = () => {
                             <span className="label-text">Data</span>
                             <input type="date"
                                 className="input input-bordered input-info min-w-fit"
-                                defaultValue={feedback.dateFeedback} />
+                                defaultValue={feedback.dateFeedback}
+                                onChange={e => feedback.dateFeedback = e.target.value} />
                         </div>
                         <div className="flex flex-col mt-2">
                             <span className="label-text">Rodzaj</span>
@@ -154,9 +217,9 @@ const Feedback_Page = () => {
                                 onChange={e => {
                                     setFeedback({ ...feedback, feedback: Object.values(Feedback_type).find(feedbackType => feedbackType === e.target.value) || Feedback_type.POSITIVE_ });
                                 }}>
-                                <option value={FeedbackLabels[Feedback_type.ALL_]} disabled>Wybierz feedback ...</option>
-                                <option key={1} value={FeedbackLabels[Feedback_type.POSITIVE_]}>{FeedbackLabels[Feedback_type.POSITIVE_]}</option>
-                                <option key={2} value={FeedbackLabels[Feedback_type.NEGATIVE_]}>{FeedbackLabels[Feedback_type.NEGATIVE_]}</option>
+                                <option value={Feedback_type.ALL_} disabled>Wybierz feedback ...</option>
+                                <option key={1} value={Feedback_type.POSITIVE_}>{FeedbackLabels[Feedback_type.POSITIVE_]}</option>
+                                <option key={2} value={Feedback_type.NEGATIVE_}>{FeedbackLabels[Feedback_type.NEGATIVE_]}</option>
                             </select>
                         </div>
                         <div className="flex flex-col mt-2">
@@ -166,7 +229,7 @@ const Feedback_Page = () => {
                                 value={feedback.agent.id}
                                 onChange={e => {
                                     feedback.agent = userList.find(user => user.id === parseInt(e.target.value)) || new User()
-
+                                    setAgentId(parseInt(e.target.value))
                                 }}>
                                 <option value={0} disabled>Wybierz agenta ...</option>
                                 {userList.filter(user => user.role === Role.AGENT_).map((user) => (
@@ -174,7 +237,12 @@ const Feedback_Page = () => {
                                 ))}
                             </select>
                         </div>
-                        <button className="btn btn-outline btn-info mt-5">
+                        <button className="btn btn-outline btn-info mt-5"
+                            onClick={() => {
+                                if (addFeedback_click()) {
+                                    closeModal
+                                }
+                            }}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
@@ -213,7 +281,11 @@ const Feedback_Page = () => {
                                         <td>{feedback.dateFeedback}</td>
                                         <td>{feedback.agent.nameUser}</td>
                                         <td>{FeedbackLabels[feedback.feedback]}</td>
-                                        <td><button className="btn btn-outline btn-warning btn-sm">
+                                        <td><button className="btn btn-outline btn-warning btn-sm"
+                                            onClick={() => {
+                                                deleteFeedback_click(feedback)
+                                            }
+                                            }>
                                             Usuń
                                         </button>
                                         </td>
