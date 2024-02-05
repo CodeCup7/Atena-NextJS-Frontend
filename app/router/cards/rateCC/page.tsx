@@ -16,6 +16,7 @@ import { api_rateCC_add, api_rateCC_update } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
 import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
+import { useSearchParams } from "next/navigation";
 
 const RateCC_Page = () => {
 
@@ -31,6 +32,11 @@ const RateCC_Page = () => {
     const [agent, setAgent] = useState(0);
     const [extraScore, setExtraScore] = useState(0);
     const [newRateModal, setOpenNewRateModal] = useState(false);
+    
+    const searchParams = useSearchParams();
+    const type = searchParams.get('type') as Type_RateCC;
+
+    console.log(type);
 
     // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
@@ -46,7 +52,6 @@ const RateCC_Page = () => {
 
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
                 setIsPermit(isPermit);
-                console.log(isPermit)
 
                 const rateCC_prev = localStorage.getItem('rateCC_prev');
 
@@ -55,7 +60,7 @@ const RateCC_Page = () => {
                     previewRateCC.mode = Rate_Mode.PREVIEW_;
                     updateRateCC(previewRateCC);
                 } else {
-                    const newRateCC = CreateNewEmptyRateCC(user);
+                    const newRateCC = CreateNewEmptyRateCC(user, type);
                     updateRateCC(newRateCC);
                 }
 
@@ -64,7 +69,7 @@ const RateCC_Page = () => {
             }
         }
         fetchData();
-    }, [refresh]);
+    }, [refresh, type]);
 
     // RateCC hooks
     const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateCC.wiedzaBlock));
@@ -107,7 +112,7 @@ const RateCC_Page = () => {
     function newBtn_Click() {
         setOpenNewRateModal(true);
         localStorage.removeItem('rateCC_prev');
-        const newRateCC = CreateNewEmptyRateCC(activeUser);
+        const newRateCC = CreateNewEmptyRateCC(activeUser, type);
         updateRateCC(newRateCC);
     }
 
@@ -317,7 +322,7 @@ const RateCC_Page = () => {
                     </div>
                 </div>
                 {/* Wykres */}
-                <div className="col-span-3 md:col-span-2 md:row-span-2 flex justify-center items-center">
+                <div className="col-span-12 md:col-span-2 md:row-span-2 flex justify-center items-center">
                     <div className='sm:my-5 md:mt-0 mx:ml-4 '><RateCC_chart value={score} /></div>
                 </div>
                 {/* Rate blocks */}

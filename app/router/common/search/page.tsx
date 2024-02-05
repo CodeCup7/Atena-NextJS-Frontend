@@ -376,7 +376,7 @@ export const Search = () => {
                             step='1'
                             type="number" />
                         </div>
-                        {/* Typ Oceny */}
+                        {/* ID Rozmowy */}
                         <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center w-full'>
                           <h1 className='text-info text-lg text-center ml-3'>ID Rozmowy</h1>
                           <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
@@ -401,11 +401,11 @@ export const Search = () => {
                               onChange={e => {
                                 setFiltrRateCC({
                                   ...filtrRateCC,
-                                  typeRate: Object.values(Type_RateCC).find(typeRate => typeRate === e.target.value) as Type_RateCC || Type_RateCC.ALL
+                                  typeRate: Object.values(Type_RateCC).find(typeRate => typeRate === e.target.value) as Type_RateCC || Type_RateCC.ALL_
                                 });
                               }}
                             >
-                              <option value={Type_RateCC.ALL}>{TypeLabels[Type_RateCC.ALL]}</option>
+                              <option value={Type_RateCC.ALL_}>{TypeLabels[Type_RateCC.ALL_]}</option>
                               <option value={Type_RateCC.RATTING_}>{TypeLabels[Type_RateCC.RATTING_]}</option>
                               <option value={Type_RateCC.MYSTERY_}>{TypeLabels[Type_RateCC.MYSTERY_]}</option>
                               <option value={Type_RateCC.CURRENT_}>{TypeLabels[Type_RateCC.CURRENT_]}</option>

@@ -34,7 +34,7 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
         id.value = filtr.id.toString()
         criteriaList.push(id)
     }
-    if (filtr.typeRate !== Type_RateCC.ALL) {
+    if (filtr.typeRate !== Type_RateCC.ALL_) {
         const typeRate = new SearchCriteria();
         typeRate.key = 'typeRate'
         typeRate.operation = ':'

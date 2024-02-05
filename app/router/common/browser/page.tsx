@@ -3,7 +3,7 @@ import { api_NoteCC_getDate, api_NoteCC_search } from '@/app/api/noteCC_api';
 import { api_RateCC_search } from '@/app/api/rateCC_api';
 import { api_RateM_search } from '@/app/api/rateM_api';
 import { getActiveUser } from '@/app/auth';
-import { StatusLabels } from '@/app/classes/enums';
+import { StatusLabels, TypeLabels } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/noteCC';
 import { RateCC } from '@/app/classes/rateCC';
 import { RateM } from '@/app/classes/rateM';
@@ -293,6 +293,7 @@ export const Browser = () => {
                                     <th>Ocena</th>
                                     <th>Data Oceny</th>
                                     <th>Data udost.</th>
+                                    <th>Typ</th>
                                 </tr>
                             </thead>
                             <tbody className="table-auto overflow-scroll w-full">
@@ -304,6 +305,7 @@ export const Browser = () => {
                                             <td>{getRateCC_RateAs100(rateCC)}</td>
                                             <td>{rateCC.dateRate}</td>
                                             <td>{rateCC.dateShare}</td>
+                                            <td>{TypeLabels[rateCC.typeRate]}</td>
                                             <td>
                                                 <Link className="group link link-info link-hover text-lg"
                                                     href='/router/cards/rateCC'>

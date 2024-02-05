@@ -8,7 +8,7 @@ import { User } from "./user";
 export class FiltrRateCC {
 
     public id: number = 0;
-    public typeRate: Type_RateCC = Type_RateCC.ALL;
+    public typeRate: Type_RateCC = Type_RateCC.ALL_;
     public dateRateStart: string = "";
     public dateRateEnd: string = "";
     public dateCallStart: string = "";

@@ -2,19 +2,21 @@
 // '*********************** RateCC Factory ***************************************************************************************************
 // '==========================================================================================================================================
 
+import { Type_RateCC } from "../classes/enums";
 import { RateBlock } from "../classes/rateBlock";
 import { RateCC } from "../classes/rateCC";
 import { User } from "../classes/user";
 import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "../globalKeys";
 import { CreateNewEmptyRatePartCC } from "./factory_ratePart";
 
-export function CreateNewEmptyRateCC(coach: User) {
+export function CreateNewEmptyRateCC(coach: User, type: Type_RateCC) {
 
     let rateCC = new RateCC();
 
     rateCC.coach = coach;
     rateCC.dateRate = new Date().toLocaleDateString('en-CA');
-
+    rateCC.typeRate = type;
+    
     rateCC.wiedzaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_w1));
     rateCC.obslugaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_o1));
     rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_t1));

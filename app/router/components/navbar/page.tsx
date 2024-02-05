@@ -1,5 +1,6 @@
 'use client'
 import { getActiveUser } from '@/app/auth';
+import { Rate_Mode, Type_RateCC } from '@/app/classes/enums';
 import { Role } from '@/app/classes/user';
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
@@ -117,7 +118,11 @@ export const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/rateCC">
+                        <Link className={disabledLink({ button: true, image: false, pernament: false })}
+                            href={{
+                                pathname: "/router/cards/rateCC",
+                                query: { type: Type_RateCC.RATTING_ }
+                            }}>
                             <button className="group" onClick={() => {
                                 localStorage.removeItem('rateCC_prev');
                                 setMenuHiden(true)
@@ -147,7 +152,11 @@ export const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/test">
+                        <Link className={disabledLink({ button: true, image: false, pernament: false })}
+                            href={{
+                                pathname: "/router/cards/rateCC",
+                                query: { type: Type_RateCC.MYSTERY_ }
+                            }}>
                             <button className="group" onClick={() => setMenuHiden(true)}>
 
                                 <div className="flex items-center">
@@ -160,7 +169,11 @@ export const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/test">
+                        <Link className={disabledLink({ button: true, image: false, pernament: false })}
+                            href={{
+                                pathname: "/router/cards/rateCC",
+                                query: { type: Type_RateCC.CURRENT_ }
+                            }}>
                             <button className="group" onClick={() => setMenuHiden(true)}>
                                 <div className="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={disabledLink({ button: false, image: true, pernament: false })}>
@@ -184,7 +197,7 @@ export const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/test">
+                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/feedback">
                             <button className="group" onClick={() => setMenuHiden(true)}>
                                 <div className="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={disabledLink({ button: false, image: true, pernament: false })}>
