@@ -166,8 +166,6 @@ const RateM_Page = () => {
         }
     }
 
-
-
     function editBtn_Click() {
 
         if (isPermit) {

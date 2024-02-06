@@ -1,5 +1,5 @@
 // '==========================================================================================================================================
-// '*********************** NoteCC API *******************************************************************************************************
+// '*********************** Feedback API *****************************************************************************************************
 // '==========================================================================================================================================
 
 import { Feedback } from "../classes/feedback";
@@ -35,7 +35,7 @@ export async function api_Feedback_add(feedback: Feedback): Promise<Foo> {
         }
         return foo;
     } catch (error) {
-        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, feedback: feedback};
+        return { callback: 'Błąd dodawania feedbacku ' + error, isOK: false, feedback: feedback};
     }
 }
 
@@ -92,7 +92,7 @@ export async function api_Feedback_delete(feedback: Feedback): Promise<Foo> {
         }
         return foo;
     } catch (error) {
-        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, feedback: feedback};
+        return { callback: 'Błąd dodawania feedbacku ' + error, isOK: false, feedback: feedback};
     }
 }
 

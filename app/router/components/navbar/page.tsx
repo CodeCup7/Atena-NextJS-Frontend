@@ -197,7 +197,7 @@ export const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/test">
+                        <Link className={disabledLink({ button: true, image: false, pernament: false })} href="/router/cards/tests">
                             <button className="group" onClick={() => setMenuHiden(true)}>
                                 <div className="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={disabledLink({ button: false, image: true, pernament: false })}>

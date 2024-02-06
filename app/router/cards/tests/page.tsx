@@ -5,19 +5,19 @@ import "react-toastify/dist/ReactToastify.css";
 import { Role, User } from '@/app/classes/user';
 import { getActiveUser } from '@/app/auth';
 import { updateUserList } from '@/app/factory/factory_user';
-import { api_Feedback_add, api_Feedback_delete, api_Feedback_getDate } from '@/app/api/feedback_api';
-import { Feedback, FeedbackLabels, Feedback_type } from '@/app/classes/feedback';
 import { format } from 'date-fns';
+import { Tests, TestsLabels, TestsPass } from '@/app/classes/tests';
+import { api_Tests_add, api_Tests_delete, api_Tests_getDate } from '@/app/api/test_api';
 
-const Feedback_Page = () => {
+const Tests_Page = () => {
 
     // ====== Ustawienie i kontrola active usera ==========================================
     const [activeUser, setActiveUser] = useState(new User());
     const [isPermit, setIsPermit] = useState(false);
-    const [isPermitAgent, setIsPermitAgent] = useState(false);
+    const [isPermitAgent, setIsPermitAgent] = useState(false);  
     const [userList, setUserList] = useState<Array<User>>([]);
-    const [feedbackList, setFeedbackList] = useState<Array<Feedback>>([]);
-    const [feedback, setFeedback] = useState(new Feedback());
+    const [testsList, setTestsList] = useState<Array<Tests>>([]);
+    const [tests, setTests] = useState(new Tests());
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
     const [dateValue, setDateValue] = useState('');
@@ -30,7 +30,7 @@ const Feedback_Page = () => {
                 const user = await getActiveUser();
                 setUserList(users);
                 setActiveUser(user);
-                setFeedback(new Feedback())
+                setTests(new Tests())
 
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
                 setIsPermit(isPermit);
@@ -60,11 +60,11 @@ const Feedback_Page = () => {
                     const startDate = new Date(year, month, 1);
                     // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
                     const endDate = new Date(year, month + 1, 0);
-                    const feedbackList = await api_Feedback_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
-                    setFeedbackList(feedbackList);
+                    const testsList = await api_Tests_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    setTestsList(testsList);
 
                 } catch (error) {
-                    console.error('Błąd pobierania feedbacków:', error);
+                    console.error('Błąd pobierania Testsów:', error);
                 }
             }
             fetchData();
@@ -77,14 +77,14 @@ const Feedback_Page = () => {
         }
     }
 
-    function addFeedback_click(): boolean {
+    function addTests_click(): boolean {
 
         if (validate()) {
 
-            api_Feedback_add(feedback).then((foo => {
+            api_Tests_add(tests).then((foo => {
                 if (foo.isOK === true) {
 
-                    setFeedbackList((prevFeedbackList) => [...prevFeedbackList, foo.feedback]);
+                    setTestsList((prevTestsList) => [...prevTestsList, foo.tests]);
                     toast.info(foo.callback, {
                         position: toast.POSITION.TOP_RIGHT, theme: "dark"
                     });
@@ -104,10 +104,10 @@ const Feedback_Page = () => {
         return false;
     }
 
-    function deleteFeedback_click(feedback_: Feedback) {
-        api_Feedback_delete(feedback_).then((foo => {
+    function deleteTests_click(tests_: Tests) {
+        api_Tests_delete(tests_).then((foo => {
             if (foo.isOK === true) {
-                setFeedbackList((prevFeedbackList) => prevFeedbackList.filter((feedback) => feedback.id !== feedback_.id));
+                setTestsList((prevTestsList) => prevTestsList.filter((Tests) => Tests.id !== tests_.id));
                 toast.info(foo.callback, {
                     position: toast.POSITION.TOP_RIGHT, theme: "dark"
                 });
@@ -135,10 +135,9 @@ const Feedback_Page = () => {
         }
     };
 
-
     // ====== FUNKCJE ==============================================================
     function validate(): boolean {
-        if (feedback.agent.id !== 0 && feedback.dateFeedback !== '' && feedback.feedback !== Feedback_type.ALL_) {
+        if (tests.agent.id !== 0 && tests.dateTest !== '' && tests.testPass !== TestsPass.ALL_) {
             return true;
         } else {
             return false;
@@ -157,7 +156,7 @@ const Feedback_Page = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-info">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54" />
                 </svg>
-                <h1 className='text-4xl text-info mb-4 ml-2'>Pochwały i skargi</h1>
+                <h1 className='text-4xl text-info mb-4 ml-2'>Testy</h1>
             </div>
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
 
@@ -186,7 +185,7 @@ const Feedback_Page = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
-                    Dodaj feedback
+                    Dodaj pojedyńczy test
                 </button>
             </div>
 
@@ -194,35 +193,22 @@ const Feedback_Page = () => {
             <dialog id="my_modal_1" className="modal" ref={modalRef}>
                 <div className="modal-box">
                     <div className="flex flex-col items-center justify-center ml-10">
-                        <span className='text-info'>Dodaj pochwałę lub skargę</span>
+                        <span className='text-info'>Dodaj pojedyńczy test</span>
                         <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
                         <div className="flex flex-col mt-5">
                             <span className="label-text">Data</span>
                             <input type="date"
                                 className="input input-bordered input-info min-w-fit"
-                                defaultValue={feedback.dateFeedback}
-                                onChange={e => feedback.dateFeedback = e.target.value} />
-                        </div>
-                        <div className="flex flex-col mt-2">
-                            <span className="label-text">Rodzaj</span>
-                            <select
-                                className="select select-info w-72"
-                                value={feedback.feedback}
-                                onChange={e => {
-                                    setFeedback({ ...feedback, feedback: Object.values(Feedback_type).find(feedbackType => feedbackType === e.target.value) || Feedback_type.POSITIVE_ });
-                                }}>
-                                <option value={Feedback_type.ALL_} disabled>Wybierz feedback ...</option>
-                                <option key={1} value={Feedback_type.POSITIVE_}>{FeedbackLabels[Feedback_type.POSITIVE_]}</option>
-                                <option key={2} value={Feedback_type.NEGATIVE_}>{FeedbackLabels[Feedback_type.NEGATIVE_]}</option>
-                            </select>
+                                defaultValue={tests.dateTest}
+                                onChange={e => tests.dateTest = e.target.value} />
                         </div>
                         <div className="flex flex-col mt-2">
                             <span className="label-text">Agent</span>
                             <select
                                 className="select select-info w-72"
-                                value={feedback.agent.id}
+                                value={tests.agent.id}
                                 onChange={e => {
-                                    feedback.agent = userList.find(user => user.id === parseInt(e.target.value)) || new User()
+                                    tests.agent = userList.find(user => user.id === parseInt(e.target.value)) || new User()
                                     setAgentId(parseInt(e.target.value))
                                 }}>
                                 <option value={0} disabled>Wybierz agenta ...</option>
@@ -233,7 +219,7 @@ const Feedback_Page = () => {
                         </div>
                         <button className="btn btn-outline btn-info mt-5"
                             onClick={() => {
-                                if (addFeedback_click()) {
+                                if (addTests_click()) {
                                     closeModal
                                 }
                             }}>
@@ -262,30 +248,29 @@ const Feedback_Page = () => {
                                 <th className=''>id</th>
                                 <th className=''>data</th>
                                 <th>agent</th>
-                                <th>rodzaj</th>
+                                <th>ocena</th>
+                                <th>próg</th>
+                                <th>status</th>
                             </tr>
                         </thead>
                         <tbody className="table-auto overflow-scroll w-full" >
-                            {feedbackList.map((feedback, index) => {
+                            {testsList.map((tests, index) => {
                                 return (
                                     <tr key={index}
                                         className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
                                             } cursor-pointer`}>
-                                        <td>{feedback.id}</td>
-                                        <td>{feedback.dateFeedback}</td>
-                                        <td>{feedback.agent.nameUser}</td>
-                                        <td>{FeedbackLabels[feedback.feedback]}</td>
+                                        <td>{tests.id}</td>
+                                        <td>{tests.dateTest}</td>
+                                        <td>{tests.agent.nameUser}</td>
                                         <td><button className="btn btn-outline btn-warning btn-sm"
                                             onClick={() => {
-                                                deleteFeedback_click(feedback)
-                                            }
-                                            }>
+                                                deleteTests_click(tests)
+                                            }}>
                                             Usuń
                                         </button>
                                         </td>
                                     </tr>
-                                )
-                            })}
+                                )})}
                         </tbody>
                     </table>
                 </div>
@@ -295,4 +280,4 @@ const Feedback_Page = () => {
     )
 }
 
-export default Feedback_Page
+export default Tests_Page
