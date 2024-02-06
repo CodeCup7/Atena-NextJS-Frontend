@@ -56,13 +56,13 @@ export const Navbar = () => {
                 </button>
                 <ul tabIndex={0} className={`${menuHidden ? 'hidden' : ''} menu menu-md dropdown-content mt-3 z-[50] p-2 shadow bg-base-100 rounded-lg flex flex-row border border-info`}>
                     <li>
-                        <Link className={disabledLink({ button: true, image: false, pernament: true })} href="/router/cards/test">
+                        <Link className={disabledLink({ button: true, image: false, pernament: true })} href="/router/cards/poligon">
                             <button className="group" onClick={() => setMenuHiden(true)}>
                                 <div className="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={disabledLink({ button: false, image: true, pernament: true })}>
                                         <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
                                     </svg>
-                                    <span className="ml-2">Testowy</span>
+                                    <span className="ml-2">Poligon</span>
                                 </div>
                             </button>
                         </Link>

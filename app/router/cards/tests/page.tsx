@@ -6,22 +6,25 @@ import { Role, User } from '@/app/classes/user';
 import { getActiveUser } from '@/app/auth';
 import { updateUserList } from '@/app/factory/factory_user';
 import { format } from 'date-fns';
-import { Tests, TestsLabels, TestsPass } from '@/app/classes/tests';
-import { api_Tests_add, api_Tests_delete, api_Tests_getDate } from '@/app/api/test_api';
+import { Test, TestPass } from '@/app/classes/test';
+import { api_Test_add, api_Test_delete, api_Test_getDate } from '@/app/api/test_api';
+import readXlsxFile from 'read-excel-file';
+import { uploadTestsFromExcel } from '@/app/factory/factory_test';
 
 const Tests_Page = () => {
 
     // ====== Ustawienie i kontrola active usera ==========================================
     const [activeUser, setActiveUser] = useState(new User());
     const [isPermit, setIsPermit] = useState(false);
-    const [isPermitAgent, setIsPermitAgent] = useState(false);  
+    const [isPermitAgent, setIsPermitAgent] = useState(false);
     const [userList, setUserList] = useState<Array<User>>([]);
-    const [testsList, setTestsList] = useState<Array<Tests>>([]);
-    const [tests, setTests] = useState(new Tests());
+    const [testsList, setTestsList] = useState<Array<Test>>([]);
+    const [test, setTest] = useState(new Test());
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
     const [dateValue, setDateValue] = useState('');
     const [agentId, setAgentId] = useState(0);
+    const [data, setData] = useState<string[][]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -30,7 +33,7 @@ const Tests_Page = () => {
                 const user = await getActiveUser();
                 setUserList(users);
                 setActiveUser(user);
-                setTests(new Tests())
+                setTest(new Test())
 
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
                 setIsPermit(isPermit);
@@ -60,7 +63,7 @@ const Tests_Page = () => {
                     const startDate = new Date(year, month, 1);
                     // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
                     const endDate = new Date(year, month + 1, 0);
-                    const testsList = await api_Tests_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    const testsList = await api_Test_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
                     setTestsList(testsList);
 
                 } catch (error) {
@@ -81,10 +84,10 @@ const Tests_Page = () => {
 
         if (validate()) {
 
-            api_Tests_add(tests).then((foo => {
+            api_Test_add(test).then((foo => {
                 if (foo.isOK === true) {
 
-                    setTestsList((prevTestsList) => [...prevTestsList, foo.tests]);
+                    setTestsList((prevTestsList) => [...prevTestsList, foo.test]);
                     toast.info(foo.callback, {
                         position: toast.POSITION.TOP_RIGHT, theme: "dark"
                     });
@@ -104,10 +107,10 @@ const Tests_Page = () => {
         return false;
     }
 
-    function deleteTests_click(tests_: Tests) {
-        api_Tests_delete(tests_).then((foo => {
+    function deleteTests_click(test_: Test) {
+        api_Test_delete(test_).then((foo => {
             if (foo.isOK === true) {
-                setTestsList((prevTestsList) => prevTestsList.filter((Tests) => Tests.id !== tests_.id));
+                setTestsList((prevTestsList) => prevTestsList.filter((Tests) => Tests.id !== test_.id));
                 toast.info(foo.callback, {
                     position: toast.POSITION.TOP_RIGHT, theme: "dark"
                 });
@@ -137,12 +140,25 @@ const Tests_Page = () => {
 
     // ====== FUNKCJE ==============================================================
     function validate(): boolean {
-        if (tests.agent.id !== 0 && tests.dateTest !== '' && tests.testPass !== TestsPass.ALL_) {
+        if (test.agent.id !== 0 && test.dateTest !== '') {
             return true;
         } else {
             return false;
         }
     }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+
+        if (file) {
+            readXlsxFile(file).then((rows) => {
+                //setData(rows as string[][]); // Rzutowanie typu rows na string[][]
+                uploadTestsFromExcel(rows as string[][], userList)
+            }).catch((error) => {
+                console.error('Wystąpił błąd podczas wczytywania pliku Excel:', error);
+            });
+        }
+    };
 
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -160,10 +176,10 @@ const Tests_Page = () => {
             </div>
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
 
-            {/* POBIERANIE I DODAWANIE */}
-            <div className='flex mt-5'>
+            {/* POBIERANIE, DODAWANIE, WCZYTYWANIE */}
+            <div className='flex flex-col md:flex-row mt-5 gap-2 justify-center'>
 
-                <div className='flex'>
+                <div className='flex mt-5'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 mx-2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
                     </svg>
@@ -181,12 +197,18 @@ const Tests_Page = () => {
                     </button>
                 </div>
 
-                <button className="btn btn-outline btn-info mx-2" onClick={openModal}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-                    Dodaj pojedyńczy test
-                </button>
+                <div className='flex gap-2'>
+                    <div className=' flex flex-col'>
+                        <span className="label-text">Wczytaj testy</span>
+                        <input className="file-input file-input-bordered file-input-info w-full max-w-xs" type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
+                    </div>
+                    <button className="btn btn-outline btn-info mx-2 mt-5" onClick={openModal}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        Dodaj pojedyńczy test
+                    </button>
+                </div>
             </div>
 
             {/* MODAL */}
@@ -195,20 +217,14 @@ const Tests_Page = () => {
                     <div className="flex flex-col items-center justify-center ml-10">
                         <span className='text-info'>Dodaj pojedyńczy test</span>
                         <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
-                        <div className="flex flex-col mt-5">
-                            <span className="label-text">Data</span>
-                            <input type="date"
-                                className="input input-bordered input-info min-w-fit"
-                                defaultValue={tests.dateTest}
-                                onChange={e => tests.dateTest = e.target.value} />
-                        </div>
+
                         <div className="flex flex-col mt-2">
                             <span className="label-text">Agent</span>
                             <select
                                 className="select select-info w-72"
-                                value={tests.agent.id}
+                                value={test.agent.id}
                                 onChange={e => {
-                                    tests.agent = userList.find(user => user.id === parseInt(e.target.value)) || new User()
+                                    test.agent = userList.find(user => user.id === parseInt(e.target.value)) || new User()
                                     setAgentId(parseInt(e.target.value))
                                 }}>
                                 <option value={0} disabled>Wybierz agenta ...</option>
@@ -216,6 +232,29 @@ const Tests_Page = () => {
                                     <option key={user.id} value={user.id}>{user.nameUser}</option>
                                 ))}
                             </select>
+                        </div>
+                        <div className='flex gap-2'>
+                            <div className="flex flex-col mt-5">
+                                <span className="label-text">Data</span>
+                                <input type="date"
+                                    className="input input-bordered input-info min-w-fit"
+                                    defaultValue={test.dateTest}
+                                    onChange={e => test.dateTest = e.target.value} />
+                            </div>
+                            <div className="flex flex-col mt-5">
+                                <span className="label-text">Wynik</span>
+                                <input type="number"
+                                    className="input input-bordered input-info w-20"
+                                    defaultValue={test.score}
+                                    onChange={e => test.score = parseInt(e.target.value)} />
+                            </div>
+                            <div className="flex flex-col mt-5">
+                                <span className="label-text">Próg</span>
+                                <input type="number"
+                                    className="input input-bordered input-info w-20"
+                                    defaultValue={test.levelPass}
+                                    onChange={e => test.levelPass = parseInt(e.target.value)} />
+                            </div>
                         </div>
                         <button className="btn btn-outline btn-info mt-5"
                             onClick={() => {
@@ -270,7 +309,8 @@ const Tests_Page = () => {
                                         </button>
                                         </td>
                                     </tr>
-                                )})}
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>

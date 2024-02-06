@@ -21,7 +21,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
               <Navbar></Navbar>
             </div>
             <div className="basis-4/6 text-white flex flex-row items-center justify-center">
-              <Image className='items-center' src="/icon.png" alt="Logo" width={120} height={120} priority />
+              <Image className='items-center m-2' src="/icon.png" alt="Logo" width={100} height={100} priority />
               <h1 className='text-5xl text-atena-LightBlue ml-2'></h1>
             </div>
             {/* Avatar */}
