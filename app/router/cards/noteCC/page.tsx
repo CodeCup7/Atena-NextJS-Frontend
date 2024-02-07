@@ -77,6 +77,7 @@ const NoteCC_Page = () => {
         }
     }
 
+    console.log(noteCC)
 
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {

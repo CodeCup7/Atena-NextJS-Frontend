@@ -27,26 +27,26 @@ export function Dashboard_DoughnutChart(props: ArcedProps) {
   }
 
   const chartOptions = {
-    responsive: false, // Wyłącz responsywność
-    maintainAspectRatio: false, // Wyłącz zachowanie proporcji
-    width: 100, // Ustaw szerokość canvasa
-    height: 600 // Ustaw wysokość canvasa
+    responsive: true, // Wyłącz responsywność
+    maintainAspectRatio: false , // Wyłącz zachowanie proporcji
   };
 
   return (
-      <div>
-        <Doughnut data={{
-          labels: ['Ocena'],
-          datasets: [{
-            label: props.agentName,
-            data: [props.value, 100 - props.value],
-            backgroundColor: bgColor,
-            borderColor: borderColor,
-            borderWidth: 1
-          }]
-        }} 
+    <div>
+      <Doughnut data={{
+        labels: ['Ocena'],
+        datasets: [{
+          label: props.agentName,
+          data: [props.value, 100 - props.value],
+          backgroundColor: bgColor,
+          borderColor: borderColor,
+          borderWidth: 1
+        }]
+      }}
         options={chartOptions}
-        />
-      </div >
+        width={300}
+        height={300}
+      />
+    </div >
   );
 }

@@ -1,32 +1,21 @@
 'use client'
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Dashboard_LineChart } from '../../components/chart/dashboard_chartLine';
+import { Dashboard_DoughnutChart } from '../../components/chart/dashboard_chartDoughnut';
 
 export default function UploadExcel() {
 
-    ChartJS.register(ArcElement, Tooltip, Legend);
-
-    const data = {
-        labels: ['Ocena Agenta'],
-        datasets: [{   // <- Dodaj pustą tablicę datasets
-            label: '# sadas of Votes',
-            data: [80,20],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    };
-
-
     return (
-        <div>
-            <Doughnut data={data} />
+        <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
+            <div className='flex flex-row m-5 h-96'>
+                <div className=''>
+                    <Dashboard_DoughnutChart value={50} agentName='Szymon' />
+                </div>
+                <div className=''>
+                    <Dashboard_LineChart value={[10, 20, 30]} agentName='Szymon' />
+                </div>
+            </div>
         </div>
     );
 }
