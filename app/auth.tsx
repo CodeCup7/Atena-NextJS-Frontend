@@ -1,4 +1,3 @@
-'use client'
 import { User } from "./classes/user";
 
 //const login = 'user12';
@@ -16,6 +15,6 @@ export async function getActiveUser(): Promise<User> {
 
         return await response.json();
     } catch (error) {
-        return new User(); // Możesz dostosować to do swoich potrzeb
+        return new User();
     }
 }

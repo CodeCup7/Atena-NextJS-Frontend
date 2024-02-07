@@ -8,13 +8,13 @@ import { Test } from "../classes/test";
 interface Foo {
     callback: string;
     isOK: boolean;
-    test:Test;
+    test: Test;
 }
 
-export async function api_Test_add(test:Test): Promise<Foo> {
+export async function api_Test_add(test: Test): Promise<Foo> {
 
     try {
-        let foo: Foo = { callback: '', isOK: false, test: test};
+        let foo: Foo = { callback: '', isOK: false, test: test };
 
         const response = await fetch('http://localhost:8080/api/test/add', {
             method: 'POST',
@@ -35,8 +35,38 @@ export async function api_Test_add(test:Test): Promise<Foo> {
         }
         return foo;
     } catch (error) {
-        return { callback: 'Błąd dodawania testu ' + error, isOK: false, test: test};
+        return { callback: 'Błąd dodawania testu ' + error, isOK: false, test: test };
     }
+}
+
+export async function api_Test_addAll(testList:Test[]) {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, test: new Test() };
+
+        const response = await fetch('http://localhost:8080/api/test/addList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(testList)
+        });
+
+        if (response.ok) {
+            const addedtests = await response.json();
+            foo.callback = 'Testy zostały dodane';
+            foo.isOK = true;
+            foo.test = addedtests;
+        } else {
+            foo.callback = 'Testy nie zostały dodane';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd dodawania testów ' + error, isOK: false, test: new Test() };
+    }
+
+
 }
 
 export async function api_Test_getDate(startDate: string, endDate: string): Promise<Test[]> {
@@ -53,7 +83,7 @@ export async function api_Test_getDate(startDate: string, endDate: string): Prom
     }
 }
 
-export async function api_Test_search(searchCriteria:SearchCriteria[]): Promise<Test[]> {
+export async function api_Test_search(searchCriteria: SearchCriteria[]): Promise<Test[]> {
 
     try {
         const response = await fetch('http://localhost:8080/api/test/search', {
@@ -73,7 +103,7 @@ export async function api_Test_search(searchCriteria:SearchCriteria[]): Promise<
 export async function api_Test_delete(test: Test): Promise<Foo> {
 
     try {
-        let foo: Foo = { callback: '', isOK: false, test: test};
+        let foo: Foo = { callback: '', isOK: false, test: test };
 
         const response = await fetch('http://localhost:8080/api/test/delete/' + test.id, {
             method: 'DELETE',
@@ -92,7 +122,7 @@ export async function api_Test_delete(test: Test): Promise<Foo> {
         }
         return foo;
     } catch (error) {
-        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, test: test};
+        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, test: test };
     }
 }
 

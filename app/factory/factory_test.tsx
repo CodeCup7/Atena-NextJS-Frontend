@@ -1,14 +1,14 @@
 // '==========================================================================================================================================
 // '*********************** Tests Factory ****************************************************************************************************
 // '==========================================================================================================================================
+import { api_Test_add, api_Test_addAll } from '../api/test_api';
 import { Test, TestPass } from '../classes/test';
 import { User } from '../classes/user';
 
-
 export async function uploadTestsFromExcel(data: string[][], userList: User[]) {
-console.log('userList :', userList);
 
-    const testList = Array<Test>();
+    // Załadowanie danych z excela do listy
+    const testList:Test[] = [];
 
     data.slice(1).forEach(row => {
         const test = new Test();
@@ -29,6 +29,10 @@ console.log('userList :', userList);
         testList.push(test);
     });
 
-    console.log('testList :', testList);
+    // Załądowanie testów do BD
+    //api_Test_addAll(testList)
+    console.log
+
+
 
 }
