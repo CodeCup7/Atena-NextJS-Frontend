@@ -12,6 +12,7 @@ interface ArcedProps {
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function Dashboard_DoughnutChart(props: ArcedProps) {
+console.log('props :', props);
 
   let bgColor;
   let borderColor;

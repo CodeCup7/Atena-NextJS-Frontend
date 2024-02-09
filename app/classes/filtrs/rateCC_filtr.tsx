@@ -2,8 +2,8 @@
 // '******************** Filtr RateCC CLASS ***********************
 // '===============================================================
 
-import { Type_RateCC } from "./enums";
-import { User } from "./user";
+import { Type_RateCC } from "../enums";
+import { User } from "../user";
 
 export class FiltrRateCC {
 

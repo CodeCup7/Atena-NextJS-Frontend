@@ -16,7 +16,7 @@ import { api_rateM_getAllRateNoNote } from "../api/rateM_api";
 export function CreateNewEmptyNoteCC(coach: User): NoteCC {
 
     let noteCC = new NoteCC();
-    noteCC.status = Status_Note.NO_START
+    noteCC.status = Status_Note.NO_START_
     noteCC.coach = coach;
 
     return noteCC;

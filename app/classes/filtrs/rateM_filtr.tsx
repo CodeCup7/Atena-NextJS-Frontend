@@ -2,7 +2,7 @@
 // '******************** Filtr RateM CLASS ************************
 // '===============================================================
 
-import { User } from "./user";
+import { User } from "../user";
 
 export class FiltrRateM {
 

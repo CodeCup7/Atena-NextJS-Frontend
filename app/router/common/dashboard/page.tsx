@@ -8,7 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { Dashboard_DoughnutChart } from '../../components/chart/dashboard_chartDoughnut';
 import { Dashboard_LineChart } from '../../components/chart/dashboard_chartLine';
 import { FinalScore } from '@/app/classes/finalScore';
-import { getFinalScoreData } from '@/app/factory/factory_dashboard';
+import { getFinalScore, getFinalScoreData, getFinalScoreFeedback, getFinalScoreMysteryAndCurrent, getFinalScoreRateCCAndRateM, getFinalScoreTests } from '@/app/factory/factory_dashboard';
+import { NoteCC } from '@/app/classes/noteCC';
+import { getNoteCC_Rate } from '@/app/factory/factory_noteCC';
+
 
 export const Dashboard = () => {
 
@@ -17,10 +20,12 @@ export const Dashboard = () => {
   const [activeUser, setActiveUser] = useState(new User());
   const [userList, setUserList] = useState<Array<User>>([]);
   const [dateAgent, setDateAgent] = useState('');
-  const [agent, setAgent] = useState(0);
+  const [agentId, setAgentId] = useState(0);
+  const [agentName, setAgentName] = useState('');
 
   // Pobrane dane
-  const [final, setFinal] = useState(new FinalScore());
+  const [finalPeriod, setFinalPeriod] = useState(new FinalScore()); // Wszytskie dane z 3 ost. miesięcy
+  const [final, setFinal] = useState(new FinalScore()); // Wybrany miesiąc
 
   useEffect(() => {
     async function fetchData() {
@@ -43,14 +48,35 @@ export const Dashboard = () => {
 
   async function getAgentDachboard() {
 
-    const user = userList.find(user => user.id = agent)
+    if (dateAgent !== '' && agentId > 0) {
 
-    if (user !== undefined) {
-      const finalScore = await getFinalScoreData(dateAgent, user);
-      setFinal(finalScore);
+      const findUser = userList.find(user => user.id === agentId)
+      console.log('findUser :', findUser);
+      if (findUser !== undefined) {
+        setAgentName(findUser.nameUser)
+      }
+
+      if (findUser !== undefined) {
+        const finalScorePeriod = await getFinalScoreData(dateAgent, findUser, 3); // Pobranie wszystkich danych ( 3 miesiące )
+        const finalScore = await getFinalScoreData(dateAgent, findUser, 0); // Pobranie obecnego miesiąca (Można odfiltrować zamiast pobierać 2x dane)
+        setFinalPeriod(finalScorePeriod);
+        setFinal(finalScore);
+      }
+
+    } else {
+      toast.error("Uzupełnij poprawnie datę i wybierz agenta", {
+        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+      });
     }
 
   }
+
+  // Funkcja, która pobiera oceny z obiektów NoteCC i zwraca listę ocen
+  function getNoteCCRates(noteList: NoteCC[]): number[] {
+    return noteList.map(note => getNoteCC_Rate(note) * 100);
+  }
+
+  console.log(final.noteList.length)
 
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -74,7 +100,7 @@ export const Dashboard = () => {
             <input
               className="input input-bordered w-full max-w-xs"
               value={dateAgent}
-              onChange={e => {setDateAgent(e.currentTarget.value) }}
+              onChange={e => { setDateAgent(e.currentTarget.value) }}
               type="month"
               placeholder="Type here"
             />
@@ -84,9 +110,9 @@ export const Dashboard = () => {
             <span className="label-text">Agent:</span>
             <select
               className="select select-info w-72"
-              value={agent}
+              value={agentId}
               onChange={e => {
-                setAgent(parseInt(e.target.value))
+                setAgentId(parseInt(e.target.value))
               }}>
               <option value={0} disabled>Wybierz agenta ...</option>
               {userList.filter(user => user.role === Role.AGENT_).map((user) => (
@@ -105,10 +131,10 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Nagłówek - Pobieranie danych */}
-      <div>
+
+      {/* Kafelki z ocenami */}
         <hr className="w-full h-1 opacity-50 border-0 rounded bg-info my-4"></hr>
-        <div className='flex sm:flex-col lg:flex-row justify-center mt-1'>
+        <div className={`flex sm:flex-col lg:flex-row justify-center mt-1 ${final.noteList.length === 0 ? 'hidden' : ''}`}>
 
           <div className="stats shadow">
 
@@ -120,7 +146,7 @@ export const Dashboard = () => {
 
               </div>
               <div className="stat-title">Coachingi</div>
-              <div className="stat-value text-primary">80%</div>
+              <div className="stat-value text-primary">{Math.round(getFinalScore(final) * 100) + " %"}</div>
               <div className="stat-desc">21% more than last month</div>
             </div>
 
@@ -131,7 +157,7 @@ export const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-title">Rozmowy i maile</div>
-              <div className="stat-value text-secondary">90%</div>
+              <div className="stat-value text-secondary">{Math.round(getFinalScoreRateCCAndRateM(final) * 100) + " %"}</div>
               <div className="stat-desc">21% more than last month</div>
             </div>
             <div className="stat">
@@ -141,7 +167,7 @@ export const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-title">Tajemniczy / Bieżący</div>
-              <div className="stat-value text-info">90%</div>
+              <div className="stat-value text-info">{Math.round(getFinalScoreMysteryAndCurrent(final) * 100) + " %"}</div>
               <div className="stat-desc">21% more than last month</div>
             </div>
             <div className="stat">
@@ -151,30 +177,30 @@ export const Dashboard = () => {
                 </svg>
               </div>
               <div className="stat-title">Testy</div>
-              <div className="stat-value text-warning">90%</div>
+              <div className="stat-value text-warning">{Math.round(getFinalScoreTests(final) * 100) + " %"}</div>
               <div className="stat-desc">21% more than last month</div>
             </div>
             <div className="stat">
               <div className="stat-figure text-accent">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-12 h-12">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
                 </svg>
               </div>
               <div className="stat-title">Skargi / Pochwały</div>
-              <div className="stat-value text-accent">90%</div>
+              <div className="stat-value text-accent">{Math.round(getFinalScoreFeedback(final) * 100) + " %"}</div>
               <div className="stat-desc">21% more than last month</div>
             </div>
           </div>
         </div>
-      </div>
 
       {/* Ocena i wykres główny */}
-      <div className='flex flex-row m-5'>
+      <div className={`flex flex-row m-5 ${final.noteList.length === 0 ? 'hidden' : ''}`}>
+
         <div>
-          <Dashboard_DoughnutChart value={final.getFinalScore()} agentName='Szymon' />
+          <Dashboard_DoughnutChart value={getFinalScore(final) * 100} agentName={agentName} />
         </div>
         <div className=''>
-          <Dashboard_LineChart value={[10, 20, 30]} agentName='Szymon' />
+          <Dashboard_LineChart value={getNoteCCRates(finalPeriod.noteList)} agentName={agentName} />
         </div>
       </div>
     </div >

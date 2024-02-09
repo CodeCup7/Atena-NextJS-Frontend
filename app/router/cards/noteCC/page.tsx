@@ -12,6 +12,7 @@ import { NoteCC_Chart } from '../../components/chart/noteCC_chart';
 import { api_NoteCC_add, api_NoteCC_update } from '@/app/api/noteCC_api';
 import { RateCC } from '@/app/classes/rateCC';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
 const NoteCC_Page = () => {
 
@@ -174,7 +175,7 @@ const NoteCC_Page = () => {
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && prewievMode)}
                                 onClick={e => {
-                                    noteCC.status = Status_Note.CLOSE
+                                    noteCC.status = Status_Note.CLOSE_
                                     rateBtn_Click();
                                 }}>
                                 {noteCC.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Zatwierdź'}
@@ -182,7 +183,7 @@ const NoteCC_Page = () => {
                             <button className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && prewievMode)}
                                 onClick={e => {
-                                    noteCC.status = Status_Note.CLOSE_WITHOUT
+                                    noteCC.status = Status_Note.CLOSE_WITHOUT_
                                     rateBtn_Click();
                                 }}>
                                 Zamknij BEZ</button>
@@ -227,9 +228,9 @@ const NoteCC_Page = () => {
                                 </div>
                                 <input
                                     className="input input-bordered input-info max-w-md w-72"
-                                    type="date"
+                                    type="month"
                                     disabled
-                                    defaultValue={noteCC.mode != Rate_Mode.NEW_ as Rate_Mode ? noteCC.appliesDate : new Date().toLocaleDateString('en-CA')} />
+                                    defaultValue={noteCC.mode != Rate_Mode.NEW_ as Rate_Mode ? format(noteCC.appliesDate, 'yyyy-MM') : format(new Date().toLocaleDateString('en-CA'), 'yyyy-MM')} />
                             </label>
                             <label className="form-control w-full max-w-xs">
                                 <div className="label">

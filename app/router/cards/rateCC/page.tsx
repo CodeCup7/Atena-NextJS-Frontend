@@ -36,7 +36,7 @@ const RateCC_Page = () => {
     const searchParams = useSearchParams();
     const type = searchParams.get('type') as Type_RateCC;
 
-    console.log(type);
+    console.log(rateCC);
 
     // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
@@ -326,7 +326,7 @@ const RateCC_Page = () => {
                     <div className='sm:my-5 md:mt-0 mx:ml-4 '><RateCC_chart value={score} /></div>
                 </div>
                 {/* Rate blocks */}
-                <div className='col-span-9 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
+                <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
 
                     <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>

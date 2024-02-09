@@ -3,7 +3,7 @@
 // '==========================================================================================================================================
 
 import { RateM } from "../classes/rateM";
-import { SearchCriteria } from "../classes/searchCriteria";
+import { SearchCriteria } from "../classes/filtrs/searchCriteria";
 
 interface Foo {
     callback: string;

@@ -2,7 +2,7 @@
 // '*********************** Test API ********************************************************************************************************
 // '==========================================================================================================================================
 
-import { SearchCriteria } from "../classes/searchCriteria";
+import { SearchCriteria } from "../classes/filtrs/searchCriteria";
 import { Test } from "../classes/test";
 
 interface Foo {
@@ -72,7 +72,7 @@ export async function api_Test_addAll(testList:Test[]) {
 export async function api_Test_getDate(startDate: string, endDate: string): Promise<Test[]> {
 
     try {
-        const response = await fetch('http://localhost:8080/api/test/getAllTSestDates/'
+        const response = await fetch('http://localhost:8080/api/test/getAllTestDates/'
             + startDate + '/' + endDate);
         if (!response.ok) {
             throw new Error('Network response was not ok');

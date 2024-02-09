@@ -22,22 +22,5 @@ export class FinalScore {
 
     public finalScore = 0;
 
-    getFinalScore() {
-        return this.getNoteCCScore() + this.getTestScore()
-    }
-
-    getNoteCCScore(): number {
-        let score = 0;
-        this.noteList.forEach(noteCC => {
-            score = score +  getNoteCC_Rate(noteCC);
-        });
-
-        return 0
-    }
-
-    getTestScore(): number {
-        return 0
-    }
-
 }
 

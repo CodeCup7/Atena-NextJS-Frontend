@@ -11,7 +11,6 @@ interface ArcedProps {
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
 
 export function Dashboard_LineChart(props: ArcedProps) {
-
   const chartOptions = {
     responsive: true, // Wyłącz responsywność
     maintainAspectRatio: false , // Wyłącz zachowanie proporcji
@@ -24,7 +23,7 @@ export function Dashboard_LineChart(props: ArcedProps) {
         labels: ['1', '2', '3'],
         datasets: [{
           label: props.agentName,
-          data: [65, 59, 80],
+          data: props.value,
           borderColor: 'rgb(75, 192, 192)',
           tension: 0.1
         }]

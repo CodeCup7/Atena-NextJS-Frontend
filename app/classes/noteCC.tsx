@@ -10,7 +10,7 @@ import { User } from "./user";
 export class NoteCC {
 
     public id: number = 0;
-    public status: Status_Note = Status_Note.NO_START;
+    public status: Status_Note = Status_Note.NO_START_;
     public agent: User = new User();
     public coach: User = new User();
     public coachDate: string = ""

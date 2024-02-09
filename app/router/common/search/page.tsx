@@ -2,12 +2,16 @@
 import { api_QueueList_getAll } from '@/app/api/queue_api';
 import { getActiveUser } from '@/app/auth';
 import { StatusLabels, Status_Note, TypeLabels, Type_RateCC } from '@/app/classes/enums';
-import { FiltrNoteCC } from '@/app/classes/filtrNoteCC';
-import { FiltrRateCC } from '@/app/classes/filtrRateCC';
-import { FiltrRateM } from '@/app/classes/filtrRateM';
+import { FeedbackLabels, Feedback_type } from '@/app/classes/feedback';
+import { FiltrFeedback } from '@/app/classes/filtrs/feedback_filtr';
+import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
+import { FiltrRateCC } from '@/app/classes/filtrs/rateCC_filtr';
+import { FiltrRateM } from '@/app/classes/filtrs/rateM_filtr';
+import { FiltrTest } from '@/app/classes/filtrs/test_filtr';
 import { Queue } from '@/app/classes/queue';
+import { TestLabels, TestPass } from '@/app/classes/test';
 import { Role, User } from '@/app/classes/user';
-import { createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC, createSearchCriteriaByFiltrRateM } from '@/app/factory/factory_searchCriteria';
+import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC, createSearchCriteriaByFiltrRateM, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
@@ -29,6 +33,8 @@ export const Search = () => {
   const [filtrNoteCC, setFiltrNoteCC] = useState(new FiltrNoteCC())
   const [filtrRateCC, setFiltrRateCC] = useState(new FiltrRateCC())
   const [filtrRateM, setFiltrRateM] = useState(new FiltrRateM())
+  const [filtrTest, setFiltrTest] = useState(new FiltrTest())
+  const [filtrFeedback, setFiltrFeedback] = useState(new FiltrFeedback())
 
   useEffect(() => {
 
@@ -60,6 +66,12 @@ export const Search = () => {
   function clearRateM_Click() {
     setFiltrRateM(new FiltrRateM())
   }
+  function clearTest_Click() {
+    setFiltrRateM(new FiltrRateM())
+  }
+  function clearFeedback_Click() {
+    setFiltrRateM(new FiltrRateM())
+  }
 
   const [choiseUsers, setSelectedUsers] = useState<Array<User>>([]);
 
@@ -71,13 +83,14 @@ export const Search = () => {
     } else {
       setSelectedUsers([...choiseUsers, selectUser]);
     }
-
   }
 
   useEffect(() => {
     setFiltrNoteCC((prevFiltrNoteCC) => ({ ...prevFiltrNoteCC, userCol: choiseUsers }));
     setFiltrRateCC((prevFiltrRateCC) => ({ ...prevFiltrRateCC, userCol: choiseUsers }));
-    setFiltrRateCC((prevFiltrRateM) => ({ ...prevFiltrRateM, userCol: choiseUsers }));
+    setFiltrRateM((prevFiltrRateM) => ({ ...prevFiltrRateM, userCol: choiseUsers }));
+    setFiltrTest((prevFiltrList) => ({ ...prevFiltrList, userCol: choiseUsers }));
+    setFiltrFeedback((prevFiltrFB) => ({ ...prevFiltrFB, userCol: choiseUsers }));
   }, [choiseUsers]);
 
   return (
@@ -117,6 +130,18 @@ export const Search = () => {
                 e.preventDefault(); setOpenTab(3);
               }}
               data-toggle="tab" href="#link3" role="tablist" > E-Mail </a>
+            <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 4 ? " tab-active " : "")
+            }
+              onClick={e => {
+                e.preventDefault(); setOpenTab(4);
+              }}
+              data-toggle="tab" href="#link3" role="tablist" > Test </a>
+            <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 5 ? " tab-active " : "")
+            }
+              onClick={e => {
+                e.preventDefault(); setOpenTab(5);
+              }}
+              data-toggle="tab" href="#link3" role="tablist" > Feedback </a>
           </div>
 
           {/* <!-- Tab content --> */}
@@ -200,14 +225,14 @@ export const Search = () => {
                       </div>
                       <div className='flex flex-col items-center justify-start mb-4'>
                         <select className="select select-bordered select-sm w-fit max-w-xs h-14"
-                          value={Status_Note.ALL}
+                          value={filtrNoteCC.status}
                           onChange={e => {
-                            setFiltrNoteCC({ ...filtrNoteCC, status: Object.values(Status_Note).find(status => status === e.target.value) as Status_Note || Status_Note.NO_START });
+                            setFiltrNoteCC({ ...filtrNoteCC, status: Object.values(Status_Note).find(status => status === e.target.value) as Status_Note || Status_Note.NO_START_ });
                           }}>
-                          <option value={Status_Note.ALL}>{StatusLabels[Status_Note.ALL]}</option>
+                          <option value={Status_Note.ALL_}>{StatusLabels[Status_Note.ALL_]}</option>
                           {/* <option value={Status_Note.NO_START}>{StatusLabels[Status_Note.NO_START]}</option> */}
-                          <option value={Status_Note.CLOSE}>{StatusLabels[Status_Note.CLOSE]}</option>
-                          <option value={Status_Note.CLOSE_WITHOUT}>{StatusLabels[Status_Note.CLOSE_WITHOUT]}</option>
+                          <option value={Status_Note.CLOSE_}>{StatusLabels[Status_Note.CLOSE_]}</option>
+                          <option value={Status_Note.CLOSE_WITHOUT_}>{StatusLabels[Status_Note.CLOSE_WITHOUT_]}</option>
                         </select>
                       </div>
                     </div>
@@ -465,6 +490,7 @@ export const Search = () => {
                 </div>
               </div>
             </div>
+            {/* RateM TAB */}
             <div className={openTab === 3 ? "block" : "hidden"} id="link1">
               <div className='flex items-center justify-center'>
                 <div className='flex flex-col items-center justify-center mt-2'>
@@ -496,7 +522,7 @@ export const Search = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Zakres ocen*/}
                       <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
                         <h1 className='text-info text-lg text-center ml-3'>Zakres ocen</h1>
@@ -565,7 +591,7 @@ export const Search = () => {
                           Szukaj maili
                         </button>
                       </Link>
-                      <button onClick={clearRateCC_Click} className="btn btn-outline btn-info mx-2">
+                      <button onClick={clearRateM_Click} className="btn btn-outline btn-info mx-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -576,6 +602,210 @@ export const Search = () => {
                 </div>
               </div>
 
+            </div>
+            {/* Test TAB */}
+            <div className={openTab === 4 ? "block" : "hidden"} id="link1">
+              <div className='flex items-center justify-center'>
+                <div className='flex flex-col items-center justify-center mt-2'>
+                  <div className='flex flex-col 2xl:flex-row '>
+                    <div className='flex flex-col items-center justify-center'>
+                      {/* Szukanie po miesiącu */}
+                      <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                        <h1 className='text-info text-lg text-center ml-3'>Data testu</h1>
+                        <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+
+                        <div className='flex mt-2'>
+                          <div className="flex flex-col m-2">
+                            <span className="label-text">Data od:</span>
+                            <input
+                              className="input input-bordered w-full max-w-xs"
+                              value={filtrTest.dateTestStart}
+                              onChange={e => { setFiltrTest({ ...filtrTest, dateTestStart: e.target.value }) }}
+                              type="date"
+                            />
+                          </div>
+                          <div className="flex flex-col mr-2 ml-4 m-2">
+                            <span className="label-text">Data do:</span>
+                            <input
+                              className="input input-bordered w-full max-w-xs"
+                              value={filtrTest.dateTestEnd}
+                              onChange={e => { setFiltrTest({ ...filtrTest, dateTestEnd: e.target.value }) }}
+                              type="date"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Test PASS */}
+                      <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                        <h1 className='text-info text-lg text-center ml-3'>Czy zdany?</h1>
+                        <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+
+                        <div className='flex items-center justify-start mb-4 gap-4'>
+
+                          <select className="select select-bordered select-sm w-fit max-w-xs h-14"
+                            value={TestPass.ALL_}
+                            onChange={e => {
+                              setFiltrTest({ ...filtrTest, testPass: Object.values(TestPass).find(testPass => testPass === e.target.value) as TestPass || TestPass.ALL_ });
+                            }}>
+                            <option value={TestPass.ALL_}>{TestLabels[TestPass.ALL_]}</option>
+                            <option value={TestPass.PASS_}>{TestLabels[TestPass.PASS_]}</option>
+                            <option value={TestPass.NO_PASS_}>{TestLabels[TestPass.NO_PASS_]}</option>
+                            <option value={TestPass.NO_REQUIRED_}>{TestLabels[TestPass.NO_REQUIRED_]}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='flex flex-col items-center justify-center h-full 2xl:ml-10 w-full gap-2'>
+                      <div className='flex items-center justify-center h-full w-full gap-2'>
+                        {/* ID */}
+                        <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center w-full'>
+                          <h1 className='text-info text-lg text-center ml-3'>Id</h1>
+                          <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+                          <input
+                            className="input input-bordered input-info max-w-md w-24 m-2"
+                            value={filtrTest.id}
+                            onChange={e => { setFiltrTest({ ...filtrTest, id: parseInt(e.target.value) }) }}
+                            min='0'
+                            step='1'
+                            type="number" />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  {/* Przyciski */}
+                  <div>
+                    <hr className="w-full h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+                    <div className='flex gap-2 mt-5'>
+                      <Link
+                        className="flex items-center group"
+                        href={{
+                          pathname: "/router/common/browser",
+                          query: { fromSearch: true }
+                        }}>
+                        <button onClick={() => {
+                          const criteriaList = createSearchCriteriaByFiltrTest(filtrTest);
+                          localStorage.setItem('testList_criteriaList', JSON.stringify(criteriaList));
+                        }} className="btn btn-outline btn-info mx-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                          </svg>
+                          Szukaj testów
+                        </button>
+                      </Link>
+                      <button onClick={clearTest_Click} className="btn btn-outline btn-info mx-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                        Wyczyść filtr
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Feedback TAB */}
+            <div className={openTab === 5 ? "block" : "hidden"} id="link1">
+              <div className='flex items-center justify-center'>
+                <div className='flex flex-col items-center justify-center mt-2'>
+                  <div className='flex flex-col 2xl:flex-row '>
+                    <div className='flex flex-col items-center justify-center'>
+                      {/* Szukanie po miesiącu */}
+                      <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                        <h1 className='text-info text-lg text-center ml-3'>Data feedbacku</h1>
+                        <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+
+                        <div className='flex mt-2'>
+                          <div className="flex flex-col m-2">
+                            <span className="label-text">Data od:</span>
+                            <input
+                              className="input input-bordered w-full max-w-xs"
+                              value={filtrFeedback.dateFeedbackStart}
+                              onChange={e => { setFiltrFeedback({ ...filtrFeedback, dateFeedbackStart: e.target.value }) }}
+                              type="date"
+                            />
+                          </div>
+                          <div className="flex flex-col mr-2 ml-4 m-2">
+                            <span className="label-text">Data do:</span>
+                            <input
+                              className="input input-bordered w-full max-w-xs"
+                              value={filtrFeedback.dateFeedbackEnd}
+                              onChange={e => { setFiltrFeedback({ ...filtrFeedback, dateFeedbackEnd: e.target.value }) }}
+                              type="date"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Feedback Type */}
+                      <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center m-2 w-full'>
+                        <h1 className='text-info text-lg text-center ml-3'>Pochwała czy skarga ?</h1>
+                        <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+
+                        <div className='flex items-center justify-start mb-4 gap-4'>
+
+                          <select className="select select-bordered select-sm w-fit max-w-xs h-14"
+                            value={Feedback_type.ALL_}
+                            onChange={e => {
+                              setFiltrFeedback({ ...filtrFeedback, feedback: Object.values(Feedback_type).find(testPass => testPass === e.target.value) as Feedback_type || Feedback_type.ALL_ });
+                            }}>
+                            <option value={Feedback_type.ALL_}>{FeedbackLabels[Feedback_type.ALL_]}</option>
+                            <option value={Feedback_type.POSITIVE_}>{FeedbackLabels[Feedback_type.POSITIVE_]}</option>
+                            <option value={Feedback_type.NEGATIVE_}>{FeedbackLabels[Feedback_type.NEGATIVE_]}</option>
+
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='flex flex-col items-center justify-center h-full 2xl:ml-10 w-full gap-2'>
+                      <div className='flex items-center justify-center h-full w-full gap-2'>
+                        {/* ID */}
+                        <div className='flex flex-col border-2 border-info border-opacity-50 mt-2 justify-center items-center w-full'>
+                          <h1 className='text-info text-lg text-center ml-3'>Id</h1>
+                          <hr className="w-48 h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+                          <input
+                            className="input input-bordered input-info max-w-md w-24 m-2"
+                            value={filtrFeedback.id}
+                            onChange={e => { setFiltrFeedback({ ...filtrFeedback, id: parseInt(e.target.value) }) }}
+                            min='0'
+                            step='1'
+                            type="number" />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  {/* Przyciski */}
+                  <div>
+                    <hr className="w-full h-1 opacity-50 border-0 rounded bg-info m-2"></hr>
+                    <div className='flex gap-2 mt-5'>
+                      <Link
+                        className="flex items-center group"
+                        href={{
+                          pathname: "/router/common/browser",
+                          query: { fromSearch: true }
+                        }}>
+                        <button onClick={() => {
+                          const criteriaList = createSearchCriteriaByFiltrFeedback(filtrFeedback);
+                          localStorage.setItem('feedbackList_criteriaList', JSON.stringify(criteriaList));
+                        }} className="btn btn-outline btn-info mx-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                          </svg>
+                          Szukaj testów
+                        </button>
+                      </Link>
+                      <button onClick={clearFeedback_Click} className="btn btn-outline btn-info mx-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                        Wyczyść filtr
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

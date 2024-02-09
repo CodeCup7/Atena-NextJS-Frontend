@@ -6,10 +6,10 @@ import { Role, User } from '@/app/classes/user';
 import { getActiveUser } from '@/app/auth';
 import { updateUserList } from '@/app/factory/factory_user';
 import { format } from 'date-fns';
-import { Test, TestPass } from '@/app/classes/test';
-import { api_Test_add, api_Test_delete, api_Test_getDate } from '@/app/api/test_api';
+import { Test, TestLabels, TestPass } from '@/app/classes/test';
+import { api_Test_add, api_Test_addAll, api_Test_delete, api_Test_getDate } from '@/app/api/test_api';
 import readXlsxFile from 'read-excel-file';
-import { uploadTestsFromExcel } from '@/app/factory/factory_test';
+import { prepareTestsList } from '@/app/factory/factory_test';
 
 const Tests_Page = () => {
 
@@ -18,7 +18,7 @@ const Tests_Page = () => {
     const [isPermit, setIsPermit] = useState(false);
     const [isPermitAgent, setIsPermitAgent] = useState(false);
     const [userList, setUserList] = useState<Array<User>>([]);
-    const [testsList, setTestsList] = useState<Array<Test>>([]);
+    const [testList, setTestList] = useState<Array<Test>>([]);
     const [test, setTest] = useState(new Test());
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
@@ -63,8 +63,8 @@ const Tests_Page = () => {
                     const startDate = new Date(year, month, 1);
                     // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
                     const endDate = new Date(year, month + 1, 0);
-                    const testsList = await api_Test_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
-                    setTestsList(testsList);
+                    const testList = await api_Test_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    setTestList(testList);
 
                 } catch (error) {
                     console.error('Błąd pobierania Testsów:', error);
@@ -87,7 +87,7 @@ const Tests_Page = () => {
             api_Test_add(test).then((foo => {
                 if (foo.isOK === true) {
 
-                    setTestsList((prevTestsList) => [...prevTestsList, foo.test]);
+                    setTestList((prevTestsList) => [...prevTestsList, foo.test]);
                     toast.info(foo.callback, {
                         position: toast.POSITION.TOP_RIGHT, theme: "dark"
                     });
@@ -110,7 +110,7 @@ const Tests_Page = () => {
     function deleteTests_click(test_: Test) {
         api_Test_delete(test_).then((foo => {
             if (foo.isOK === true) {
-                setTestsList((prevTestsList) => prevTestsList.filter((Tests) => Tests.id !== test_.id));
+                setTestList((prevTestsList) => prevTestsList.filter((Tests) => Tests.id !== test_.id));
                 toast.info(foo.callback, {
                     position: toast.POSITION.TOP_RIGHT, theme: "dark"
                 });
@@ -152,13 +152,36 @@ const Tests_Page = () => {
 
         if (file) {
             readXlsxFile(file).then((rows) => {
-                //setData(rows as string[][]); // Rzutowanie typu rows na string[][]
-                uploadTestsFromExcel(rows as string[][], userList)
+                setData(rows as string[][]); // Rzutowanie typu rows na string[][]
             }).catch((error) => {
                 console.error('Wystąpił błąd podczas wczytywania pliku Excel:', error);
             });
         }
     };
+
+    async function loadFile() {
+
+        const testList = prepareTestsList(data, userList);
+
+        if (testList.length > 0) {
+            api_Test_addAll(testList).then((foo => {
+                if (foo.isOK === true) {
+                    setTestList(testList);
+                    toast.info(foo.callback, {
+                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                    });
+                } else {
+                    toast.error(foo.callback, {
+                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                    });
+                }
+            }));
+        } else {
+            toast.error("Wybierz plik zawierający testy", {
+                position: toast.POSITION.TOP_RIGHT, theme: "dark"
+            });
+        }
+    }
 
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -166,12 +189,10 @@ const Tests_Page = () => {
 
             {/* NAGŁÓWEK */}
             <div className='flex items-center justify-center'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-info">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-12 h-12">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                 </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-info">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 0 1-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 0 1 1.423.23l3.114 1.04a4.5 4.5 0 0 0 1.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 0 0 7.5 19.75 2.25 2.25 0 0 0 9.75 22a.75.75 0 0 0 .75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 0 0 2.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384m-10.253 1.5H9.7m8.075-9.75c.01.05.027.1.05.148.593 1.2.925 2.55.925 3.977 0 1.487-.36 2.89-.999 4.125m.023-8.25c-.076-.365.183-.75.575-.75h.908c.889 0 1.713.518 1.972 1.368.339 1.11.521 2.287.521 3.507 0 1.553-.295 3.036-.831 4.398-.306.774-1.086 1.227-1.918 1.227h-1.053c-.472 0-.745-.556-.5-.96a8.95 8.95 0 0 0 .303-.54" />
-                </svg>
+
                 <h1 className='text-4xl text-info mb-4 ml-2'>Testy</h1>
             </div>
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
@@ -179,7 +200,7 @@ const Tests_Page = () => {
             {/* POBIERANIE, DODAWANIE, WCZYTYWANIE */}
             <div className='flex flex-col md:flex-row mt-5 gap-2 justify-center'>
 
-                <div className='flex mt-5'>
+                <div className='flex m-2'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 mx-2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
                     </svg>
@@ -198,16 +219,18 @@ const Tests_Page = () => {
                 </div>
 
                 <div className='flex gap-2'>
-                    <div className=' flex flex-col'>
-                        <span className="label-text">Wczytaj testy</span>
-                        <input className="file-input file-input-bordered file-input-info w-full max-w-xs" type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
-                    </div>
-                    <button className="btn btn-outline btn-info mx-2 mt-5" onClick={openModal}>
+                    <button className="btn btn-outline btn-info m-2" onClick={openModal}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                         Dodaj pojedyńczy test
                     </button>
+
+                    <div className=' flex gap-2 border-2 border-opacity-50 border-info'>
+                        <input className="file-input file-input-bordered file-input-info w-full max-w-xs m-2" type="file" accept=".xlsx,.xls" onChange={handleFileChange} />
+                        <button className='btn btn-info w-20 m-2' onClick={loadFile}>Wczytaj testy</button>
+                    </div>
+
                 </div>
             </div>
 
@@ -279,28 +302,29 @@ const Tests_Page = () => {
 
             {/* TABELA */}
             <div className='flex sm:flex-col md:flex-row'>
-
                 <div className="table">
                     <table className="table table-pin-rows ">
                         <thead>
                             <tr>
-                                <th className=''>id</th>
-                                <th className=''>data</th>
-                                <th>agent</th>
-                                <th>ocena</th>
-                                <th>próg</th>
-                                <th>status</th>
+                                <th className=''>Imię i nazwisko</th>
+                                <th className=''>Wynik</th>
+                                <th>Próg</th>
+                                <th>Data zaliczenia</th>
+                                <th>Status</th>
+                                <th>Akcja</th>
                             </tr>
                         </thead>
                         <tbody className="table-auto overflow-scroll w-full" >
-                            {testsList.map((tests, index) => {
+                            {testList.map((tests, index) => {
                                 return (
                                     <tr key={index}
                                         className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
                                             } cursor-pointer`}>
-                                        <td>{tests.id}</td>
-                                        <td>{tests.dateTest}</td>
                                         <td>{tests.agent.nameUser}</td>
+                                        <td>{tests.score}</td>
+                                        <td>{tests.levelPass}</td>
+                                        <td>{tests.dateTest}</td>
+                                        <td>{TestLabels[tests.testPass]}</td>
                                         <td><button className="btn btn-outline btn-warning btn-sm"
                                             onClick={() => {
                                                 deleteTests_click(tests)

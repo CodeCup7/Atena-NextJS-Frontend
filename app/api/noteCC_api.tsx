@@ -3,7 +3,7 @@
 // '==========================================================================================================================================
 
 import { NoteCC } from "../classes/noteCC";
-import { SearchCriteria } from "../classes/searchCriteria";
+import { SearchCriteria } from "../classes/filtrs/searchCriteria";
 
 interface Foo {
     callback: string;

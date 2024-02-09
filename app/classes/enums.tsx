@@ -3,17 +3,17 @@
 // '==========================================================================================================================================
 
 export enum Status_Note {
-    ALL = '0',
-    NO_START = '1',
-    CLOSE = '2',
-    CLOSE_WITHOUT = '3',
+    ALL_ = 'ALL_',
+    NO_START_ = 'NO_START_',
+    CLOSE_ = 'CLOSE_',
+    CLOSE_WITHOUT_ = 'CLOSE_WITHOUT_',
 };
 
 export const StatusLabels: Record<Status_Note, string> = {
-    [Status_Note.ALL]: "Wszystkie",
-    [Status_Note.NO_START]: "Nie rozpoczęty",
-    [Status_Note.CLOSE]: "Zamknięty",
-    [Status_Note.CLOSE_WITHOUT]: "Zamknięty BEZ",
+    [Status_Note.ALL_]: "Wszystkie",
+    [Status_Note.NO_START_]: "Nie rozpoczęty",
+    [Status_Note.CLOSE_]: "Zamknięty",
+    [Status_Note.CLOSE_WITHOUT_]: "Zamknięty BEZ",
 };
 
 export enum Type_RateCC {

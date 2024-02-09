@@ -7,7 +7,7 @@ import { StatusLabels, TypeLabels } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/noteCC';
 import { RateCC } from '@/app/classes/rateCC';
 import { RateM } from '@/app/classes/rateM';
-import { SearchCriteria } from '@/app/classes/searchCriteria';
+import { SearchCriteria } from '@/app/classes/filtrs/searchCriteria';
 import { Role, User } from '@/app/classes/user';
 import { getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
 import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
@@ -18,6 +18,10 @@ import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import { api_Test_search } from '@/app/api/test_api';
+import { api_Feedback_search } from '@/app/api/feedback_api';
+import { Feedback, FeedbackLabels } from '@/app/classes/feedback';
+import { Test, TestLabels } from '@/app/classes/test';
 
 export const Browser = () => {
 
@@ -33,8 +37,8 @@ export const Browser = () => {
     const [noteCC_List, setNoteCC_List] = useState<Array<NoteCC>>([]);
     const [rateCC_List, setRateCC_List] = useState<Array<RateCC>>([]);
     const [rateM_List, setRateM_List] = useState<Array<RateM>>([]);
-    // const [test_list, setTest_list] = useState<Array<User>>([]);
-    // const [fb_List, setFb_List] = useState<Array<User>>([]);
+    const [test_list, setTest_list] = useState<Array<Test>>([]);
+    const [fb_List, setFb_List] = useState<Array<Feedback>>([]);
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
 
     useEffect(() => {
@@ -66,21 +70,33 @@ export const Browser = () => {
                 const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
                 const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
                 const criteriaListRateM = localStorage.getItem('rateMList_criteriaList');
+                const criteriaListTest = localStorage.getItem('testList_criteriaList');
+                const criteriaListFB = localStorage.getItem('feedbackList_criteriaList');
 
                 if (criteriaListNoteCC !== null) {
-                    const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC))
+                    const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC));
                     setNoteCC_List(notelist);
                     localStorage.removeItem('noteCCList_criteriaList');
                 } else if (criteriaListRateCC !== null) {
-                    const ratelist = await api_RateCC_search(JSON.parse(criteriaListRateCC))
+                    const ratelist = await api_RateCC_search(JSON.parse(criteriaListRateCC));
                     setRateCC_List(ratelist);
                     setOpenTab(2)
                     localStorage.removeItem('rateCCList_criteriaList');
                 } else if (criteriaListRateM !== null) {
-                    const ratelist = await api_RateM_search(JSON.parse(criteriaListRateM))
+                    const ratelist = await api_RateM_search(JSON.parse(criteriaListRateM));
                     setRateM_List(ratelist);
                     setOpenTab(3)
                     localStorage.removeItem('rateMList_criteriaList');
+                } else if (criteriaListTest !== null) {
+                    const testlist = await api_Test_search(JSON.parse(criteriaListTest));
+                    setTest_list(testlist);
+                    setOpenTab(4)
+                    localStorage.removeItem('testList_criteriaList');
+                } else if (criteriaListFB !== null) {
+                    const fblist = await api_Feedback_search(JSON.parse(criteriaListFB));
+                    setFb_List(fblist);
+                    setOpenTab(5)
+                    localStorage.removeItem('feedbackList_criteriaList');
                 }
             }
 
@@ -121,6 +137,17 @@ export const Browser = () => {
 
             const rateMList = await api_RateM_search(criteriaList);
             setRateM_List(rateMList);
+
+            dateCriteria.key = 'dateTest'
+
+            const testList = await api_Test_search(criteriaList);
+            setTest_list(testList);
+
+            dateCriteria.key = 'dateFeedback'
+
+            const fblist = await api_Feedback_search(criteriaList);
+            setFb_List(fblist);
+            
 
         } else {
             toast.error("Uzupełnij poprawnie daty", {
@@ -330,6 +357,7 @@ export const Browser = () => {
                     </div>
 
                 </div>
+                {/* RateM TAB */}
                 <div className={openTab === 3 ? "block" : "hidden"} id="link1">
                     <div className='flex items-center justify-center'>
                         <table className="table">
@@ -373,13 +401,59 @@ export const Browser = () => {
                     </div>
 
                 </div>
+                {/* Test TAB */}
                 <div className={openTab === 4 ? "block" : "hidden"} id="link1">
+                    <div className='flex items-center justify-center'>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Data testu</th>
+                                    <th>Agent</th>
+                                    <th>Ocena</th>
+                                    <th>Próg</th>
+                                    <th>Czy zdany</th>
+                                </tr>
+                            </thead>
+                            <tbody className="table-auto overflow-scroll w-full">
+                                {test_list.map((test, index) => {
+                                    return (
+                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                            <td>{test.dateTest}</td>
+                                            <td>{test.agent.nameUser}</td>
+                                            <td>{test.score}</td>
+                                            <td>{test.levelPass}</td>
+                                            <td>{TestLabels[test.testPass]}</td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
+                {/* Feedback TAB */}
                 <div className={openTab === 5 ? "block" : "hidden"} id="link1">
-                    <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
-
-                        Feadback
+                    <div className='flex items-center justify-center'>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Agent</th>
+                                    <th>Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody className="table-auto overflow-scroll w-full">
+                                {fb_List.map((fb, index) => {
+                                    return (
+                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                            <td>{fb.dateFeedback}</td>
+                                            <td>{fb.agent.nameUser}</td>
+                                            <td>{FeedbackLabels[fb.feedback]}</td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>

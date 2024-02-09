@@ -3,10 +3,14 @@
 // '==========================================================================================================================================
 
 import { Status_Note, Type_RateCC } from "../classes/enums";
-import { FiltrNoteCC } from "../classes/filtrNoteCC";
-import { FiltrRateCC } from "../classes/filtrRateCC";
-import { FiltrRateM } from "../classes/filtrRateM";
-import { SearchCriteria } from "../classes/searchCriteria";
+import { Feedback_type } from "../classes/feedback";
+import { FiltrFeedback } from "../classes/filtrs/feedback_filtr";
+import { FiltrNoteCC } from "../classes/filtrs/noteCC_Filtr";
+import { FiltrRateCC } from "../classes/filtrs/rateCC_filtr";
+import { FiltrRateM } from "../classes/filtrs/rateM_filtr";
+import { SearchCriteria } from "../classes/filtrs/searchCriteria";
+import { FiltrTest } from "../classes/filtrs/test_filtr";
+import { TestPass } from "../classes/test";
 
 export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
 
@@ -71,7 +75,7 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
             criteriaList.push(userCriteria)
         })
     }
-    console.log('criteriaList RATE:', criteriaList);
+    console.log('criteriaList RATE_CC:', criteriaList);
     return criteriaList;
 
 }
@@ -111,7 +115,7 @@ export function createSearchCriteriaByFiltrRateM(filtr: FiltrRateM) {
             criteriaList.push(userCriteria)
         })
     }
-    console.log('criteriaList RATE:', criteriaList);
+    console.log('criteriaList RATE_M:', criteriaList);
     return criteriaList;
 
 }
@@ -132,7 +136,7 @@ export function createSearchCriteriaByFiltrNoteCC(filtr: FiltrNoteCC) {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'appliesDate'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.appliesDateStart + '-01' + " AND " + filtr.appliesDateEnd + lastDay
+        dateCriteria.value = filtr.appliesDateStart + '-01' + " AND " + filtr.appliesDateEnd + "-" + lastDay
         criteriaList.push(dateCriteria)
     }
     if (filtr.coachDateStart !== '' && filtr.coachDateEnd !== '') {
@@ -163,7 +167,7 @@ export function createSearchCriteriaByFiltrNoteCC(filtr: FiltrNoteCC) {
         id.value = filtr.id.toString()
         criteriaList.push(id)
     }
-    if (filtr.status !== Status_Note.ALL) {
+    if (filtr.status !== Status_Note.ALL_) {
         const status = new SearchCriteria();
         status.key = 'status'
         status.operation = ':'
@@ -188,6 +192,88 @@ export function createSearchCriteriaByFiltrNoteCC(filtr: FiltrNoteCC) {
 
     }
     console.log('criteriaList NOTE:', criteriaList);
+    return criteriaList;
+
+}
+
+export function createSearchCriteriaByFiltrTest(filtr: FiltrTest) {
+
+    const criteriaList: SearchCriteria[] = []
+
+    if (filtr.dateTestStart !== '' && filtr.dateTestEnd !== '') {
+        const dateCriteria = new SearchCriteria();
+        dateCriteria.key = 'dateTest'
+        dateCriteria.operation = 'BETWEEN'
+        dateCriteria.value = filtr.dateTestStart + " AND " + filtr.dateTestEnd
+        criteriaList.push(dateCriteria)
+    }
+
+    if (filtr.id > 0) {
+        const id = new SearchCriteria();
+        id.key = 'id'
+        id.operation = ':'
+        id.value = filtr.id.toString()
+        criteriaList.push(id)
+    }
+    if (filtr.testPass !== TestPass.ALL_) {
+        const id = new SearchCriteria();
+        id.key = 'testPass'
+        id.operation = ':'
+        id.value = filtr.testPass.toString()
+        criteriaList.push(id)
+    }
+
+    if(filtr.userCol.length > 0){
+        filtr.userCol.forEach(user=>{
+            const userCriteria = new SearchCriteria();
+            userCriteria.key = 'agent'
+            userCriteria.operation = ':'
+            userCriteria.value = user.id.toString();
+            criteriaList.push(userCriteria)
+        })
+    }
+    console.log('criteriaList TEST:', criteriaList);
+    return criteriaList;
+
+}
+
+export function createSearchCriteriaByFiltrFeedback(filtr: FiltrFeedback) {
+
+    const criteriaList: SearchCriteria[] = []
+
+    if (filtr.dateFeedbackStart !== '' && filtr.dateFeedbackEnd !== '') {
+        const dateCriteria = new SearchCriteria();
+        dateCriteria.key = 'dateFeedback'
+        dateCriteria.operation = 'BETWEEN'
+        dateCriteria.value = filtr.dateFeedbackStart + " AND " + filtr.dateFeedbackEnd
+        criteriaList.push(dateCriteria)
+    }
+
+    if (filtr.id > 0) {
+        const id = new SearchCriteria();
+        id.key = 'id'
+        id.operation = ':'
+        id.value = filtr.id.toString()
+        criteriaList.push(id)
+    }
+    if (filtr.feedback !== Feedback_type.ALL_) {
+        const id = new SearchCriteria();
+        id.key = 'testPass'
+        id.operation = ':'
+        id.value = filtr.feedback.toString()
+        criteriaList.push(id)
+    }
+
+    if(filtr.userCol.length > 0){
+        filtr.userCol.forEach(user=>{
+            const userCriteria = new SearchCriteria();
+            userCriteria.key = 'agent'
+            userCriteria.operation = ':'
+            userCriteria.value = user.id.toString();
+            criteriaList.push(userCriteria)
+        })
+    }
+    console.log('criteriaList FEEDBACK:', criteriaList);
     return criteriaList;
 
 }
