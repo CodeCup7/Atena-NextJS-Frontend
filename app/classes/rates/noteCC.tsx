@@ -2,10 +2,10 @@
 // '*********************** NoteCC CLASS **************************
 // '===============================================================
 
-import { Rate_Mode, Status_Note } from "./enums";
+import { Rate_Mode, Status_Note } from "../enums";
 import { RateCC } from "./rateCC";
 import { RateM } from "./rateM";
-import { User } from "./user";
+import { User } from "../user";
 
 export class NoteCC {
 

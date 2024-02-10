@@ -3,9 +3,9 @@
 // '==========================================================================================================================================
 
 import { Rate_Mode, Status_Note } from "../classes/enums";
-import { NoteCC } from "../classes/noteCC";
-import { RateCC } from "../classes/rateCC";
-import { RateM } from "../classes/rateM";
+import { NoteCC } from "../classes/rates/noteCC";
+import { RateCC } from "../classes/rates/rateCC";
+import { RateM } from "../classes/rates/rateM";
 import { Role, User } from "../classes/user";
 import { getRateCC_Rate } from "./factory_rateCC";
 import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";

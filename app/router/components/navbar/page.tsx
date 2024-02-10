@@ -1,7 +1,7 @@
 'use client'
 import { getActiveUser } from '@/app/auth';
 import { Rate_Mode, Type_RateCC } from '@/app/classes/enums';
-import { Role } from '@/app/classes/user';
+import { Role, User } from '@/app/classes/user';
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
 
@@ -12,7 +12,8 @@ export const Navbar = () => {
         image: boolean;
         pernament: boolean;
     }
-
+    
+    const [activeUser, setActiveUser] = useState(new User());
     const [menuHidden, setMenuHiden] = useState(false);
     const [isPermit, setIsPermit] = useState(false);
 
@@ -20,6 +21,7 @@ export const Navbar = () => {
         async function fetchData() {
             try {
                 const user = await getActiveUser();
+                setActiveUser(user);
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
                 setIsPermit(isPermit);
             } catch (error) {
@@ -51,6 +53,7 @@ export const Navbar = () => {
         <div className="navbar flex flex-1 w-full">
             <div className="dropdown dropdown-bottoms">
                 <button tabIndex={0} className="btn btn-outline btn-info btn-xs sm:btn-sm md:btn-md lg:btn-lg"
+                    disabled={activeUser.id === 0}
                     onClick={() => setMenuHiden(false)}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
                 </button>

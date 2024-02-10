@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Rate_Mode, StatusLabels, Status_Note } from '@/app/classes/enums';
-import { NoteCC } from '@/app/classes/noteCC';
+import { NoteCC } from '@/app/classes/rates/noteCC';
 import { Get_NoteList_With_NoStartNote } from '@/app/factory/factory_noteCC';
-import { RateCC } from '@/app/classes/rateCC';
+import { RateCC } from '@/app/classes/rates/rateCC';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { updateUserList } from '@/app/factory/factory_user';
@@ -14,7 +14,7 @@ import { getActiveUser } from '@/app/auth';
 import { getRateCC_Rate, getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { format } from 'date-fns';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
-import { RateM } from '@/app/classes/rateM';
+import { RateM } from '@/app/classes/rates/rateM';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 
 export const NoteMain = () => {

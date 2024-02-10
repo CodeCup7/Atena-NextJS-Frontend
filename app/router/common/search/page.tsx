@@ -14,6 +14,7 @@ import { Role, User } from '@/app/classes/user';
 import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC, createSearchCriteriaByFiltrRateM, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
+import { userInfo } from 'os';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -26,15 +27,15 @@ export const Search = () => {
   const [userList, setUserList] = useState<Array<User>>([]);
   const [queueList, setQueueList] = useState<Array<Queue>>([]);
 
-  const [dateStart, setDateStart] = useState('');
-  const [dateEnd, setDateEnd] = useState('');
-  const [agent, setAgent] = useState(0);
+  const [agentId, setAgentId] = useState(0);
 
   const [filtrNoteCC, setFiltrNoteCC] = useState(new FiltrNoteCC())
   const [filtrRateCC, setFiltrRateCC] = useState(new FiltrRateCC())
   const [filtrRateM, setFiltrRateM] = useState(new FiltrRateM())
   const [filtrTest, setFiltrTest] = useState(new FiltrTest())
   const [filtrFeedback, setFiltrFeedback] = useState(new FiltrFeedback())
+
+  const [choiseUsers, setSelectedUsers] = useState<Array<User>>([]);
 
   useEffect(() => {
 
@@ -47,6 +48,11 @@ export const Search = () => {
         setUserList(users);
         setQueueList(queues);
 
+        // Walidacja roli. Możliwość pobrania tylko swoich danych przez agenta
+        if (user.role === Role.AGENT_) {
+          setAgentId(user.id)
+          handleCheckboxChange(user)
+        }
         const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
         setIsPermit(isPermit);
 
@@ -72,8 +78,6 @@ export const Search = () => {
   function clearFeedback_Click() {
     setFiltrRateM(new FiltrRateM())
   }
-
-  const [choiseUsers, setSelectedUsers] = useState<Array<User>>([]);
 
   const handleCheckboxChange = (selectUser: User) => {
     const isSelected = choiseUsers.some(user => user.id === selectUser.id)
@@ -369,6 +373,7 @@ export const Search = () => {
                               className="input input-bordered input-info max-w-md w-24 m-2"
                               value={filtrRateCC.rateStart}
                               onChange={e => { setFiltrRateCC({ ...filtrRateCC, rateStart: e.target.value }) }}
+                              disabled
                               min='0'
                               step='1'
                               type="number" />
@@ -380,6 +385,7 @@ export const Search = () => {
                               className="input input-bordered input-info max-w-md w-24 m-2"
                               value={filtrRateCC.rateEnd}
                               onChange={e => { setFiltrRateCC({ ...filtrRateCC, rateEnd: e.target.value }) }}
+                              disabled
                               min='0'
                               step='1'
                               type="number" />
@@ -832,6 +838,7 @@ export const Search = () => {
                       <td>
                         <input
                           type="checkbox"
+                          disabled={!isPermit}
                           className="checkbox checkbox-info"
                           onChange={() => { }}
                           checked={choiseUsers.some(userInList => userInList.id === user.id)}

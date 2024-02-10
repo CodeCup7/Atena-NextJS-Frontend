@@ -12,7 +12,6 @@ interface ArcedProps {
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function Dashboard_DoughnutChart(props: ArcedProps) {
-console.log('props :', props);
 
   let bgColor;
   let borderColor;
@@ -28,13 +27,14 @@ console.log('props :', props);
   }
 
   const chartOptions = {
+    
     responsive: true, // Wyłącz responsywność
     maintainAspectRatio: false , // Wyłącz zachowanie proporcji
   };
 
   return (
     <div>
-      <Doughnut data={{
+      <Doughnut  data={{
         labels: ['Ocena'],
         datasets: [{
           label: props.agentName,

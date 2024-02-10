@@ -1,5 +1,5 @@
 'use client'
-import { RateM } from "@/app/classes/rateM";
+import { RateM } from "@/app/classes/rates/rateM";
 import { CreateNewEmptyRateM } from "@/app/factory/factory_rateM";
 import { useState } from "react";
 

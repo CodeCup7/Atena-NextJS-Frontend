@@ -2,8 +2,8 @@
 // '*********************** RateM Factory ***************************************************************************************************
 // '==========================================================================================================================================
 
-import { RateBlock } from "../classes/rateBlock";
-import { RateM } from "../classes/rateM";
+import { RateBlock } from "../classes/rates/rateBlock";
+import { RateM } from "../classes/rates/rateM";
 import { User } from "../classes/user";
 import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "../globalKeys";
 import { CreateNewEmptyRatePartM } from "./factory_ratePart";

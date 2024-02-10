@@ -5,12 +5,12 @@ import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Role, User } from '@/app/classes/user';
-import { NoteCC } from '@/app/classes/noteCC';
+import { NoteCC } from '@/app/classes/rates/noteCC';
 import { getActiveUser } from '@/app/auth';
 import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { NoteCC_Chart } from '../../components/chart/noteCC_chart';
 import { api_NoteCC_add, api_NoteCC_update } from '@/app/api/noteCC_api';
-import { RateCC } from '@/app/classes/rateCC';
+import { RateCC } from '@/app/classes/rates/rateCC';
 import Link from 'next/link';
 import { format } from 'date-fns';
 

@@ -1,13 +1,13 @@
 // '=========================================================================
 // '*********************** C_RateCC CLASS **********************************
 // '=========================================================================
-import { key_k, key_k1, key_k2, key_k3, key_o, key_o1, key_s, key_s1, key_s2, key_s3, key_s4, key_t, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from "../globalKeys";
-import { Rate_Mode, Type_RateCC } from "./enums";
+import { key_k, key_k1, key_k2, key_k3, key_o, key_o1, key_s, key_s1, key_s2, key_s3, key_s4, key_t, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from "../../globalKeys";
+import { Rate_Mode, Type_RateCC } from "../enums";
 import { NoteCC } from "./noteCC";
-import { Queue } from "./queue";
+import { Queue } from "../queue";
 import { RateBlock } from "./rateBlock";
 import { RatePart } from "./ratePart";
-import { User } from "./user";
+import { User } from "../user";
 import 'reflect-metadata';
 export class RateCC {
 

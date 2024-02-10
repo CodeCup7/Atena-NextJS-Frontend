@@ -3,8 +3,8 @@
 // '==========================================================================================================================================
 
 import { Type_RateCC } from "../classes/enums";
-import { RateBlock } from "../classes/rateBlock";
-import { RateCC } from "../classes/rateCC";
+import { RateBlock } from "../classes/rates/rateBlock";
+import { RateCC } from "../classes/rates/rateCC";
 import { User } from "../classes/user";
 import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "../globalKeys";
 import { CreateNewEmptyRatePartCC } from "./factory_ratePart";

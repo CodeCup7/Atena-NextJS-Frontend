@@ -14,7 +14,7 @@ export class FiltrRateCC {
     public dateCallStart: string = "";
     public dateCallEnd: string = "";
     public idCall: string = "";
-    public rateStart: string = '';
+    public rateStart: string = '0';
     public rateEnd: string = '';
     public queueId: string = '0';
 

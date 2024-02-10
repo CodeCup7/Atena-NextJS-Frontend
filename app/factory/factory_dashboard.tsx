@@ -7,14 +7,16 @@ import { User } from "../classes/user";
 import { format } from "date-fns";
 import { api_NoteCC_search } from "../api/noteCC_api";
 import { FiltrNoteCC } from "../classes/filtrs/noteCC_Filtr";
-import { createSearchCriteriaByFiltrNoteCC } from "./factory_searchCriteria";
+import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrTest } from "./factory_searchCriteria";
 import { getNoteCC_Rate } from "./factory_noteCC";
 import { getRateCC_Rate } from "./factory_rateCC";
 import { getScore_Test } from "./factory_test";
 import { Feedback_type } from "../classes/feedback";
 import { getRateM_Rate } from "./factory_rateM";
-import { api_Feedback_getDate } from "../api/feedback_api";
-import { api_Test_getDate } from "../api/test_api";
+import { api_Feedback_getDate, api_Feedback_search } from "../api/feedback_api";
+import { api_Test_getDate, api_Test_search } from "../api/test_api";
+import { FiltrTest } from "../classes/filtrs/test_filtr";
+import { FiltrFeedback } from "../classes/filtrs/feedback_filtr";
 
 export async function getFinalScoreData(dateValue: string, agent: User, howManyMonths: number) {
 
@@ -39,17 +41,29 @@ export async function getFinalScoreData(dateValue: string, agent: User, howManyM
     filtrNoteCC.appliesDateEnd = format(new Date(endDate), 'yyyy-MM');
     filtrNoteCC.userCol.push(agent);
 
-    const searchCriteria = createSearchCriteriaByFiltrNoteCC(filtrNoteCC);
-    final.noteList = await api_NoteCC_search(searchCriteria);
+    const filtrTest = new FiltrTest();
+    filtrTest.dateTestStart = final.startDate;
+    filtrTest.dateTestEnd = final.endDate;
+    filtrTest.userCol.push(agent);
+
+    const filtrFB = new FiltrFeedback();
+    filtrFB.dateFeedbackStart = final.startDate;
+    filtrFB.dateFeedbackEnd = final.endDate;
+    filtrFB.userCol.push(agent);
+
+    const searchCriteriaTest = createSearchCriteriaByFiltrTest(filtrTest);
+    const searchCriteriaFB = createSearchCriteriaByFiltrFeedback(filtrFB);
+    const searchCriteriaNoteCC = createSearchCriteriaByFiltrNoteCC(filtrNoteCC);
+
+    final.noteList = await api_NoteCC_search(searchCriteriaNoteCC);
+    final.testList = await api_Test_search(searchCriteriaTest);
+    final.feedbackList = await api_Feedback_search(searchCriteriaFB);
 
     final.noteList.forEach(noteCC=>{
         noteCC.rateCC_Col.forEach(rateCC=>{
             final.rateCCList.push(rateCC)
         })
     });
-
-    final.feedbackList = await api_Feedback_getDate(final.startDate,  final.endDate);
-    final.testList = await api_Test_getDate(final.startDate,  final.endDate);
 
     return final;
 }

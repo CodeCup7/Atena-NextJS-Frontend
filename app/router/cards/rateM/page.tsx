@@ -1,6 +1,6 @@
 'use client'
 import { ModeLabels, Rate_Mode, TypeLabels } from '@/app/classes/enums';
-import { RateM } from '@/app/classes/rateM';
+import { RateM } from '@/app/classes/rates/rateM';
 import { Role, User } from '@/app/classes/user';
 import { CreateNewEmptyRateM, getRateM_RateAs100, } from '@/app/factory/factory_rateM';
 import { valueOfRatePartCC } from '@/app/global';
@@ -11,9 +11,10 @@ import "react-toastify/dist/ReactToastify.css";
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { api_rateM_add, api_rateM_downloadAttachment, api_rateM_getAttachment, api_rateM_update } from '@/app/api/rateM_api';
 import { updateUserList } from '@/app/factory/factory_user';
-import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
+import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
 import { RateM_chart } from '../../components/chart/rateM_chart';
+import { RateBlock } from '@/app/classes/rates/rateBlock';
 
 const RateM_Page = () => {
 
@@ -102,11 +103,18 @@ const RateM_Page = () => {
         }
     }
 
-    function newBtn_Click() {
-        setOpenNewRateModal(true);
-        localStorage.removeItem('rateM_prev');
-        const newRateM = CreateNewEmptyRateM(activeUser);
-        updateRateM(newRateM);
+    function rateBlockBorderColor(rateBlock: RateBlock) {
+
+        const score = getRateBlock_Rate(rateBlock);
+        const maxRate = getRateBlock_MaxRate(rateBlock)
+
+        if (score === maxRate) {
+            return ''
+        } else if (score < maxRate && score > (maxRate * 60 / 100)) {
+            return 'border-warning'
+        } else {
+            return 'border-error'
+        }
     }
 
     // ====== ZAŁĄCZNIK  ==============================================================
@@ -123,6 +131,13 @@ const RateM_Page = () => {
         api_rateM_downloadAttachment(rateM.attachmentPath);
     }
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    function newBtn_Click() {
+        setOpenNewRateModal(true);
+        localStorage.removeItem('rateM_prev');
+        const newRateM = CreateNewEmptyRateM(activeUser);
+        updateRateM(newRateM);
+    }
+
     function rateBtn_Click() {
 
         if (validate()) {
@@ -341,29 +356,29 @@ const RateM_Page = () => {
                     <div className="flex flex-col lg:flex-row gap-4 justify-end items-center sm:justify-center w-full m-2">
 
                         <div className='flex flex-col 2xl:flex-row gap-2'>
-                            <div className='flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48'>
+                            <div className={`flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockBorderColor(rateM.wiedzaBlock)}`}>
                                 <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>
                                 <label className='text-2xl'>{wiedzaScore} %</label>
                                 <div className='bg-info w-full h-full rounded-b'></div>
                             </div>
-                            <div className='flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48'>
+                            <div className={`flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockBorderColor(rateM.obslugaBlock)}`}>
                                 <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Obsługa aplikacji / systemów</h6>
                                 <label className='text-2xl'>{obsługaScore} %</label>
                                 <div className='bg-info w-full h-full rounded-b'></div>
                             </div>
                         </div>
-                        <div className='flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48'>
+                        <div className={`flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockBorderColor(rateM.technikaBlock)}`}>
                             <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Techniki obsługi</h6>
                             <label className='text-2xl'>{technikaScore} %</label>
                             <div className='bg-info w-full h-full rounded-b'></div>
                         </div>
                         <div className='flex flex-col 2xl:flex-row gap-2'>
-                            <div className='flex flex-col border-info border-2 rounded-lg items-center  h-20 gap-2 w-48'>
+                            <div className={`flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockBorderColor(rateM.standardBlock)}`}>
                                 <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'> Standard obsługi rozmowy</h6>
                                 <label className='text-2xl'>{standardScore} %</label>
                                 <div className='bg-info w-full h-full rounded-b'></div>
                             </div>
-                            <div className='flex flex-col border-info border-2 rounded-lg items-center h-20 gap-2 w-48'>
+                            <div className='flex flex-col border-info border-2 rounded-lg items-center  h-20 gap-2 w-48'>
                                 <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Dodatkowa punktacja</h6>
                                 <label className='text-2xl'>{rateM.extraScore}</label>
                                 <div className='bg-info w-full h-full rounded-b'></div>
@@ -419,7 +434,8 @@ const RateM_Page = () => {
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
                         <h5 className='text-center my-3 text-green-500'>znajomość produktów/usług świadczonych przez PP oraz aktów prawnych / przepisów / wytycznych</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -494,7 +510,8 @@ const RateM_Page = () => {
 
                         <h5 className='text-center my-3 text-green-500'>umiejętność korzystania i poruszania się w aplikacjach/systemach</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -569,7 +586,8 @@ const RateM_Page = () => {
                         {/* T1 */}
                         <h5 className='text-center my-3 text-green-500'>Rozpoznanie potrzeb klienta i zaproponowanie właściwego rozwiązania</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -637,7 +655,8 @@ const RateM_Page = () => {
                         {/* T2 */}
                         <h5 className='text-center my-3 text-green-500'>Praca z obiekcjami, reagowanie na uwagi Klienta - w tym trudny Klient</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
                                 <div className='flex flex-col xl:flex-row w-full '>
@@ -712,7 +731,8 @@ const RateM_Page = () => {
                         {/* S1 */}
                         <h5 className='text-center my-3 text-green-500'>znajomość procesu</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -782,7 +802,8 @@ const RateM_Page = () => {
                         {/* S2 */}
                         <h5 className='text-center my-3 text-green-500'>Jakość korespondencji/ Poprawność pisowni i styl wypowiedzi</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -848,13 +869,82 @@ const RateM_Page = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* S3 */}
+                        <h5 className='text-center my-3 text-green-500'>Forma korespondencji/ Prawidłowy wygląd dokumentu</h5>
+
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
+
+                            {/* WAGA i OCENA */}
+                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
+                                <div className='flex flex-col xl:flex-row w-full '>
+
+                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
+                                        <label className="label">
+                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                        </label>
+                                        <label className="label xl:h-16 xl:mt-2">
+                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_s3)}%</span>
+                                        </label>
+                                    </div>
+
+                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
+                                        <label className="label">
+                                            <span className="label-text xl:text-2xl">Ocena</span>
+                                        </label>
+                                        <select className="select select-bordered xl:select-lg text-center m-2"
+                                            value={rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena}
+                                            disabled={prewievMode}
+                                            onChange={e => {
+                                                const ratePart = rateM.standardBlock.ratePart.find(ratePart => ratePart.key === key_s3);
+                                                if (ratePart) {
+                                                    ratePart.ocena = parseInt(e.target.value);
+                                                }
+                                                updateRateM(rateM);
+                                            }}>
+                                            {valueOfRatePartCC().map((value, index) => (
+                                                <option key={index} value={value}>{value}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
+                                <label className="label">
+                                    <span className="label-text">Nieprawidłowości</span>
+                                </label>
+                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.nieprawidlowosci : ""}
+                                    className="textarea textarea-bordered h-1/2 w-full"
+                                    disabled={prewievMode}
+                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s3 ? part.nieprawidlowosci = e.target.value : "")} />
+                            </div>
+
+                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
+
+                                <label className="label">
+                                    <span className="label-text">Uwagi</span>
+                                </label>
+                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.uwagi : ""}
+                                    className="textarea textarea-bordered h-1/2 w-full"
+                                    disabled={prewievMode}
+                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s3 ? part.uwagi = e.target.value : "")} />
+                            </div>
+                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
+                                <div className='flex flex-col'>
+                                    <h5 className='text-center'>Opis wskaźnika</h5>
+                                    <hr className='opacity-50 m-1'></hr>
+                                    <p className='text-sm text-justify'>Jednolity rozmiar i rodzaj czcionki, przejrzysty i jednolity układ graficzny tekstu, ważne fragmenty wyróżnione w jednolity sposób.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* # Dodatkowa punktacja TAB */}
                     <div className={openTab === 5 ? "block" : "hidden"} id="link6">
-                        {/* --- */}
-                        <h5 className='text-center my-3 text-green-500'>dodatkowa punktacja</h5>
 
+                        <h5 className='text-center my-3 text-green-500'>dodatkowa punktacja</h5>
                         <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
 
                             {/* WAGA i OCENA */}

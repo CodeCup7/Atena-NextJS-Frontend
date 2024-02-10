@@ -1,10 +1,10 @@
 // '===============================================================
 // '*********************** RateM CLASS ***************************
 // '===============================================================
-import { key_w, key_o, key_t, key_k, key_s } from "../globalKeys";
-import { Rate_Mode } from "./enums";
+import { key_w, key_o, key_t, key_k, key_s } from "../../globalKeys";
+import { Rate_Mode } from "../enums";
 import { RateBlock } from "./rateBlock";
-import { User } from "./user";
+import { User } from "../user";
 
 export class RateM {
 

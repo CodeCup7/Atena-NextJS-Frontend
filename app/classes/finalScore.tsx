@@ -4,9 +4,9 @@
 
 import { getNoteCC_Rate } from "../factory/factory_noteCC";
 import { Feedback } from "./feedback";
-import { NoteCC } from "./noteCC";
-import { RateCC } from "./rateCC";
-import { RateM } from "./rateM";
+import { NoteCC } from "./rates/noteCC";
+import { RateCC } from "./rates/rateCC";
+import { RateM } from "./rates/rateM";
 import { Test } from "./test";
 
 export class FinalScore {

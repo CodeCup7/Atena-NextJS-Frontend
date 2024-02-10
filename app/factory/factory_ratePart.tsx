@@ -3,7 +3,7 @@
 // '==========================================================================================================================================
 
 import { Adamina } from "next/font/google";
-import { RatePart } from "../classes/ratePart";
+import { RatePart } from "../classes/rates/ratePart";
 import { getWagRateCC, getWagRateM } from "../globalKeys";
 
 export function CreateNewEmptyRatePartCC(key_: string) {

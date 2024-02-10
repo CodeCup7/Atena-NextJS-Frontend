@@ -56,7 +56,7 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
         const rate = new SearchCriteria();
         rate.key = 'rate'
         rate.operation = 'BETWEEN'
-        rate.value = filtr.rateStart + " AND " + filtr.rateStart
+        rate.value = filtr.rateStart + " AND " + filtr.rateEnd
         criteriaList.push(rate)
     }
     if (filtr.queueId !== '0') {

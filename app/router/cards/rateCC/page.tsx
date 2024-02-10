@@ -1,7 +1,7 @@
 'use client'
 import { ModeLabels, Rate_Mode, TypeLabels, Type_RateCC } from '@/app/classes/enums';
 import { Queue } from '@/app/classes/queue';
-import { RateCC } from '@/app/classes/rateCC';
+import { RateCC } from '@/app/classes/rates/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { updateQueueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, getRateCC_RateAs100, } from '@/app/factory/factory_rateCC';
@@ -14,9 +14,10 @@ import { RateCC_chart } from '../../components/chart/rateCC_chart';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { api_rateCC_add, api_rateCC_update } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
-import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
+import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
 import { useSearchParams } from "next/navigation";
+import { RateBlock } from '@/app/classes/rates/rateBlock';
 
 const RateCC_Page = () => {
 
@@ -32,7 +33,7 @@ const RateCC_Page = () => {
     const [agent, setAgent] = useState(0);
     const [extraScore, setExtraScore] = useState(0);
     const [newRateModal, setOpenNewRateModal] = useState(false);
-    
+
     const searchParams = useSearchParams();
     const type = searchParams.get('type') as Type_RateCC;
 
@@ -109,14 +110,27 @@ const RateCC_Page = () => {
         }
     }
 
+    function rateBlockBorderColor(rateBlock: RateBlock) {
+
+        const score = getRateBlock_Rate(rateBlock);
+        const maxRate = getRateBlock_MaxRate(rateBlock)
+
+        if (score === maxRate) {
+            return ''
+        } else if (score < maxRate && score > (maxRate * 60 / 100)) {
+            return 'border-warning'
+        } else {
+            return 'border-error'
+        }
+    }
+
+    // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function newBtn_Click() {
         setOpenNewRateModal(true);
         localStorage.removeItem('rateCC_prev');
         const newRateCC = CreateNewEmptyRateCC(activeUser, type);
         updateRateCC(newRateCC);
     }
-
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {
 
         if (validate()) {
@@ -328,27 +342,27 @@ const RateCC_Page = () => {
                 {/* Rate blocks */}
                 <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
 
-                    <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
+                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.wiedzaBlock)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>
                         <label className='text-2xl'>{wiedzaScore} %</label>
                         <div className='bg-info w-full h-full rounded-b'></div>
                     </div>
-                    <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
+                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.obslugaBlock)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Obsługa aplikacji / systemów</h6>
                         <label className='text-2xl'>{obsługaScore} %</label>
                         <div className='bg-info w-full h-full rounded-b'></div>
                     </div>
-                    <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
+                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.technikaBlock)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Techniki obsługi</h6>
                         <label className='text-2xl'>{technikaScore} %</label>
                         <div className='bg-info w-full h-full rounded-b'></div>
                     </div>
-                    <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
+                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.komunikacjaBlock)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Komunikatywność</h6>
                         <label className='text-2xl'>{komunikacjaScore} %</label>
                         <div className='bg-info w-full h-full rounded-b'></div>
                     </div>
-                    <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
+                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.standardBlock)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'> Standard obsługi rozmowy</h6>
                         <label className='text-2xl'>{standardScore} %</label>
                         <div className='bg-info w-full h-full rounded-b'></div>
@@ -414,7 +428,8 @@ const RateCC_Page = () => {
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
                         <h5 className='text-center my-3 text-green-500'>znajomość produktów/usług świadczonych przez PP oraz aktów prawnych / przepisów / wytycznych</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -490,7 +505,8 @@ const RateCC_Page = () => {
 
                         <h5 className='text-center my-3 text-green-500'>umiejętność korzystania z aplikacji / systemów oraz właściwe wprowadzanie danych pozyskanych podczas rozmowy</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -566,7 +582,8 @@ const RateCC_Page = () => {
                         {/* T1 */}
                         <h5 className='text-center my-3 text-green-500'>rozpoznawanie potrzeb</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -635,7 +652,8 @@ const RateCC_Page = () => {
                         {/* T2 */}
                         <h5 className='text-center my-3 text-green-500'>praca z objekcjami</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
                                 <div className='flex flex-col xl:flex-row w-full '>
@@ -707,7 +725,8 @@ const RateCC_Page = () => {
                         {/* T3 */}
                         <h5 className='text-center my-3 text-green-500'>dbałość o wizerunek Poczty Polskiej</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -778,7 +797,8 @@ const RateCC_Page = () => {
                         {/* T4 */}
                         <h5 className='text-center my-3 text-green-500'>kontrola rozmowy, właściwe zarządzanie czasem i przebiegiem rozmowy </h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.technikaBlock.ratePart.find(part => part.key === key_t4)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -858,7 +878,8 @@ const RateCC_Page = () => {
                         {/* K1 */}
                         <h5 className='text-center my-3 text-green-500'>forma wypowiedzi</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -932,7 +953,8 @@ const RateCC_Page = () => {
                         {/* K2 */}
                         <h5 className='text-center my-3 text-green-500'>brak negatywnych emocji w rozmowie</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -1006,7 +1028,8 @@ const RateCC_Page = () => {
                         {/* K3 */}
                         <h5 className='text-center my-3 text-green-500'>aktywne słuchanie</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.komunikacjaBlock.ratePart.find(part => part.key === key_k3)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -1083,7 +1106,8 @@ const RateCC_Page = () => {
                         {/* S1 */}
                         <h5 className='text-center my-3 text-green-500'>powitanie i zakończenie rozmowy</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -1155,7 +1179,8 @@ const RateCC_Page = () => {
                         {/* S2 */}
                         <h5 className='text-center my-3 text-green-500'>znajomość procesu kampanii</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -1225,7 +1250,8 @@ const RateCC_Page = () => {
                         {/* S3 */}
                         <h5 className='text-center my-3 text-green-500'>język wypowiedzi</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -1299,7 +1325,8 @@ const RateCC_Page = () => {
                         {/* S4 */}
                         <h5 className='text-center my-3 text-green-500'>brak wtrętów językowych</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.standardBlock.ratePart.find(part => part.key === key_s4)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
@@ -1373,7 +1400,8 @@ const RateCC_Page = () => {
                         {/* --- */}
                         <h5 className='text-center my-3 text-green-500'>dodatkowa punktacja</h5>
 
-                        <div className='grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border'>
+                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
+                                        ${rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
 
                             {/* WAGA i OCENA */}
                             <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
