@@ -2,20 +2,17 @@
 // '*********************** Notification Component *******************************************************************************************
 // '==========================================================================================================================================
 'use client'
-import { api_NoteCC_update, api_noteCC_getById } from '@/app/api/noteCC_api';
+import { api_noteCC_getById } from '@/app/api/noteCC_api';
 import { api_NotificationList_getAll, api_Notification_update } from '@/app/api/notification_api';
 import { api_rateCC_getById } from '@/app/api/rateCC_api';
 import { api_rateM_getById } from '@/app/api/rateM_api';
-import { api_Test_search } from '@/app/api/test_api';
 import { getActiveUser } from '@/app/auth';
 import { FiltrFeedback } from '@/app/classes/filtrs/feedback_filtr';
-import { SearchCriteria } from '@/app/classes/filtrs/searchCriteria';
 import { FiltrTest } from '@/app/classes/filtrs/test_filtr';
 import { Notification, Notification_Mode, Notification_Type } from '@/app/classes/notification';
 import { NoteCC } from '@/app/classes/rates/noteCC';
 import { RateCC } from '@/app/classes/rates/rateCC';
 import { RateM } from '@/app/classes/rates/rateM';
-import { Test } from '@/app/classes/test';
 import { User } from '@/app/classes/user';
 import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
 import Link from 'next/link';
