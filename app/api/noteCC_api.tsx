@@ -53,6 +53,19 @@ export async function api_NoteCC_getDate(startDate: string, endDate: string): Pr
     }
 }
 
+export async function api_noteCC_getById(id: number): Promise<NoteCC> {
+    try {
+        const response = await fetch('http://localhost:8080/api/noteCC/getById/' + id);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Błąd pobierania ocen RateCC:', error);
+        return new NoteCC();
+    }
+}
+
 export async function api_NoteCC_search(searchCriteria:SearchCriteria[]): Promise<NoteCC[]> {
 
     try {

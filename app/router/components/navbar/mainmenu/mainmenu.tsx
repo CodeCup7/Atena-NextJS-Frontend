@@ -5,7 +5,7 @@ import { Role, User } from '@/app/classes/user';
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
 
-export const Navbar = () => {
+export const MainMenu = () => {
 
     interface Foo {
         button: boolean;
@@ -242,5 +242,5 @@ export const Navbar = () => {
     )
 }
 
-export default Navbar
+export default MainMenu
 
