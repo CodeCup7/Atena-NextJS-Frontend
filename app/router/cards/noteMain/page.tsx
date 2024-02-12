@@ -148,8 +148,8 @@ export const NoteMain = () => {
 
     // Karta coucha aktywna tylko wtedy gdy użytkownik przypisze oceny do coachingu lub gdy coaching jest w trybie podglądu
     useEffect(() => {
-        setNotePath(choiseRateCC.length !== 0 || selectedNoteCC.mode === Rate_Mode.PREVIEW_ ? '/router/cards/noteCC' : '');
-    }, [choiseRateCC.length, selectedNoteCC.mode]);
+        setNotePath(choiseRateCC.length !== 0 || choiseRateM.length !== 0 || selectedNoteCC.mode === Rate_Mode.PREVIEW_ ? '/router/cards/noteCC' : '');
+    }, [choiseRateCC.length, selectedNoteCC.mode, choiseRateM.length]);
 
 
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
@@ -168,13 +168,14 @@ export const NoteMain = () => {
 
         if (selectedNoteCC.mode === Rate_Mode.NEW_) { // Nowy Coaching
             //Sprawdzenie czy wybrano rozmowy do coachingu
-            if (choiseRateCC.length === 0) {
+            if (choiseRateCC.length === 0 && choiseRateM.length === 0) {
                 toast.error("Nie wybrano żadnych rozmów do coachingu", {
                     position: toast.POSITION.TOP_RIGHT,
                     theme: "dark"
                 });
                 return false;
             } else {
+                
                 selectedNoteCC.appliesDate = dateValue
                 selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie wybranych rozmów do coachingu
                 selectedNoteCC.rateM_Col = choiseRateM //Przypisanie wybranych maili do coachingu
@@ -347,14 +348,14 @@ export const NoteMain = () => {
                             onClick={e => {
                                 e.preventDefault(); setOpenTab(1);
                             }}
-                            data-toggle="tab" href="#link1" role="tablist" > Rozmowy </a>
+                            data-toggle="tab" href="#link1" role="tablist" > Rozmowy [ {selectedNoteCC.rateCC_Col.length} ]</a>
 
                         <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 2 ? " tab-active " : "")
                         }
                             onClick={e => {
                                 e.preventDefault(); setOpenTab(2);
                             }}
-                            data-toggle="tab" href="#link2" role="tablist" > Maile </a>
+                            data-toggle="tab" href="#link2" role="tablist" > Maile [ {selectedNoteCC.rateM_Col.length} ] </a>
 
                     </div>
 

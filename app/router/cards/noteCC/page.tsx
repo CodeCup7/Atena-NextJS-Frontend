@@ -423,12 +423,9 @@ const NoteCC_Page = () => {
                                                         </Link>
                                                     </td>
                                                 </tr>
-                                            )
-                                        })}
-
+                                            )})}
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
 
@@ -444,15 +441,12 @@ const NoteCC_Page = () => {
                                             <th>Data udost.</th>
                                         </tr>
                                     </thead>
-
                                 </table>
                                 <div className='flex gap-2 mt-2'>
                                     <button className="btn btn-outline btn-info btn-sm">Podgląd</button>
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
