@@ -13,7 +13,7 @@ import { Notification, Notification_Mode, Notification_Type } from '@/app/classe
 import { NoteCC } from '@/app/classes/rates/noteCC';
 import { RateCC } from '@/app/classes/rates/rateCC';
 import { RateM } from '@/app/classes/rates/rateM';
-import { User } from '@/app/classes/user';
+import { Role, User } from '@/app/classes/user';
 import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
@@ -28,7 +28,7 @@ const NotificationComponent = () => {
     const fetchData = async () => {
       const user = await getActiveUser();
       setActiveUser(user);
-
+      
       const list = await api_NotificationList_getAll(user);
       setNotiList(list);
     };
@@ -42,7 +42,7 @@ const NotificationComponent = () => {
 
     switch (noti.type) {
 
-      case Notification_Type.NOTE_CC_: {
+      case Notification_Type.NOTE_CC_ || Notification_Type.NOTE_APPEALS_: {
         const noteCC: NoteCC = await api_noteCC_getById(noti.previewId)
         localStorage.removeItem('noteCC_new');
         localStorage.setItem('noteCC_prev', JSON.stringify(noteCC))
@@ -139,6 +139,7 @@ const NotificationComponent = () => {
                           noti.type === Notification_Type.RATE_CC_M_ ? '/router/cards/rateCC' :
                             noti.type === Notification_Type.RATE_M_ ? '/router/cards/rateM' :
                               noti.type === Notification_Type.NOTE_CC_ ? '/router/cards/noteCC' :
+                              noti.type === Notification_Type.NOTE_APPEALS_ ? '/router/cards/noteCC' :
                                 noti.type === Notification_Type.TEST_ ? '/router/cards/tests' :
                                   Notification_Type.FEEDBACK_ ? '/router/cards/feedback' : ''}>
                       <button className="btn btn-neutral btn-xs"

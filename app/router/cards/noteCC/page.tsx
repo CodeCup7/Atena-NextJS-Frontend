@@ -78,8 +78,6 @@ const NoteCC_Page = () => {
         }
     }
 
-    console.log(noteCC)
-
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {
 
@@ -123,7 +121,7 @@ const NoteCC_Page = () => {
                 position: toast.POSITION.TOP_RIGHT,
                 theme: "dark"
             });
-        }  
+        }
     }
 
     function editBtn_Click() {
@@ -142,6 +140,9 @@ const NoteCC_Page = () => {
     function odwolanie_click() {
 
         if (isPermitAgent) {
+
+            noteCC.status = Status_Note.APPEAL_;
+
             api_NoteCC_update(noteCC).then((foo => {
                 if (foo.isOK === true) {
 
@@ -159,6 +160,8 @@ const NoteCC_Page = () => {
             }));
         }
     }
+
+    console.log(noteCC)
 
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -230,7 +233,7 @@ const NoteCC_Page = () => {
                                     className="input input-bordered input-info max-w-md w-72"
                                     type="month"
                                     disabled
-                                    defaultValue={noteCC.mode != Rate_Mode.NEW_ as Rate_Mode ? format(noteCC.appliesDate, 'yyyy-MM') : format(new Date().toLocaleDateString('en-CA'), 'yyyy-MM')} />
+                                    defaultValue={noteCC.appliesDate} />
                             </label>
                             <label className="form-control w-full max-w-xs">
                                 <div className="label">
@@ -340,17 +343,15 @@ const NoteCC_Page = () => {
                                     </div>
                                     <div className='flex flex-row mt-2 justify-center items-center' >
                                         <textarea className="textarea textarea-bordered textarea-lg w-full"
-                                            disabled={!isPermitAgent}
+                                            disabled={!isPermitAgent || noteCC.status === Status_Note.APPEAL_}
                                             defaultValue={noteCC.odwolanie}
                                             onChange={e => noteCC.odwolanie = e.target.value} />
                                         <button className='btn btn-outline btn-info btn-sm m-2'
-                                            disabled={!isPermitAgent}
+                                            disabled={!isPermitAgent || noteCC.status === Status_Note.APPEAL_}
                                             onClick={odwolanie_click}>
                                             Wyślij odwołanie</button>
                                     </div>
-
                                 </label>
-
                             </div>
                         </div>
 

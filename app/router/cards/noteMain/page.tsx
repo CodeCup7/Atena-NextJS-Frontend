@@ -175,8 +175,9 @@ export const NoteMain = () => {
                 });
                 return false;
             } else {
-                selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie wybrnaych rozmów do coachingu
-                selectedNoteCC.rateM_Col = choiseRateM //Przypisanie wybrnaych maili do coachingu
+                selectedNoteCC.appliesDate = dateValue
+                selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie wybranych rozmów do coachingu
+                selectedNoteCC.rateM_Col = choiseRateM //Przypisanie wybranych maili do coachingu
                 localStorage.removeItem('noteCC_prev');
                 localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
                 return true;

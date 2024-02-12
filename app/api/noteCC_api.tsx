@@ -84,6 +84,7 @@ export async function api_NoteCC_search(searchCriteria:SearchCriteria[]): Promis
 }
 
 export async function api_NoteCC_update(noteCC: NoteCC): Promise<Foo> {
+
     try {
         let foo: Foo = { callback: '', isOK: false, noteCC: noteCC };
 

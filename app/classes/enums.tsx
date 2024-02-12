@@ -7,6 +7,7 @@ export enum Status_Note {
     NO_START_ = 'NO_START_',
     CLOSE_ = 'CLOSE_',
     CLOSE_WITHOUT_ = 'CLOSE_WITHOUT_',
+    APPEAL_ = 'APPEAL_',
 };
 
 export const StatusLabels: Record<Status_Note, string> = {
@@ -14,6 +15,7 @@ export const StatusLabels: Record<Status_Note, string> = {
     [Status_Note.NO_START_]: "Nie rozpoczęty",
     [Status_Note.CLOSE_]: "Zamknięty",
     [Status_Note.CLOSE_WITHOUT_]: "Zamknięty BEZ",
+    [Status_Note.APPEAL_]: "Odwołanie",
 };
 
 export enum Type_RateCC {

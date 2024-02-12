@@ -36,9 +36,17 @@ export async function api_Notification_add(notification: Notification): Promise<
     }
 }
 
-export async function api_NotificationList_getAll(user:User): Promise<Notification[]> {
+export async function api_NotificationList_getAll(user: User): Promise<Notification[]> {
     try {
-        const response = await fetch('http://localhost:8080/api/notification/getAll/' + user.id, );
+        
+        const response = await fetch('http://localhost:8080/api/notification/getAll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
