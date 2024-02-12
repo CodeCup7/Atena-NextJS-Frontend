@@ -24,21 +24,14 @@ export const NoteMain = () => {
     const [rowIndex, setRowIndex] = useState(-1);
     const [rowRateIndex, setRowRateIndex] = useState(-1);
     const [newRateModal, setOpenNewRateModal] = useState(false);
-
     const [dateValue, setDateValue] = useState('');
     const [openTab, setOpenTab] = useState(1);
-
     const [selectedNoteCC, setSelectedNoteCC] = useState(new NoteCC);
     const [selectedRateCC, setSelectedRateCC] = useState(new RateCC);
     const [selectedRateM, setSelectedRateM] = useState(new RateM);
-
     const [noteList, setNoteList] = useState<Array<NoteCC>>([]);
-    const [downloadList, setDowloadList] = useState<Array<NoteCC>>([]);
-
+    const [downloadList, setDownloadList] = useState<Array<NoteCC>>([]);
     const [userList, setUserList] = useState<Array<User>>([]);
-
-    const [agentFilter, setAgentFilter] = useState('ALL');
-    const [statusFilter, setStatusFilter] = useState('ALL');
 
     useEffect(() => {
         async function fetchData() {
@@ -121,7 +114,8 @@ export const NoteMain = () => {
                     const getExistNoteList = await api_NoteCC_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
                     const noteList = await Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
 
-                    setNoteList(noteList);
+                    setDownloadList(noteList);
+                    setNoteList(noteList)
 
                 } catch (error) {
                     console.error('Błąd pobierania użytkowników:', error);
@@ -131,16 +125,23 @@ export const NoteMain = () => {
         }
     }
 
+    // Filtrowanie listy coachingów
+    const [isMy, setSelectedCoach] = useState('false');
+    const [filterStatus, setSelectedStatus] = useState(Status_Note.ALL_);
+
     function filterService() {
 
-        if (agentFilter === 'ALL' && statusFilter === 'ALL') {// Filtr wszystko
+        if (isMy === 'false' && filterStatus === Status_Note.ALL_) {// Filtr wszystko
             setNoteList(downloadList)
-        } else if (agentFilter === 'MY' && statusFilter === 'ALL') { // Filtr dla MOICH i wszytskich statusów
-            setNoteList(downloadList.filter(note => note.agent.coachId === activeUser.id));
-        } else if (agentFilter === 'MY' && statusFilter != 'ALL') { // Filtr dla MOICH i wybranego statusu)
-            setNoteList(downloadList.filter(note => note.agent.coachId === activeUser.id && note.status === statusFilter));
-        } else if (agentFilter === 'ALL' && statusFilter != 'ALL') { // Filtr dla wszystkich i wybranego statusu
-            setNoteList(downloadList.filter(note => note.status === statusFilter));
+        } else if (isMy=== 'true' && filterStatus === Status_Note.ALL_) { // Filtr dla MOICH i wszytskich statusów
+            const filterList = noteList.filter(note => note.agent.coachId === activeUser.id)
+            setNoteList(filterList)
+        } else if (isMy=== 'true' && filterStatus !== Status_Note.ALL_) { // Filtr dla MOICH i wybranego statusu)
+            const filterList = noteList.filter(note => note.agent.coachId === activeUser.id && note.status === filterStatus)
+            setNoteList(filterList);
+        } else if (isMy === 'false' && filterStatus !== Status_Note.ALL_) { // Filtr dla wszystkich i wybranego statusu
+            const filterList = noteList.filter(note => note.status === filterStatus)
+            setNoteList(filterList)
         }
     }
 
@@ -175,8 +176,8 @@ export const NoteMain = () => {
                 });
                 return false;
             } else {
-                
-                selectedNoteCC.appliesDate = dateValue
+
+                selectedNoteCC.appliesDate = dateValue + '-01'
                 selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie wybranych rozmów do coachingu
                 selectedNoteCC.rateM_Col = choiseRateM //Przypisanie wybranych maili do coachingu
                 localStorage.removeItem('noteCC_prev');
@@ -261,22 +262,24 @@ export const NoteMain = () => {
                             <tr>
                                 <th>
                                     <select className="select select-bordered select-sm w-full max-w-xs"
-                                        defaultValue={'ALL'}
+                                        defaultValue={'false'}
                                         onChange={e => {
-                                            setAgentFilter(e.target.value)
+                                            setSelectedCoach(e.target.value)
+
                                         }}>
-                                        <option value="MY">Moi</option>
-                                        <option value="ALL">Wszyscy</option>
+                                        <option value="true">Moi</option>
+                                        <option value="false">Wszyscy</option>
                                     </select>
                                 </th>
                                 <th>
                                     <select className="select select-bordered select-sm w-fit max-w-xs"
-                                        defaultValue={'DEFAULT'}
-                                        onChange={e => { setStatusFilter(e.target.value) }}>
-                                        <option value="DEFAULT">Wszystkie</option>
-                                        <option> {StatusLabels[Status_Note.NO_START_]} </option>
-                                        <option> {StatusLabels[Status_Note.CLOSE_]} </option>
-                                        <option> {StatusLabels[Status_Note.CLOSE_WITHOUT_]} </option>
+                                        defaultValue={Status_Note.ALL_}
+                                        onChange={e => { setSelectedStatus(e.target.value as Status_Note) }}>
+                                        <option value={Status_Note.ALL_}>{StatusLabels[Status_Note.ALL_]}</option>
+                                        <option value={Status_Note.NO_START_}> {StatusLabels[Status_Note.NO_START_]} </option>
+                                        <option value={Status_Note.CLOSE_}> {StatusLabels[Status_Note.CLOSE_]} </option>
+                                        <option value={Status_Note.CLOSE_WITHOUT_}> {StatusLabels[Status_Note.CLOSE_WITHOUT_]} </option>
+                                        <option value={Status_Note.APPEAL_}> {StatusLabels[Status_Note.APPEAL_]} </option>
                                     </select>
                                 </th>
                                 <th>

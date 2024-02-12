@@ -13,6 +13,7 @@ import { api_NoteCC_add, api_NoteCC_update } from '@/app/api/noteCC_api';
 import { RateCC } from '@/app/classes/rates/rateCC';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 
 const NoteCC_Page = () => {
 
@@ -161,8 +162,6 @@ const NoteCC_Page = () => {
         }
     }
 
-    console.log(noteCC)
-
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
@@ -233,7 +232,7 @@ const NoteCC_Page = () => {
                                     className="input input-bordered input-info max-w-md w-72"
                                     type="month"
                                     disabled
-                                    defaultValue={noteCC.appliesDate} />
+                                    defaultValue={noteCC.appliesDate.slice(0, -3)} />
                             </label>
                             <label className="form-control w-full max-w-xs">
                                 <div className="label">
@@ -369,14 +368,14 @@ const NoteCC_Page = () => {
                             onClick={e => {
                                 e.preventDefault(); setOpenRateTab(1);
                             }}
-                            data-toggle="tab" href="#link1" role="tablist" > Rozmowy </a>
+                            data-toggle="tab" href="#link1" role="tablist" > Rozmowy [ {noteCC.rateCC_Col.length} ]</a>
 
                         <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (rateTab === 2 ? " tab-active " : "")
                         }
                             onClick={e => {
                                 e.preventDefault(); setOpenRateTab(2);
                             }}
-                            data-toggle="tab" href="#link2" role="tablist" > Maile</a>
+                            data-toggle="tab" href="#link2" role="tablist" > Maile [ {noteCC.rateM_Col.length} ]</a>
 
                     </div>
 
@@ -436,15 +435,36 @@ const NoteCC_Page = () => {
                                     {/* head */}
                                     <thead>
                                         <tr>
-                                            <th>Ocena</th>
                                             <th>Data Oceny</th>
-                                            <th>Data udost.</th>
+                                            <th>Ocena</th>
                                         </tr>
                                     </thead>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {noteCC.rateM_Col.map((rateM, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>{rateM.dateRate}</td>
+                                                    <td>{getRateM_RateAs100(rateM)}</td>
+                                                    <td>
+                                                        <Link className="group link link-info link-hover text-lg"
+                                                            href='/router/cards/rateM'>
+                                                            <button className="btn btn-outline btn-info btn-sm"
+                                                                onClick={() => {
+                                                                    localStorage.removeItem('rateM_prev');
+                                                                    localStorage.setItem('rateM_prev', JSON.stringify(rateM));
+                                                                }}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                                </svg>
+                                                                Podgląd
+                                                            </button>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            )})}
+                                    </tbody>
                                 </table>
-                                <div className='flex gap-2 mt-2'>
-                                    <button className="btn btn-outline btn-info btn-sm">Podgląd</button>
-                                </div>
                             </div>
                         </div>
                     </div>

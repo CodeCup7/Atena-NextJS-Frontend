@@ -176,9 +176,9 @@ export function createSearchCriteriaByFiltrNoteCC(filtr: FiltrNoteCC) {
     }
     if (filtr.allOdwolania === true) {
         const allOdwolania = new SearchCriteria();
-        allOdwolania.key = 'odwolanie'
+        allOdwolania.key = 'status'
         allOdwolania.operation = ':'
-        allOdwolania.value = ''
+        allOdwolania.value = Status_Note.APPEAL_;
         criteriaList.push(allOdwolania)
     }
     if(filtr.userCol.length > 0){

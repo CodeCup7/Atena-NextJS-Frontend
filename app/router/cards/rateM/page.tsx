@@ -195,6 +195,22 @@ const RateM_Page = () => {
         }
     }
 
+    function tempSave(){
+        localStorage.setItem('tempRateM', JSON.stringify(rateM));
+        toast.success("Pomyślnie zapisano tymczasowo ocenę", {
+            position: toast.POSITION.TOP_RIGHT,
+            theme: "dark"
+        });
+    }
+
+    function tempLoad(){
+        const checkTemp = localStorage.getItem('tempRateM');
+        if(checkTemp !== null){
+            const tempRateM = JSON.parse(checkTemp);
+            updateRateM(tempRateM);
+        }
+    }
+
     // ====================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -226,10 +242,10 @@ const RateM_Page = () => {
                                 disabled={!isPermit || (isPermit && prewievMode)} onClick={rateBtn_Click}>{rateM.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Oceń'}</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}>Zapisz</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempSave}>Zapisz</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}>Wczytaj</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempLoad}>Wczytaj</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && prewievMode)}>Spr. Pisownie</button>

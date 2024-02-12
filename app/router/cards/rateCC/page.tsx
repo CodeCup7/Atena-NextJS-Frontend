@@ -189,6 +189,22 @@ const RateCC_Page = () => {
         }
     }
 
+    function tempSave(){
+        localStorage.setItem('tempRateCC', JSON.stringify(rateCC));
+        toast.success("Pomyślnie zapisano tymczasowo ocenę", {
+            position: toast.POSITION.TOP_RIGHT,
+            theme: "dark"
+        });
+    }
+
+    function tempLoad(){
+        const checkTemp = localStorage.getItem('tempRateCC');
+        if(checkTemp !== null){
+            const tempRateCC = JSON.parse(checkTemp);
+            updateRateCC(tempRateCC);
+        }
+    }
+
     // ====================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -220,10 +236,10 @@ const RateCC_Page = () => {
                                 disabled={!isPermit || (isPermit && prewievMode)} onClick={rateBtn_Click}>{rateCC.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Oceń'}</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}>Zapisz</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempSave}>Zapisz</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}>Wczytaj</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempLoad}>Wczytaj</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && prewievMode)}>Spr. Pisownie</button>
@@ -263,7 +279,7 @@ const RateCC_Page = () => {
                                 type="date"
                                 className="input input-bordered input-info min-w-fit"
                                 disabled={prewievMode}
-                                defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.dateCall : ""}
+                                defaultValue={rateCC.dateCall}
                                 onChange={e => rateCC.dateCall = e.target.value}
                             />
                         </div>
@@ -470,7 +486,7 @@ const RateCC_Page = () => {
                                 <label className="label">
                                     <span className="label-text">Nieprawidłowości</span>
                                 </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.nieprawidlowosci : ""}
+                                <textarea defaultValue={rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.nieprawidlowosci}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
                                     onChange={e => rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.nieprawidlowosci = e.target.value : "")} />
