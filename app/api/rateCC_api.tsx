@@ -66,7 +66,59 @@ export async function api_rateCC_update(rateCC: RateCC): Promise<Foo> {
     }
 }
 
-export async function api_RateCC_search(searchCriteria:SearchCriteria[]): Promise<RateCC[]> {
+export async function api_rateCC_updateList(rateList: RateCC[], noteId: number): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, rateCC: new RateCC() };
+
+        const response = await fetch('http://localhost:8080/api/rateCC/updateList/' + noteId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateList)
+        });
+
+        if (response.ok) {
+            foo.callback = 'Lista ocen została pomyślnie zaaktualizowana';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Lista ocen nie została zaktualizowana';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateCC: new RateCC() };
+    }
+}
+
+export async function api_rateCC_deleteList(rateList: RateCC[]): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, rateCC: new RateCC() };
+
+        const response = await fetch('http://localhost:8080/api/rateCC/deleteList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateList)
+        });
+
+        if (response.ok) {
+            foo.callback = 'Lista ocen została pomyślnie zaaktualizowana';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Lista ocen nie została zaktualizowana';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateCC: new RateCC() };
+    }
+}
+
+export async function api_rateCC_search(searchCriteria: SearchCriteria[]): Promise<RateCC[]> {
 
     try {
         const response = await fetch('http://localhost:8080/api/rateCC/search', {
@@ -99,6 +151,21 @@ export async function api_rateCC_getById(id: number): Promise<RateCC> {
 export async function api_rateCC_getAllRateNoNote(): Promise<RateCC[]> {
     try {
         const response = await fetch('http://localhost:8080/api/rateCC/getAllRateNoNote');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const rateList: Array<RateCC> = await response.json();
+
+        return rateList;
+    } catch (error) {
+        console.error('Błąd pobierania ocen RateCC:', error);
+        return [];
+    }
+}
+export async function api_rateCC_getAllRateNoNoteByAgent(agentId: number): Promise<RateCC[]> {
+    try {
+        const response = await fetch('http://localhost:8080/api/rateCC/getAllRateNoNoteByAgent/' + agentId);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

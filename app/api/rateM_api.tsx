@@ -75,7 +75,7 @@ export async function api_rateM_update(rateM: RateM, attachment?: File | null): 
     }
 }
 
-export async function api_RateM_search(searchCriteria: SearchCriteria[]): Promise<RateM[]> {
+export async function api_rateM_search(searchCriteria: SearchCriteria[]): Promise<RateM[]> {
 
     try {
         const response = await fetch('http://localhost:8080/api/rateM/search', {
@@ -108,6 +108,22 @@ export async function api_rateM_getById(id: number): Promise<RateM> {
 export async function api_rateM_getAllRateNoNote(): Promise<RateM[]> {
     try {
         const response = await fetch('http://localhost:8080/api/rateM/getAllRateNoNote');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const rateList: Array<RateM> = await response.json();
+
+        return rateList;
+    } catch (error) {
+        console.error('Błąd pobierania ocen RateM:', error);
+        return [];
+    }
+}
+
+export async function api_rateM_getAllRateNoNoteByAgent(agentId:number): Promise<RateM[]> {
+    try {
+        const response = await fetch('http://localhost:8080/api/rateM/getAllRateNoNoteByAgent/'+ agentId);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

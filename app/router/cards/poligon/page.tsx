@@ -1,17 +1,19 @@
 'use client'
 import { api_Notification_add } from "@/app/api/notification_api";
+import { api_rateCC_getById } from "@/app/api/rateCC_api";
 import { Notification, Notification_Mode, Notification_Type } from "@/app/classes/notification";
+import { RateCC } from "@/app/classes/rates/rateCC";
 
 export const Test = () => {
 
+    
 
+    
 
     async function send() {
-        const noti = new Notification();
-        noti.agent.id = 9
-        noti.mode = Notification_Mode.PUSH_
-        noti.type = Notification_Type.RATE_CC_;
-        const response = await api_Notification_add(noti)
+
+        const r:RateCC = await api_rateCC_getById(1)
+        console.log(r)
     }
 
     return (

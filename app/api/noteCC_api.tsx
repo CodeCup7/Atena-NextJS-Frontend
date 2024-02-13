@@ -109,6 +109,32 @@ export async function api_NoteCC_update(noteCC: NoteCC): Promise<Foo> {
     }
 }
 
+export async function api_NoteCC_updateRateList(noteCC: NoteCC): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, noteCC: noteCC };
+
+        const response = await fetch('http://localhost:8080/api/noteCC/updateRateList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(noteCC),
+        });
+
+        if (response.ok) {
+            foo.callback = 'Coaching został edytowany';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Coaching nie został edytownay';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, noteCC:noteCC };
+    }
+}
+
 export async function api_NoteCC_deleteNote(noteCC: NoteCC): Promise<Foo> {
 
     try {

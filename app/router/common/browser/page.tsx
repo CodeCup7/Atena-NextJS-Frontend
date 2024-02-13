@@ -1,7 +1,7 @@
 'use client'
 import { api_NoteCC_getDate, api_NoteCC_search } from '@/app/api/noteCC_api';
-import { api_RateCC_search } from '@/app/api/rateCC_api';
-import { api_RateM_search } from '@/app/api/rateM_api';
+import { api_rateCC_search } from '@/app/api/rateCC_api';
+import { api_rateM_search } from '@/app/api/rateM_api';
 import { getActiveUser } from '@/app/auth';
 import { StatusLabels, TypeLabels } from '@/app/classes/enums';
 import { NoteCC } from '@/app/classes/rates/noteCC';
@@ -88,12 +88,12 @@ const Browser = () => {
                     setNoteCC_List(notelist);
                     localStorage.removeItem('noteCCList_criteriaList');
                 } else if (criteriaListRateCC !== null) {
-                    const ratelist = await api_RateCC_search(JSON.parse(criteriaListRateCC));
+                    const ratelist = await api_rateCC_search(JSON.parse(criteriaListRateCC));
                     setRateCC_List(ratelist);
                     setOpenTab(2)
                     localStorage.removeItem('rateCCList_criteriaList');
                 } else if (criteriaListRateM !== null) {
-                    const ratelist = await api_RateM_search(JSON.parse(criteriaListRateM));
+                    const ratelist = await api_rateM_search(JSON.parse(criteriaListRateM));
                     setRateM_List(ratelist);
                     setOpenTab(3)
                     localStorage.removeItem('rateMList_criteriaList');
@@ -161,8 +161,8 @@ const Browser = () => {
             const criteriaFbList = createSearchCriteriaByFiltrFeedback(filtrFeedback);
 
             const noteList = await api_NoteCC_search(criteriaNoteCCList);
-            const rateCCList = await api_RateCC_search(criteriaRateCCList);
-            const rateMList = await api_RateM_search(criteriaRateMList);
+            const rateCCList = await api_rateCC_search(criteriaRateCCList);
+            const rateMList = await api_rateM_search(criteriaRateMList);
             const testList = await api_Test_search(criteriaTestList);
             const fblist = await api_Feedback_search(criteriaFbList);
 

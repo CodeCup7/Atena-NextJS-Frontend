@@ -9,13 +9,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { updateUserList } from '@/app/factory/factory_user';
 import { User } from '@/app/classes/user';
-import { api_NoteCC_deleteNote, api_NoteCC_getDate } from '@/app/api/noteCC_api';
+import { api_NoteCC_deleteNote, api_NoteCC_getDate, api_NoteCC_update } from '@/app/api/noteCC_api';
 import { getActiveUser } from '@/app/auth';
 import { getRateCC_Rate, getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { format } from 'date-fns';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { RateM } from '@/app/classes/rates/rateM';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
+import { api_rateCC_deleteList, api_rateCC_getAllRateNoNoteByAgent, api_rateCC_search, api_rateCC_update, api_rateCC_updateList } from '@/app/api/rateCC_api';
+import { FiltrRateCC } from '@/app/classes/filtrs/rateCC_filtr';
+import { api_rateM_getAllRateNoNoteByAgent } from '@/app/api/rateM_api';
 
 export const NoteMain = () => {
 
@@ -133,10 +136,10 @@ export const NoteMain = () => {
 
         if (isMy === 'false' && filterStatus === Status_Note.ALL_) {// Filtr wszystko
             setNoteList(downloadList)
-        } else if (isMy=== 'true' && filterStatus === Status_Note.ALL_) { // Filtr dla MOICH i wszytskich statusów
+        } else if (isMy === 'true' && filterStatus === Status_Note.ALL_) { // Filtr dla MOICH i wszytskich statusów
             const filterList = noteList.filter(note => note.agent.coachId === activeUser.id)
             setNoteList(filterList)
-        } else if (isMy=== 'true' && filterStatus !== Status_Note.ALL_) { // Filtr dla MOICH i wybranego statusu)
+        } else if (isMy === 'true' && filterStatus !== Status_Note.ALL_) { // Filtr dla MOICH i wybranego statusu)
             const filterList = noteList.filter(note => note.agent.coachId === activeUser.id && note.status === filterStatus)
             setNoteList(filterList);
         } else if (isMy === 'false' && filterStatus !== Status_Note.ALL_) { // Filtr dla wszystkich i wybranego statusu
@@ -208,6 +211,64 @@ export const NoteMain = () => {
             }
         }));
     }
+
+    async function rateCCListSync() {
+        // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
+        const list = await api_rateCC_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
+        list.forEach(rateCC => {
+            rateCC.mode = Rate_Mode.LOAD_;
+        });
+
+        const updatedNoteCC = { ...selectedNoteCC };
+        updatedNoteCC.rateCC_Col = updatedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_);// Filtracja duplikatów na podstawie atrybutu mode
+        updatedNoteCC.rateCC_Col = [...updatedNoteCC.rateCC_Col, ...list];
+        setSelectedNoteCC(updatedNoteCC);
+    }
+
+    async function rateMListSync() {
+
+        // Pobranie wszytskich maili agenta z bazy które nie mają idNote
+        const list = await api_rateM_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
+        list.forEach(rateM => {
+            rateM.mode = Rate_Mode.LOAD_;
+        });
+
+        const updatedNoteCC = { ...selectedNoteCC };
+        updatedNoteCC.rateM_Col = updatedNoteCC.rateM_Col.filter(rateM => rateM.mode !== Rate_Mode.LOAD_);// Filtracja duplikatów na podstawie atrybutu mode
+        updatedNoteCC.rateM_Col = [...updatedNoteCC.rateM_Col, ...list];
+        setSelectedNoteCC(updatedNoteCC);
+    }
+
+    async function rateCCListUpdate() {
+
+        const noLoadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_);
+        const loadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode === Rate_Mode.LOAD_);
+
+        const toDeleteList:RateCC[] = noLoadMode.filter(item => choiseRateCC.indexOf(item) < 0); // Lista spraw do usunięcia idNote z DB
+        const toUpdateList:RateCC[] = loadMode.filter(item => choiseRateCC.indexOf(item) > 0); // Lista spraw do zaaktualizowania idNote z DB
+
+        const response1 = await api_rateCC_updateList(toUpdateList, selectedNoteCC.id);
+        const response2 = await api_rateCC_deleteList(toDeleteList);
+
+        selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie wybranych rozmów do coachingu
+        setSelectedNoteCC(new NoteCC());
+
+        
+        localStorage.removeItem('noteCC_prev');
+        localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
+
+        // Aktualizacja numerów ID
+    }
+
+
+    async function rateMListUpdate() {
+
+        selectedNoteCC.rateM_Col = choiseRateM //Przypisanie wybranych maili do coachingu
+        localStorage.removeItem('noteCC_prev');
+        localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
+
+    }
+
 
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -384,7 +445,6 @@ export const NoteMain = () => {
                                             <th>Kolejka</th>
                                             <th>Ocena</th>
                                             <th>Data Oceny</th>
-                                            <th>Data udost.</th>
                                             <th>Coaching id.</th>
                                             <th>Szczegóły</th>
                                         </tr>
@@ -409,8 +469,7 @@ export const NoteMain = () => {
                                                     <td>{rateCC.queue.nameQueue}</td>
                                                     <td>{getRateCC_RateAs100(rateCC)}</td>
                                                     <td>{rateCC.dateRate}</td>
-                                                    <td>{rateCC.dateShare}</td>
-                                                    <td>{selectedNoteCC.id}</td>
+                                                    <td>{rateCC.mode === Rate_Mode.LOAD_ ? '' : selectedNoteCC.id}</td>
                                                     <td>
                                                         <Link className="group link link-info link-hover text-lg"
                                                             href='/router/cards/rateCC'>
@@ -447,20 +506,15 @@ export const NoteMain = () => {
                                             Nowa
                                         </button>
                                     </Link>
-
-                                    <button className="btn btn-outline btn-info btn-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-                                        </svg>
-                                        Udost. Rozmowy
-                                    </button>
-                                    <button className="btn btn-outline btn-info btn-sm">
+                                    <button className="btn btn-outline btn-info btn-sm"
+                                        onClick={rateCCListSync}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                                         </svg>
                                         Dołącz rozłącz
                                     </button>
-                                    <button className="btn btn-outline btn-info btn-sm">
+                                    <button className="btn btn-outline btn-info btn-sm"
+                                        onClick={rateCCListUpdate}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                                         </svg>
@@ -488,7 +542,6 @@ export const NoteMain = () => {
                                             </th>
                                             <th>Ocena</th>
                                             <th>Data Oceny</th>
-                                            <th>Data udost.</th>
                                             <th>Coaching id.</th>
                                             <th>Szczegóły</th>
                                         </tr>
@@ -511,8 +564,7 @@ export const NoteMain = () => {
                                                     </td>
                                                     <td>{getRateM_RateAs100(rateM)}</td>
                                                     <td>{rateM.dateRate}</td>
-                                                    <td>{rateM.dateShare}</td>
-                                                    <td>{selectedNoteCC.id}</td>
+                                                    <td>{rateM.mode === Rate_Mode.LOAD_ ? '' : selectedNoteCC.id}</td>
                                                     <td>
                                                         <Link className="group link link-info link-hover text-lg"
                                                             href='/router/cards/rateM'>
@@ -549,20 +601,15 @@ export const NoteMain = () => {
                                             Nowa
                                         </button>
                                     </Link>
-
-                                    <button className="btn btn-outline btn-info btn-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-                                        </svg>
-                                        Udost. Rozmowy
-                                    </button>
-                                    <button className="btn btn-outline btn-info btn-sm">
+                                    <button className="btn btn-outline btn-info btn-sm"
+                                        onClick={rateMListSync}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                                         </svg>
                                         Dołącz rozłącz
                                     </button>
-                                    <button className="btn btn-outline btn-info btn-sm">
+                                    <button className="btn btn-outline btn-info btn-sm"
+                                        onClick={rateMListUpdate}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                                         </svg>

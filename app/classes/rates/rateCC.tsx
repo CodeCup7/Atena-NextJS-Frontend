@@ -6,7 +6,6 @@ import { Rate_Mode, Type_RateCC } from "../enums";
 import { NoteCC } from "./noteCC";
 import { Queue } from "../queue";
 import { RateBlock } from "./rateBlock";
-import { RatePart } from "./ratePart";
 import { User } from "../user";
 import 'reflect-metadata';
 export class RateCC {
