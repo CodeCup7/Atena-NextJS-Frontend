@@ -75,6 +75,58 @@ export async function api_rateM_update(rateM: RateM, attachment?: File | null): 
     }
 }
 
+export async function api_rateM_updateList(rateList: RateM[], noteId: number): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, rateM: new RateM() };
+
+        const response = await fetch('http://localhost:8080/api/rateM/updateList/' + noteId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateList)
+        });
+
+        if (response.ok) {
+            foo.callback = 'Lista ocen została pomyślnie zaaktualizowana';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Lista ocen nie została zaktualizowana';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateM: new RateM() };
+    }
+}
+
+export async function api_rateM_deleteList(rateList: RateM[]): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, rateM: new RateM() };
+
+        const response = await fetch('http://localhost:8080/api/rateM/deleteList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateList)
+        });
+
+        if (response.ok) {
+            foo.callback = 'Lista ocen została pomyślnie zaaktualizowana';
+            foo.isOK = true;
+        } else {
+            foo.callback = 'Lista ocen nie została zaktualizowana';
+            foo.isOK = false;
+        }
+        return foo;
+    } catch (error) {
+        return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateM: new RateM() };
+    }
+}
+
 export async function api_rateM_search(searchCriteria: SearchCriteria[]): Promise<RateM[]> {
 
     try {
@@ -121,9 +173,9 @@ export async function api_rateM_getAllRateNoNote(): Promise<RateM[]> {
     }
 }
 
-export async function api_rateM_getAllRateNoNoteByAgent(agentId:number): Promise<RateM[]> {
+export async function api_rateM_getAllRateNoNoteByAgent(agentId: number): Promise<RateM[]> {
     try {
-        const response = await fetch('http://localhost:8080/api/rateM/getAllRateNoNoteByAgent/'+ agentId);
+        const response = await fetch('http://localhost:8080/api/rateM/getAllRateNoNoteByAgent/' + agentId);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

@@ -66,6 +66,15 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
         queue.value = filtr.queueId
         criteriaList.push(queue)
     }
+    if (filtr.noteCC.id !== 0) {
+        const noteCC = new SearchCriteria();
+        noteCC.key = 'noteCC'
+        noteCC.operation = ':'
+        noteCC.value = filtr.noteCC.id.toString();
+        criteriaList.push(noteCC)
+    }
+
+
     if(filtr.userCol.length > 0){
         filtr.userCol.forEach(user=>{
             const userCriteria = new SearchCriteria();

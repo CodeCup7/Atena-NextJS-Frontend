@@ -9,16 +9,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { updateUserList } from '@/app/factory/factory_user';
 import { User } from '@/app/classes/user';
-import { api_NoteCC_deleteNote, api_NoteCC_getDate, api_NoteCC_update } from '@/app/api/noteCC_api';
+import { api_NoteCC_deleteNote, api_NoteCC_getDate } from '@/app/api/noteCC_api';
 import { getActiveUser } from '@/app/auth';
 import { getRateCC_Rate, getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { format } from 'date-fns';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { RateM } from '@/app/classes/rates/rateM';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
-import { api_rateCC_deleteList, api_rateCC_getAllRateNoNoteByAgent, api_rateCC_search, api_rateCC_update, api_rateCC_updateList } from '@/app/api/rateCC_api';
+import { api_rateCC_deleteList, api_rateCC_getAllRateNoNoteByAgent, api_rateCC_updateList } from '@/app/api/rateCC_api';
 import { FiltrRateCC } from '@/app/classes/filtrs/rateCC_filtr';
-import { api_rateM_getAllRateNoNoteByAgent } from '@/app/api/rateM_api';
+import { api_rateM_deleteList, api_rateM_getAllRateNoNoteByAgent, api_rateM_updateList } from '@/app/api/rateM_api';
 
 export const NoteMain = () => {
 
@@ -68,6 +68,8 @@ export const NoteMain = () => {
         setSelectedRateM(emptyRateM);
         setRowRateIndex(-1);
         setRowIndex(-1);
+        setChoiseRateCC([]);
+        setChoiseRateM([]);
     }, [noteList]);
 
     const [choiseRateCC, setChoiseRateCC] = useState<Array<RateCC>>([]);
@@ -212,9 +214,11 @@ export const NoteMain = () => {
         }));
     }
 
+    // Sekcja aktualizowania ocen w coachingu
+
     async function rateCCListSync() {
         // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
-        const list = await api_rateCC_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
+        const list: RateCC[] = await api_rateCC_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
         list.forEach(rateCC => {
             rateCC.mode = Rate_Mode.LOAD_;
         });
@@ -225,10 +229,36 @@ export const NoteMain = () => {
         setSelectedNoteCC(updatedNoteCC);
     }
 
+    async function rateCCListUpdate() {
+
+        if (choiseRateCC.length > 0) {
+            const noLoadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_);
+            const loadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode === Rate_Mode.LOAD_);
+
+            const toDeleteList: RateCC[] = noLoadMode.filter(item => choiseRateCC.indexOf(item) < 0); // Lista spraw do usunięcia idNote z DB
+            const toUpdateList: RateCC[] = loadMode.filter(item => choiseRateCC.indexOf(item) > 0); // Lista spraw do zaaktualizowania idNote z DB
+
+            const updateResponse = await api_rateCC_updateList(toUpdateList, selectedNoteCC.id);
+            const deleteResponse = await api_rateCC_deleteList(toDeleteList);
+
+            if (updateResponse.isOK && deleteResponse.isOK) {
+                setNoteList(new Array<NoteCC>)
+                toast.info("Pomyślnie zaktualizowano listę ocen - pobierz ponownie dane", {
+                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                });
+            }
+        } else {
+            toast.error("Coaching musi zawierać choć jedną ocenę.", {
+                position: toast.POSITION.TOP_RIGHT, theme: "dark"
+            });
+        }
+
+
+    }
     async function rateMListSync() {
 
-        // Pobranie wszytskich maili agenta z bazy które nie mają idNote
-        const list = await api_rateM_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
+        // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
+        const list: RateM[] = await api_rateM_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
         list.forEach(rateM => {
             rateM.mode = Rate_Mode.LOAD_;
         });
@@ -239,36 +269,32 @@ export const NoteMain = () => {
         setSelectedNoteCC(updatedNoteCC);
     }
 
-    async function rateCCListUpdate() {
-
-        const noLoadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_);
-        const loadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode === Rate_Mode.LOAD_);
-
-        const toDeleteList:RateCC[] = noLoadMode.filter(item => choiseRateCC.indexOf(item) < 0); // Lista spraw do usunięcia idNote z DB
-        const toUpdateList:RateCC[] = loadMode.filter(item => choiseRateCC.indexOf(item) > 0); // Lista spraw do zaaktualizowania idNote z DB
-
-        const response1 = await api_rateCC_updateList(toUpdateList, selectedNoteCC.id);
-        const response2 = await api_rateCC_deleteList(toDeleteList);
-
-        selectedNoteCC.rateCC_Col = choiseRateCC //Przypisanie wybranych rozmów do coachingu
-        setSelectedNoteCC(new NoteCC());
-
-        
-        localStorage.removeItem('noteCC_prev');
-        localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
-
-        // Aktualizacja numerów ID
-    }
-
-
     async function rateMListUpdate() {
 
-        selectedNoteCC.rateM_Col = choiseRateM //Przypisanie wybranych maili do coachingu
-        localStorage.removeItem('noteCC_prev');
-        localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
+        if (choiseRateM.length > 0) {
 
+            const noLoadMode = selectedNoteCC.rateM_Col.filter(rateM => rateM.mode !== Rate_Mode.LOAD_);
+            const loadMode = selectedNoteCC.rateM_Col.filter(rateM => rateM.mode === Rate_Mode.LOAD_);
+
+            const toDeleteList: RateM[] = noLoadMode.filter(item => choiseRateM.indexOf(item) < 0); // Lista spraw do usunięcia idNote z DB
+            const toUpdateList: RateM[] = loadMode.filter(item => choiseRateM.indexOf(item) > 0); // Lista spraw do zaaktualizowania idNote z DB
+
+            const updateResponse = await api_rateM_updateList(toUpdateList, selectedNoteCC.id);
+            const deleteResponse = await api_rateM_deleteList(toDeleteList);
+
+            if (updateResponse.isOK && deleteResponse.isOK) {
+                setNoteList(new Array<NoteCC>)
+                toast.info("Pomyślnie zaktualizowano listę ocen - pobierz ponownie dane", {
+                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
+                });
+            }
+
+        } else {
+            toast.error("Coaching musi zawierać choć jedną ocenę.", {
+                position: toast.POSITION.TOP_RIGHT, theme: "dark"
+            });
+        }
     }
-
 
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -436,6 +462,7 @@ export const NoteMain = () => {
                                                 <input
                                                     type="checkbox"
                                                     className="checkbox"
+                                                    value={choiseRateCC.length === 0 ? 0 : 1}
                                                     onClick={(e) => {
                                                         const target = e.target as HTMLInputElement;
                                                         target.checked ? setChoiseRateCC(selectedNoteCC.rateCC_Col) : setChoiseRateCC([])
@@ -535,6 +562,7 @@ export const NoteMain = () => {
                                                 <input
                                                     type="checkbox"
                                                     className="checkbox"
+                                                    value={choiseRateM.length === 0 ? 0 : 1}
                                                     onClick={(e) => {
                                                         const target = e.target as HTMLInputElement;
                                                         target.checked ? setChoiseRateM(selectedNoteCC.rateM_Col) : setChoiseRateM([])
