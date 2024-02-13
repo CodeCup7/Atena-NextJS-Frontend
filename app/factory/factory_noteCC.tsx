@@ -12,6 +12,8 @@ import { api_rateCC_getAllRateNoNote } from "../api/rateCC_api";
 import { getActiveUser } from "../auth";
 import { getRateM_Rate } from "./factory_rateM";
 import { api_rateM_getAllRateNoNote } from "../api/rateM_api";
+import { Mistake } from "../classes/mistake";
+import { RatePart } from "../classes/rates/ratePart";
 
 export function CreateNewEmptyNoteCC(coach: User): NoteCC {
 
@@ -23,7 +25,7 @@ export function CreateNewEmptyNoteCC(coach: User): NoteCC {
 }
 
 export function CreateNoteCC(id: number, status: Status_Note, agent: User, coach: User, coachDate: string, appliesDate: string,
-    zalecenia: string, odwolanie: string, rateCC_Col: Array<RateCC>,  rateM_Col: Array<RateM>, mode: Rate_Mode) {
+    zalecenia: string, odwolanie: string, rateCC_Col: Array<RateCC>, rateM_Col: Array<RateM>, mode: Rate_Mode) {
 
     let noteCC = new NoteCC();
     noteCC.id = id;
@@ -119,3 +121,52 @@ export async function Get_NoteList_With_NoStartNote(userList: Array<User>, noteL
     return noteListWitnNoStart;
 
 }
+
+export function getMistakeReport(noteCC: NoteCC) {
+
+    const mistakeList: Mistake[] = []
+
+    noteCC.rateCC_Col.forEach(rateCC => {
+
+        const allRatePart: RatePart[] = []
+
+        allRatePart.push(...rateCC.wiedzaBlock.ratePart)
+        allRatePart.push(...rateCC.obslugaBlock.ratePart)
+        allRatePart.push(...rateCC.komunikacjaBlock.ratePart)
+        allRatePart.push(...rateCC.standardBlock.ratePart)
+        allRatePart.push(...rateCC.technikaBlock.ratePart)
+
+        allRatePart.forEach(ratePart => {
+            if (ratePart.ocena === 0){
+                addMistake(ratePart, mistakeList);
+            }
+        });
+    });
+
+    noteCC.rateM_Col.forEach(rateM => {
+
+        const allRatePart: RatePart[] = []
+
+        allRatePart.push(...rateM.wiedzaBlock.ratePart)
+        allRatePart.push(...rateM.obslugaBlock.ratePart)
+        allRatePart.push(...rateM.standardBlock.ratePart)
+        allRatePart.push(...rateM.technikaBlock.ratePart)
+
+        allRatePart.forEach(ratePart => {
+            if (ratePart.ocena === 0){
+                addMistake(ratePart, mistakeList);
+            }
+        });
+    });
+
+    return mistakeList;
+}
+
+function addMistake(ratePart: RatePart, mistakeList: Mistake[]) {
+    const mistake = new Mistake();
+    mistake.blockKey = ratePart.key.slice(0, -1);
+    mistake.ratePartKey = ratePart.key;
+    mistake.score = 0;
+    mistakeList.push(mistake);
+}
+

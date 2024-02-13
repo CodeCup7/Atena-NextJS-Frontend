@@ -10,7 +10,8 @@ import { Dashboard_LineChart } from '../../components/chart/dashboard_chartLine'
 import { FinalScore } from '@/app/classes/finalScore';
 import { getFinalScore, getFinalScoreData, getFinalScoreFeedback, getFinalScoreMysteryAndCurrent, getFinalScoreRateCCAndRateM, getFinalScoreTests } from '@/app/factory/factory_dashboard';
 import { NoteCC } from '@/app/classes/rates/noteCC';
-import { getNoteCC_Rate } from '@/app/factory/factory_noteCC';
+import { getMistakeReport, getNoteCC_Rate } from '@/app/factory/factory_noteCC';
+import { Mistake } from '@/app/classes/mistake';
 
 
 const Dashboard = () => {
@@ -65,6 +66,26 @@ const Dashboard = () => {
         const finalScore = await getFinalScoreData(dateAgent, findUser, 0); // Pobranie obecnego miesiąca (Można odfiltrować zamiast pobierać 2x dane)
         setFinalPeriod(finalScorePeriod);
         setFinal(finalScore);
+
+        const mistakeList: Mistake[] = []
+        finalScore.noteList.forEach(noteCC => {
+          
+          mistakeList.push(...getMistakeReport(noteCC))
+          
+        });
+        console.log("MISTAKE ", mistakeList);
+
+        const groupedMistakes: Record<string, Mistake[]> = mistakeList.reduce((acc: Record<string, Mistake[]>, mistake) => {
+          if (acc[mistake.blockKey]) {
+              acc[mistake.blockKey].push(mistake);
+          } else {
+              acc[mistake.blockKey] = [mistake];
+          }
+          return acc;
+      }, {});
+      
+      console.log(groupedMistakes);
+      
       }
 
     } else {

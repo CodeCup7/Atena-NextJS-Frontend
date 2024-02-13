@@ -14,6 +14,8 @@ import { RateCC } from '@/app/classes/rates/rateCC';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
+import { Dashboard_NoteCC_BarChart } from '../../components/chart/noteCC_dashboard_barchart';
+import { Dashboard_DoughnutChart } from '../../components/chart/dashboard_chartDoughnut';
 
 const NoteCC_Page = () => {
 
@@ -79,6 +81,10 @@ const NoteCC_Page = () => {
         }
     }
 
+    function dashboardGenerate() {
+
+    }
+
     // ====== OBSŁUGA PRZYCISKÓW ======================================================
     function rateBtn_Click() {
 
@@ -90,14 +96,9 @@ const NoteCC_Page = () => {
                         const note: NoteCC = foo.noteCC; // Aktualizacja oceny o ID z DB
                         note.mode = Rate_Mode.PREVIEW_;
                         updateNoteCC(note)
-
-                        toast.info(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     } else {
-                        toast.error(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     }
                 }));
             } else {
@@ -106,14 +107,9 @@ const NoteCC_Page = () => {
 
                         noteCC.mode = Rate_Mode.PREVIEW_;
                         updateNoteCC(noteCC)
-
-                        toast.info(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     } else {
-                        toast.error(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     }
                 }));
             }
@@ -356,6 +352,9 @@ const NoteCC_Page = () => {
 
                         {/* # Dashboard TAB */}
                         <div className={noteTab === 3 ? "block" : "hidden"} id="link3">
+                            <div className='w-full h-52'>
+                                <Dashboard_NoteCC_BarChart value={[10, 20, 30, 40, 50]} agentName={'aaaa'} />
+                            </div>
 
                         </div>
 
@@ -422,7 +421,8 @@ const NoteCC_Page = () => {
                                                         </Link>
                                                     </td>
                                                 </tr>
-                                            )})}
+                                            )
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -462,7 +462,8 @@ const NoteCC_Page = () => {
                                                         </Link>
                                                     </td>
                                                 </tr>
-                                            )})}
+                                            )
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
