@@ -14,7 +14,6 @@ interface Foo {
 export async function api_Test_add(test: Test): Promise<Foo> {
 
     try {
-        let foo: Foo = { callback: '', isOK: false, test: test };
 
         const response = await fetch('http://localhost:8080/api/test/add', {
             method: 'POST',
@@ -25,25 +24,19 @@ export async function api_Test_add(test: Test): Promise<Foo> {
         });
 
         if (response.ok) {
-            const addedtest = await response.json();
-            foo.callback = 'Test został dodany';
-            foo.isOK = true;
-            foo.test = addedtest;
+            return { callback: 'Test został dodany', isOK: true, test: test };
         } else {
-            foo.callback = 'Test nie został dodany';
-            foo.isOK = false;
+            return { callback: 'Test nie został dodany ' + response, isOK: false, test: test };
         }
-        return foo;
+
     } catch (error) {
         return { callback: 'Błąd dodawania testu ' + error, isOK: false, test: test };
     }
 }
 
-export async function api_Test_addAll(testList:Test[]) {
+export async function api_Test_addAll(testList: Test[]) {
 
     try {
-        let foo: Foo = { callback: '', isOK: false, test: new Test() };
-
         const response = await fetch('http://localhost:8080/api/test/addList', {
             method: 'POST',
             headers: {
@@ -53,20 +46,14 @@ export async function api_Test_addAll(testList:Test[]) {
         });
 
         if (response.ok) {
-            const addedtests = await response.json();
-            foo.callback = 'Testy zostały dodane';
-            foo.isOK = true;
-            foo.test = addedtests;
+            return { callback: 'Testy zostały dodane', isOK: true, test: new Test() };
         } else {
-            foo.callback = 'Testy nie zostały dodane';
-            foo.isOK = false;
+            return { callback: 'Testy nie zostały dodane' + response, isOK: false, test: new Test() };
         }
-        return foo;
+
     } catch (error) {
-        return { callback: 'Błąd dodawania testów ' + error, isOK: false, test: new Test() };
+        return { callback: 'Błąd dodawania testu ' + error, isOK: false, test: new Test() };
     }
-
-
 }
 
 export async function api_Test_getDate(startDate: string, endDate: string): Promise<Test[]> {
@@ -74,11 +61,13 @@ export async function api_Test_getDate(startDate: string, endDate: string): Prom
     try {
         const response = await fetch('http://localhost:8080/api/test/getAllTestDates/'
             + startDate + '/' + endDate);
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         return await response.json();
     } catch (error) {
+        console.error('Error during API call:', error);
         return [];
     }
 }
@@ -96,6 +85,7 @@ export async function api_Test_search(searchCriteria: SearchCriteria[]): Promise
 
         return await response.json();
     } catch (error) {
+        console.error('Error during API call:', error);
         return [];
     }
 }

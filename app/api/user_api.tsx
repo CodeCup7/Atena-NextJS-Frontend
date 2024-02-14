@@ -7,12 +7,12 @@ import { User } from "../classes/user";
 interface Foo {
     callback: string;
     isOK: boolean;
+    user: User;
 }
 
 export async function api_User_add(user: User): Promise<Foo> {
 
     try {
-        let foo: Foo = { callback: '', isOK: false };
 
         const response = await fetch('http://localhost:8080/api/user/add', {
             method: 'POST',
@@ -23,37 +23,37 @@ export async function api_User_add(user: User): Promise<Foo> {
         });
 
         if (response.ok) {
-            foo.callback = 'Użytkownik został dodany';
-            foo.isOK = true;
+            const addedUser = await response.json();
+            return { callback: 'Użytkownik został dodany', isOK: true, user: addedUser };
         } else {
-            foo.callback = 'Użytkownik nie został dodany';
-            foo.isOK = false;
+            return { callback: 'Użytkownik nie został dodany' + response, isOK: false, user: new User() };
         }
-        return foo;
     } catch (error) {
-        return { callback: 'Błąd dodawania Użytkownika ' + error, isOK: false };
+        return { callback: 'Błąd dodawania Użytkownika ' + error, isOK: false, user: new User() };
     }
 }
 
 export async function api_UserList_add(userList: []) {
-    fetch('http://localhost:8080/api/user/addList', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json', // Określenie, że dane są w formacie JSON
-        },
-        body: JSON.stringify(userList),
-    })
-        .then(response => {
-            if (response.ok) {
-                console.log('User została dodana');
-            } else {
-                console.log('User nie została dodana ');;
-            }
 
-        })
-        .catch(error => {
-            console.log('Błąd dodawania User ' + error)
+    try {
+
+        const response = await fetch('http://localhost:8080/api/user/addList', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userList),
         });
+
+        if (response.ok) {
+            const addedUser = await response.json();
+            return { callback: 'Użytkownicy zostali dodani', isOK: true, user: addedUser };
+        } else {
+            return { callback: 'Użytkownicy nie zostali dodani' + response, isOK: false, user: new User() };
+        }
+    } catch (error) {
+        return { callback: 'Błąd dodawania użytkowników ' + error, isOK: false, user: new User() };
+    }
 }
 
 export async function api_UserList_getAll(): Promise<User[]> {
@@ -64,40 +64,46 @@ export async function api_UserList_getAll(): Promise<User[]> {
         }
         return await response.json();
     } catch (error) {
-        console.error('Błąd pobierania użytkowników:', error);
+        console.error('Error during API call:', error);
         return [];
     }
 }
 
 export async function api_UserList_getByLogin(login: string): Promise<User> {
+
     try {
+
         const response = await fetch('http://localhost:8080/api/user/getUserLogin/' + login);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         return await response.json();
     } catch (error) {
-        return new User;
+        console.error('Error during API call:', error);
+        return new User();
     }
 }
 
 export async function api_UserList_getById(id: number): Promise<User> {
+
     try {
+
         const response = await fetch('http://localhost:8080/api/user/getUserId/' + id);
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         return await response.json();
+
     } catch (error) {
         console.error('Błąd pobierania użytkowników:', error);
-        return new User;
+        return new User();
     }
 }
 
 export async function api_User_update(user: User): Promise<Foo> {
 
     try {
-        let foo: Foo = { callback: '', isOK: false };
 
         const response = await fetch('http://localhost:8080/api/user/update', {
             method: 'POST',
@@ -108,21 +114,19 @@ export async function api_User_update(user: User): Promise<Foo> {
         });
 
         if (response.ok) {
-            foo.callback = 'Użytkownik został edytowany';
-            foo.isOK = true;
+            return { callback: 'Użytkownik został edytowany', isOK: true, user: new User() };
+
         } else {
-            foo.callback = 'Użytkownik nie został edytownay';
-            foo.isOK = false;
+            return { callback: 'Użytkownik nie został edytowany', isOK: false, user: new User() };
         }
-        return foo;
     } catch (error) {
-        return { callback: 'Błąd edytowania Użytkownika ' + error, isOK: false };
-    }  
+        return { callback: 'Błąd edytowania użytkownika ' + error, isOK: false, user: new User() };
+    }
 }
 
 export async function api_User_delete(userId: number): Promise<Foo> {
+    
     try {
-        let foo: Foo = { callback: '', isOK: false };
 
         const response = await fetch('http://localhost:8080/api/user/delete/' + userId, {
             method: 'DELETE',
@@ -132,14 +136,12 @@ export async function api_User_delete(userId: number): Promise<Foo> {
         });
 
         if (response.ok) {
-            foo.callback = 'Użytkownik został usunięty';
-            foo.isOK = true;
+            return { callback: 'Użytkownik został usunięty', isOK: true, user: new User() };
+
         } else {
-            foo.callback = 'Użytkownik nie został usunięty';
-            foo.isOK = false;
+            return { callback: 'Użytkownik nie został usunięty', isOK: false, user: new User() };
         }
-        return foo;
     } catch (error) {
-        return { callback: 'Błąd usuwania użytkownika ' + error, isOK: false };
+        return { callback: 'Błąd usuwania użytkownika ' + error, isOK: false, user: new User() };
     }
 }
