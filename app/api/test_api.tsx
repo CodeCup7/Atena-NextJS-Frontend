@@ -83,6 +83,10 @@ export async function api_Test_search(searchCriteria: SearchCriteria[]): Promise
             body: JSON.stringify(searchCriteria)
         });
 
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
+        }
+
         return await response.json();
     } catch (error) {
         console.error('Error during API call:', error);
@@ -103,17 +107,15 @@ export async function api_Test_delete(test: Test): Promise<Foo> {
             body: JSON.stringify(test),
         });
 
+
         if (response.ok) {
-            foo.callback = 'Test został usunięty';
-            foo.isOK = true;
+            return { callback: 'Test został usunięty', isOK: true, test: new Test() };
         } else {
-            foo.callback = 'Test nie został usunięty';
-            foo.isOK = false;
+            return { callback: 'Test nie został usunięty' + response, isOK: false, test: new Test() };
         }
-        return foo;
+
     } catch (error) {
-        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, test: test };
+        return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, test: new Test() };
     }
 }
-
 
