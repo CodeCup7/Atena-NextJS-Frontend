@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { RateCC_chart } from '../../components/chart/rateCC_chart';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
-import { api_rateCC_add, api_rateCC_update } from '@/app/api/rateCC_api';
+import { api_rateCC_add, api_rateCC_export, api_rateCC_update } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
 import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
@@ -174,7 +174,6 @@ const RateCC_Page = () => {
             });
         }
     }
-
     function editBtn_Click() {
 
         if (isPermit) {
@@ -188,21 +187,26 @@ const RateCC_Page = () => {
             toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
         }
     }
-
-    function tempSave(){
+    function tempSave_Click() {
         localStorage.setItem('tempRateCC', JSON.stringify(rateCC));
         toast.success("Pomyślnie zapisano tymczasowo ocenę", {
             position: toast.POSITION.TOP_RIGHT,
             theme: "dark"
         });
     }
-
-    function tempLoad(){
+    function tempLoad_Click() {
         const checkTemp = localStorage.getItem('tempRateCC');
-        if(checkTemp !== null){
+        if (checkTemp !== null) {
             const tempRateCC = JSON.parse(checkTemp);
             updateRateCC(tempRateCC);
         }
+    }
+    function exportToFile_Click() {
+
+        api_rateCC_export(rateCC);
+
+        
+
     }
 
     // ====================================================================================================================================================================================================
@@ -236,15 +240,15 @@ const RateCC_Page = () => {
                                 disabled={!isPermit || (isPermit && prewievMode)} onClick={rateBtn_Click}>{rateCC.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Oceń'}</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempSave}>Zapisz</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempSave_Click}>Zapisz</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempLoad}>Wczytaj</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempLoad_Click}>Wczytaj</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && prewievMode)}>Spr. Pisownie</button>
                             <button
-                                className="btn btn-outline btn-info btn-sm">Export do xls</button>
+                                className="btn btn-outline btn-info btn-sm" onClick={exportToFile_Click}>Export do pliku</button>
                         </ul>
                     </div>
                 </div>

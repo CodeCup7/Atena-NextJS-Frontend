@@ -160,4 +160,28 @@ export async function api_NoteCC_deleteNote(noteCC: NoteCC): Promise<Foo> {
         return { callback: 'Błąd dodawania coachingu ' + error, isOK: false, noteCC:noteCC };
     }
 }
+export async function api_noteCC_export(noteCC: NoteCC): Promise<void> {
+    console.log(JSON.stringify(noteCC))
+    try {
+        const response = await fetch('http://localhost:8080/api/noteCC/export', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(noteCC)
+        });
 
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = noteCC.id + '_coaching_eksport.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    } catch (error) {
+        console.error('Błąd pobierania danych:', error);
+    }
+}

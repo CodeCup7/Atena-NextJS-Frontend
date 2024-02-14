@@ -9,7 +9,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
-import { api_rateM_add, api_rateM_downloadAttachment, api_rateM_getAttachment, api_rateM_update } from '@/app/api/rateM_api';
+import { api_rateM_add, api_rateM_downloadAttachment, api_rateM_export, api_rateM_getAttachment, api_rateM_update } from '@/app/api/rateM_api';
 import { updateUserList } from '@/app/factory/factory_user';
 import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
@@ -195,7 +195,7 @@ const RateM_Page = () => {
         }
     }
 
-    function tempSave(){
+    function tempSave_Click() {
         localStorage.setItem('tempRateM', JSON.stringify(rateM));
         toast.success("Pomyślnie zapisano tymczasowo ocenę", {
             position: toast.POSITION.TOP_RIGHT,
@@ -203,12 +203,15 @@ const RateM_Page = () => {
         });
     }
 
-    function tempLoad(){
+    function tempLoad_Click() {
         const checkTemp = localStorage.getItem('tempRateM');
-        if(checkTemp !== null){
+        if (checkTemp !== null) {
             const tempRateM = JSON.parse(checkTemp);
             updateRateM(tempRateM);
         }
+    }
+    function exportToFile_Click() {
+        api_rateM_export(rateM);
     }
 
     // ====================================================================================================================================================================================================
@@ -242,15 +245,12 @@ const RateM_Page = () => {
                                 disabled={!isPermit || (isPermit && prewievMode)} onClick={rateBtn_Click}>{rateM.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Oceń'}</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempSave}>Zapisz</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempSave_Click}>Zapisz</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempLoad}>Wczytaj</button>
+                                disabled={!isPermit || (isPermit && prewievMode)} onClick={tempLoad_Click}>Wczytaj</button>
                             <button
-                                className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}>Spr. Pisownie</button>
-                            <button
-                                className="btn btn-outline btn-info btn-sm">Export do xls</button>
+                                className="btn btn-outline btn-info btn-sm" onClick={exportToFile_Click}>Export do pliku</button>
                         </ul>
                     </div>
                 </div>

@@ -109,8 +109,8 @@ export function getKeyAsName(key: string) {
         case key_t: {
             return "Techniki Obsługi";
         }
-        case key_k2: {
-            return "Komunikatywność";
+        case key_k: {
+            return "Komunikacja";
         }
         case key_s: {
             return "Standard obsługi rozmowy";

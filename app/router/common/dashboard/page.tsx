@@ -67,25 +67,6 @@ const Dashboard = () => {
         setFinalPeriod(finalScorePeriod);
         setFinal(finalScore);
 
-        const mistakeList: Mistake[] = []
-        finalScore.noteList.forEach(noteCC => {
-          
-          mistakeList.push(...getMistakeReport(noteCC))
-          
-        });
-        console.log("MISTAKE ", mistakeList);
-
-        const groupedMistakes: Record<string, Mistake[]> = mistakeList.reduce((acc: Record<string, Mistake[]>, mistake) => {
-          if (acc[mistake.blockKey]) {
-              acc[mistake.blockKey].push(mistake);
-          } else {
-              acc[mistake.blockKey] = [mistake];
-          }
-          return acc;
-      }, {});
-      
-      console.log(groupedMistakes);
-      
       }
 
     } else {

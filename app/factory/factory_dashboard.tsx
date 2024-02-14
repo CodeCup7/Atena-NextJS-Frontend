@@ -1,7 +1,7 @@
-'use client'
 // '==========================================================================================================================================
 // '*********************** Dashboard Factory ************************************************************************************************
 // '==========================================================================================================================================
+'use client'
 import { FinalScore } from "../classes/finalScore";
 import { User } from "../classes/user";
 import { format } from "date-fns";
@@ -13,8 +13,8 @@ import { getRateCC_Rate } from "./factory_rateCC";
 import { getScore_Test } from "./factory_test";
 import { Feedback_type } from "../classes/feedback";
 import { getRateM_Rate } from "./factory_rateM";
-import { api_Feedback_getDate, api_Feedback_search } from "../api/feedback_api";
-import { api_Test_getDate, api_Test_search } from "../api/test_api";
+import { api_Feedback_search } from "../api/feedback_api";
+import { api_Test_search } from "../api/test_api";
 import { FiltrTest } from "../classes/filtrs/test_filtr";
 import { FiltrFeedback } from "../classes/filtrs/feedback_filtr";
 
@@ -135,6 +135,8 @@ export function getFinalScoreFeedback(final: FinalScore): number {
 
     return score;
 }
+
+
 
 
 

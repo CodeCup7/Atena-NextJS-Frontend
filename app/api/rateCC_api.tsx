@@ -178,3 +178,29 @@ export async function api_rateCC_getAllRateNoNoteByAgent(agentId: number): Promi
         return [];
     }
 }
+
+export async function api_rateCC_export(rateCC: RateCC): Promise<void> {
+    console.log(JSON.stringify(rateCC))
+    try {
+        const response = await fetch('http://localhost:8080/api/rateCC/export', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateCC)
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = rateCC.id + '_Ocena_eksport.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    } catch (error) {
+        console.error('Błąd pobierania danych:', error);
+    }
+}

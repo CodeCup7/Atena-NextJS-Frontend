@@ -1,6 +1,6 @@
 'use client'
 import { ModeLabels, Rate_Mode, StatusLabels, Status_Note } from '@/app/classes/enums';
-import { CreateNewEmptyNoteCC, getNoteCC_Rate, getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
+import { CreateNewEmptyNoteCC, getMistakeReport, getNoteCC_Rate, getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -9,13 +9,14 @@ import { NoteCC } from '@/app/classes/rates/noteCC';
 import { getActiveUser } from '@/app/auth';
 import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { NoteCC_Chart } from '../../components/chart/noteCC_chart';
-import { api_NoteCC_add, api_NoteCC_update } from '@/app/api/noteCC_api';
+import { api_NoteCC_add, api_NoteCC_getDate, api_NoteCC_update, api_noteCC_export } from '@/app/api/noteCC_api';
 import { RateCC } from '@/app/classes/rates/rateCC';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 import { Dashboard_NoteCC_BarChart } from '../../components/chart/noteCC_dashboard_barchart';
 import { Dashboard_DoughnutChart } from '../../components/chart/dashboard_chartDoughnut';
+import { Mistake } from '@/app/classes/mistake';
 
 const NoteCC_Page = () => {
 
@@ -27,10 +28,12 @@ const NoteCC_Page = () => {
     const [noteCC, setNoteCC] = useState(CreateNewEmptyNoteCC(activeUser));
     const [prewievMode, setPreviewMode] = useState(false);
 
-    const [noteTab, setOpenNoteTab] = React.useState(1);
-    const [rateTab, setOpenRateTab] = React.useState(1);
-    const [prevNoteHide, setPrevNoteHide] = React.useState(true);
+    const [noteTab, setOpenNoteTab] = useState(1);
+    const [rateTab, setOpenRateTab] = useState(1);
+    const [prevNoteHide, setPrevNoteHide] = useState(true);
     const [score, setScore] = useState(0);
+    const [mistakeChartBarValue, setMistakeChartBarValue] = useState<Array<Record<string, number>>>();
+
 
     useEffect(() => {
         async function fetchData() {
@@ -81,7 +84,49 @@ const NoteCC_Page = () => {
         }
     }
 
-    function dashboardGenerate() {
+    async function dashboardGenerate(period: boolean) {
+
+        let mistakeList: Mistake[] = [];
+
+        if (period) {
+
+            const parts = noteCC.appliesDate.split('-'); // Rozbijanie daty na części
+
+            // Tworzenie daty z części daty
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
+
+            const date = new Date(year, month, 1);
+            // Ustawienie daty na pierwszy dzień miesiąca
+            const startDate = new Date(year, month - 3, 1);
+            // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
+            const endDate = new Date(year, month + 1, 0);
+
+            const noteList = await api_NoteCC_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'))
+
+            noteList.forEach(noteCC => {
+                mistakeList.push(...getMistakeReport(noteCC))
+            });
+        } else {
+            mistakeList = getMistakeReport(noteCC);
+        }
+
+        const groupedMistakes: Record<string, Mistake[]> = mistakeList.reduce((acc: Record<string, Mistake[]>, mistake) => {
+
+            if (acc[mistake.blockKey]) {
+                acc[mistake.blockKey].push(mistake);
+            } else {
+                acc[mistake.blockKey] = [mistake];
+            }
+            return acc;
+        }, {});
+
+        const dataList: Record<string, number>[] = [];
+        Object.entries(groupedMistakes).forEach(([key, mistakes]) => {
+            dataList.push({ [key]: mistakes.length });
+        });
+
+        setMistakeChartBarValue(dataList);
 
     }
 
@@ -157,6 +202,9 @@ const NoteCC_Page = () => {
             }));
         }
     }
+    function exportToFile_Click() {
+        api_noteCC_export(noteCC);
+    }
 
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -188,8 +236,7 @@ const NoteCC_Page = () => {
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
-                            <button className="btn btn-outline btn-info btn-sm">Export do xls</button>
-                            <button className="btn btn-outline btn-info btn-sm">Export do mail</button>
+                            <button className="btn btn-outline btn-info btn-sm"onClick={exportToFile_Click}>Export do xls</button>
                         </ul>
                     </div>
                 </div>
@@ -352,8 +399,15 @@ const NoteCC_Page = () => {
 
                         {/* # Dashboard TAB */}
                         <div className={noteTab === 3 ? "block" : "hidden"} id="link3">
-                            <div className='w-full h-52'>
-                                <Dashboard_NoteCC_BarChart value={[10, 20, 30, 40, 50]} agentName={'aaaa'} />
+                            <div className='w-full h-52 mt-2'>
+                                <Dashboard_NoteCC_BarChart
+                                    data={mistakeChartBarValue || new Array<Record<string, number>>()}
+                                    agentName={noteCC.agent.nameUser} />
+                            </div>
+                            <hr className='mt-4 opacity-40'></hr>
+                            <div className='flex gap-2 mt-4'>
+                                <button className='btn btn-neutral btn-sm ' onClick={e => dashboardGenerate(true)}>3 ost. miesiące</button>
+                                <button className='btn btn-neutral btn-sm ' onClick={e => dashboardGenerate(false)}>Obecny miesiąc</button>
                             </div>
 
                         </div>

@@ -204,3 +204,29 @@ export async function api_rateM_getAttachment(fileName: string): Promise<File> {
 export async function api_rateM_downloadAttachment(fileName: string) {
     window.location.href = `http://localhost:8080/api/rateM/getAttachment?fileName=${encodeURIComponent(fileName)}`;
 }
+
+export async function api_rateM_export(rateM: RateM): Promise<void> {
+    console.log(JSON.stringify(rateM))
+    try {
+        const response = await fetch('http://localhost:8080/api/rateM/export', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rateM)
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = rateM.id + '_Ocena_Mail_eksport.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    } catch (error) {
+        console.error('Błąd pobierania danych:', error);
+    }
+}
