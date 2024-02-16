@@ -9,18 +9,18 @@ import { NoteCC } from '@/app/classes/rates/noteCC';
 import { getActiveUser } from '@/app/auth';
 import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import { NoteCC_Chart } from '../../components/chart/noteCC_chart';
-import { api_NoteCC_add, api_NoteCC_getDate, api_NoteCC_update, api_noteCC_export } from '@/app/api/noteCC_api';
-import { RateCC } from '@/app/classes/rates/rateCC';
+import { api_NoteCC_add, api_NoteCC_search, api_NoteCC_update, api_noteCC_export } from '@/app/api/noteCC_api';
 import Link from 'next/link';
-import { format } from 'date-fns';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 import { Dashboard_NoteCC_BarChart } from '../../components/chart/noteCC_dashboard_barchart';
-import { Dashboard_DoughnutChart } from '../../components/chart/dashboard_chartDoughnut';
 import { Mistake } from '@/app/classes/mistake';
+import { calculateStartEndDate } from '@/app/global';
+import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
+import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
 
 const NoteCC_Page = () => {
 
-    // ====== Ustawienie i kontrola active usera ==========================================
+    // ====== Hooks =====================================================================================================================================================================================================================
     const [activeUser, setActiveUser] = useState(new User());
     const [isPermit, setIsPermit] = useState(false);
     const [isPermitAgent, setIsPermitAgent] = useState(false);
@@ -59,17 +59,19 @@ const NoteCC_Page = () => {
                     note.mode = Rate_Mode.NEW_;
                     updateNoteCC(note)
                 } else {
+                    toast.error('Bład ustawienia początkowego coachingu', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     console.log('Bład ustawienia NoteCC')
                 }
 
             } catch (error) {
+                toast.error('Błąd oólny, sprawdź konsolę', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 console.log('Błąd useEffect', error);
             }
         }
         fetchData();
     }, []);
 
-    // ====== FUNKCJE ==========================================
+    // ====== Funkcje ==========================================================================================================================================================================================================================
     function updateNoteCC(noteCC: NoteCC) {
         setNoteCC(noteCC);
         setScore(getNoteCC_RateAs100(noteCC))
@@ -90,19 +92,12 @@ const NoteCC_Page = () => {
 
         if (period) {
 
-            const parts = noteCC.appliesDate.split('-'); // Rozbijanie daty na części
+            const { startDate, endDate } = calculateStartEndDate(noteCC.appliesDate + '-01', 0);
+            const noteFilter = new FiltrNoteCC();
+            noteFilter.appliesDateStart = startDate.toString();
+            noteFilter.appliesDateEnd = endDate.toString();
 
-            // Tworzenie daty z części daty
-            const year = parseInt(parts[0]);
-            const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
-
-            const date = new Date(year, month, 1);
-            // Ustawienie daty na pierwszy dzień miesiąca
-            const startDate = new Date(year, month - 3, 1);
-            // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
-            const endDate = new Date(year, month + 1, 0);
-
-            const noteList = await api_NoteCC_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'))
+            const noteList = await api_NoteCC_search(createSearchCriteriaByFiltrNoteCC(noteFilter));
 
             noteList.forEach(noteCC => {
                 mistakeList.push(...getMistakeReport(noteCC))
@@ -130,7 +125,7 @@ const NoteCC_Page = () => {
 
     }
 
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    // ====== Akcje =====================================================================================================================================================================================================================
     function rateBtn_Click() {
 
         if (validate()) {
@@ -159,10 +154,7 @@ const NoteCC_Page = () => {
                 }));
             }
         } else {
-            toast.error("Wybierz date coachingu", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.error("Wybierz date coachingu", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
 
@@ -171,10 +163,7 @@ const NoteCC_Page = () => {
         if (isPermit) {
             noteCC.mode = Rate_Mode.EDIT_;
             updateNoteCC(noteCC)
-            toast.warning("Włączono tryb edycji", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.warning("Włączono tryb edycji", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         } else {
             toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
         }
@@ -191,13 +180,9 @@ const NoteCC_Page = () => {
                     noteCC.mode = Rate_Mode.PREVIEW_;
                     updateNoteCC(noteCC)
 
-                    toast.info("Odwołanie zostało poprawnie zamieszczone", {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.info("Odwołanie zostało poprawnie zamieszczone", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 } else {
-                    toast.error("Błąd wysyłania odwołania", {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.error("Błąd wysyłania odwołania", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 }
             }));
         }
@@ -206,6 +191,15 @@ const NoteCC_Page = () => {
         api_noteCC_export(noteCC);
     }
 
+    // ====== Ikony w tabeli =====================================================================================================================================================================================================================
+    const PreviewIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+    );
+
+    // ====== HTML =============================================================================================================================================================================================================================
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
@@ -236,7 +230,7 @@ const NoteCC_Page = () => {
                             <button
                                 className="btn btn-outline btn-info btn-sm"
                                 disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
-                            <button className="btn btn-outline btn-info btn-sm"onClick={exportToFile_Click}>Export do xls</button>
+                            <button className="btn btn-outline btn-info btn-sm" onClick={exportToFile_Click}>Export do xls</button>
                         </ul>
                     </div>
                 </div>
@@ -466,10 +460,7 @@ const NoteCC_Page = () => {
                                                                     localStorage.removeItem('rateCC_prev');
                                                                     localStorage.setItem('rateCC_prev', JSON.stringify(rateCC));
                                                                 }}>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                                </svg>
+                                                                <PreviewIcon />
                                                                 Podgląd
                                                             </button>
                                                         </Link>
@@ -507,10 +498,7 @@ const NoteCC_Page = () => {
                                                                     localStorage.removeItem('rateM_prev');
                                                                     localStorage.setItem('rateM_prev', JSON.stringify(rateM));
                                                                 }}>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                                </svg>
+                                                                <PreviewIcon />
                                                                 Podgląd
                                                             </button>
                                                         </Link>

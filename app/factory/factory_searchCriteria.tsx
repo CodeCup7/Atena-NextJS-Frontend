@@ -1,7 +1,7 @@
 // '==========================================================================================================================================
 // '*********************** SearchCriteria Factory *******************************************************************************************
 // '==========================================================================================================================================
-
+import { format } from "date-fns";
 import { Status_Note, Type_RateCC } from "../classes/enums";
 import { Feedback_type } from "../classes/feedback";
 import { FiltrFeedback } from "../classes/filtrs/feedback_filtr";
@@ -20,7 +20,7 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'dateRate'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.dateRateStart + " AND " + filtr.dateRateEnd
+        dateCriteria.value = format(filtr.dateRateStart, 'yyyy-MM-dd') + " AND " + format(filtr.dateRateEnd, 'yyyy-MM-dd')
         criteriaList.push(dateCriteria)
     }
 
@@ -28,7 +28,7 @@ export function createSearchCriteriaByFiltrRateCC(filtr: FiltrRateCC) {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'dateCall'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.dateCallStart + " AND " + filtr.dateCallEnd
+        dateCriteria.value = format(filtr.dateCallStart, 'yyyy-MM-dd') + " AND " + format(filtr.dateCallEnd, 'yyyy-MM-dd')
         criteriaList.push(dateCriteria)
     }
     if (filtr.id > 0) {
@@ -97,7 +97,7 @@ export function createSearchCriteriaByFiltrRateM(filtr: FiltrRateM) {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'dateRate'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.dateRateStart + " AND " + filtr.dateRateEnd
+        dateCriteria.value = format(filtr.dateRateStart, 'yyyy-MM-dd') + " AND " + format(filtr.dateRateEnd, 'yyyy-MM-dd')
         criteriaList.push(dateCriteria)
     }
 
@@ -134,25 +134,17 @@ export function createSearchCriteriaByFiltrNoteCC(filtr: FiltrNoteCC) {
     const criteriaList: SearchCriteria[] = []
 
     if (filtr.appliesDateStart !== '' && filtr.appliesDateEnd != '') {
-
-        // Ostatni dzień wybranego zakresu miesiąca DO
-        const [year, month] = filtr.appliesDateEnd.split("-");
-        const firstDayOfMonth = new Date(parseInt(year), parseInt(month) - 1, 1);
-        const firstDayOfNextMonth = new Date(firstDayOfMonth.getFullYear(), firstDayOfMonth.getMonth() + 1, 1);
-        const lastDayOfMonth = new Date(firstDayOfNextMonth.getTime() - 1);
-        const lastDay = lastDayOfMonth.getDate();
-
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'appliesDate'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.appliesDateStart + '-01' + " AND " + filtr.appliesDateEnd + "-" + lastDay
+        dateCriteria.value = format(filtr.appliesDateStart, 'yyyy-MM-dd')  + " AND " +  format(filtr.appliesDateEnd, 'yyyy-MM-dd');
         criteriaList.push(dateCriteria)
     }
     if (filtr.coachDateStart !== '' && filtr.coachDateEnd !== '') {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'coachDate'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.coachDateStart + " AND " + filtr.coachDateEnd
+        dateCriteria.value = format(filtr.coachDateStart, 'yyyy-MM-dd') + " AND " + format(filtr.coachDateEnd, 'yyyy-MM-dd')
         criteriaList.push(dateCriteria)
     }
     if (filtr.zalecenia !== '') {
@@ -213,7 +205,7 @@ export function createSearchCriteriaByFiltrTest(filtr: FiltrTest) {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'dateTest'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.dateTestStart + " AND " + filtr.dateTestEnd
+        dateCriteria.value = format(filtr.dateTestStart, 'yyyy-MM-dd') + " AND " + format(filtr.dateTestEnd, 'yyyy-MM-dd')
         criteriaList.push(dateCriteria)
     }
 
@@ -254,7 +246,7 @@ export function createSearchCriteriaByFiltrFeedback(filtr: FiltrFeedback) {
         const dateCriteria = new SearchCriteria();
         dateCriteria.key = 'dateFeedback'
         dateCriteria.operation = 'BETWEEN'
-        dateCriteria.value = filtr.dateFeedbackStart + " AND " + filtr.dateFeedbackEnd
+        dateCriteria.value = format(filtr.dateFeedbackStart, 'yyyy-MM-dd') + " AND " + format(filtr.dateFeedbackEnd, 'yyyy-MM-dd')
         criteriaList.push(dateCriteria)
     }
 

@@ -3,23 +3,19 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { Role, User } from '@/app/classes/user';
-import { getActiveUser } from '@/app/auth';
 import { updateUserList } from '@/app/factory/factory_user';
 import { api_Feedback_add, api_Feedback_delete, api_Feedback_getDate } from '@/app/api/feedback_api';
 import { Feedback, FeedbackLabels, Feedback_type } from '@/app/classes/feedback';
 import { format } from 'date-fns';
+import { calculateStartEndDate } from '@/app/global';
 
 const Feedback_Page = () => {
 
-    // ====== Ustawienie i kontrola active usera ==========================================
-    const [activeUser, setActiveUser] = useState(new User());
-    const [isPermit, setIsPermit] = useState(false);
-    const [isPermitAgent, setIsPermitAgent] = useState(false);
+    // ====== Hooks =====================================================================================================================================================================================================================
     const [userList, setUserList] = useState<Array<User>>([]);
     const [feedbackList, setFeedbackList] = useState<Array<Feedback>>([]);
     const [feedback, setFeedback] = useState(new Feedback());
     const [rowIndex, setRowIndex] = useState(-1);
-    const [rowRateIndex, setRowRateIndex] = useState(-1);
     const [dateValue, setDateValue] = useState('');
     const [agentId, setAgentId] = useState(0);
 
@@ -27,53 +23,37 @@ const Feedback_Page = () => {
         async function fetchData() {
             try {
                 const users = await updateUserList();
-                const user = await getActiveUser();
                 setUserList(users);
-                setActiveUser(user);
                 setFeedback(new Feedback())
 
-                const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
-                setIsPermit(isPermit);
-
             } catch (error) {
-                console.log('Błąd useEffect', error);
+                toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                console.log('Błąd pobierania użytkowników', error);
             }
         }
         fetchData();
     }, []);
 
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    // ====== Akcje =====================================================================================================================================================================================================================
     function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
 
             async function fetchData() {
                 try {
-                    const parts = dateValue.split('-'); // Rozbijanie daty na części
-
-                    // Tworzenie daty z części daty
-                    const year = parseInt(parts[0]);
-                    const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
-
-                    const date = new Date(year, month, 1);
-                    // Ustawienie daty na pierwszy dzień miesiąca
-                    const startDate = new Date(year, month, 1);
-                    // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
-                    const endDate = new Date(year, month + 1, 0);
-                    const feedbackList = await api_Feedback_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    const { startDate, endDate } = calculateStartEndDate(dateValue + '-01', 0);
+                    const feedbackList = await api_Feedback_getDate(format(startDate, 'yyyy-MM-dd'), format(endDate, 'yyyy-MM-dd'));
                     setFeedbackList(feedbackList);
 
                 } catch (error) {
+                    toast.error('Błąd pobierania feedbacków', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     console.error('Błąd pobierania feedbacków:', error);
                 }
             }
             fetchData();
 
         } else {
-            toast.error("Wybierz datę!", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.error("Wybierz datę!", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
 
@@ -83,23 +63,16 @@ const Feedback_Page = () => {
 
             api_Feedback_add(feedback).then((foo => {
                 if (foo.isOK === true) {
-
                     setFeedbackList((prevFeedbackList) => [...prevFeedbackList, foo.feedback]);
-                    toast.info(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     return true;
                 } else {
-                    toast.error(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 }
             }));
 
         } else {
-            toast.error("Uzupełnij poprawnie wszystkie pola", {
-                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-            });
+            toast.error("Uzupełnij poprawnie wszystkie pola", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
         return false;
     }
@@ -120,7 +93,7 @@ const Feedback_Page = () => {
         }));
     }
 
-    // ====== OBSŁUGA MODALA =========================================================
+    // ====== Obsługa modala =====================================================================================================================================================================================================================
     const modalRef = useRef<HTMLDialogElement>(null);
 
     const openModal = () => {
@@ -136,7 +109,7 @@ const Feedback_Page = () => {
     };
 
 
-    // ====== FUNKCJE ==============================================================
+    // ====== Funkcje =====================================================================================================================================================================================================================
     function validate(): boolean {
         if (feedback.agent.id !== 0 && feedback.dateFeedback !== '' && feedback.feedback !== Feedback_type.ALL_) {
             return true;
@@ -145,6 +118,14 @@ const Feedback_Page = () => {
         }
     }
 
+    // ====== Ikony w tabeli =====================================================================================================================================================================================================================
+    const DeleteIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+        </svg>
+    );
+
+    // ====== HTML ========================================================================================================================================================================================================================
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
@@ -278,8 +259,8 @@ const Feedback_Page = () => {
                                         <td><button className="btn btn-outline btn-warning btn-sm"
                                             onClick={() => {
                                                 deleteFeedback_click(feedback)
-                                            }
-                                            }>
+                                            }}>
+                                            <DeleteIcon />
                                             Usuń
                                         </button>
                                         </td>

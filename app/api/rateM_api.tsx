@@ -1,7 +1,6 @@
 // '==========================================================================================================================================
 // '*********************** RateM API *******************************************************************************************************
 // '==========================================================================================================================================
-
 import { RateM } from "../classes/rates/rateM";
 import { SearchCriteria } from "../classes/filtrs/searchCriteria";
 
@@ -101,10 +100,33 @@ export async function api_rateM_deleteList(rateList: RateM[]): Promise<Foo> {
                 return { callback: 'Lista ocen została pomyślnie zaaktualizowana', isOK: true, rateM: new RateM() };
     
             } else {
-                return { callback: 'Lista ocen nie została zaktualizowana', isOK: false, rateM: new RateM() };
+                return { callback: 'Lista ocen nie została zaktualizowana ' + response, isOK: false, rateM: new RateM() };
             }
         } catch (error) {
             return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateM: new RateM() };
+        }
+    }
+
+    export async function api_rateM_delete(id: Number): Promise<Foo> {
+
+        try {
+            let foo: Foo = { callback: '', isOK: false, rateM: new RateM() };
+    
+            const response = await fetch('http://localhost:8080/api/rateM/delete/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (response.ok) {
+                return { callback: 'Ocena została pomyślnie usunięta', isOK: true, rateM: new RateM() };
+    
+            } else {
+                return { callback: 'Ocena nie została pomyślnie usunięta ' + response, isOK: false, rateM: new RateM() };
+            }
+        } catch (error) {
+            return { callback: 'Błąd usuwania oceny ' + error, isOK: false, rateM: new RateM() };
         }
     }
 

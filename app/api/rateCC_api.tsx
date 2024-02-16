@@ -1,7 +1,6 @@
 // '==========================================================================================================================================
 // '*********************** RateCC API *******************************************************************************************************
 // '==========================================================================================================================================
-
 import { RateCC } from "../classes/rates/rateCC";
 import { SearchCriteria } from "../classes/filtrs/searchCriteria";
 
@@ -26,7 +25,7 @@ export async function api_rateCC_add(rateCC: RateCC): Promise<Foo> {
             const addedRateCC = await response.json();
             return { callback: 'Ocena została dodana', isOK: true, rateCC: addedRateCC };
         } else {
-            return { callback: 'Ocena nie została dodana', isOK: false, rateCC: new RateCC() };
+            return { callback: 'Ocena nie została dodana ' + response, isOK: false, rateCC: new RateCC() };
         }
     } catch (error) {
         return { callback: 'Błąd dodawania oceny ' + error, isOK: false, rateCC: rateCC };
@@ -47,7 +46,7 @@ export async function api_rateCC_update(rateCC: RateCC): Promise<Foo> {
         if (response.ok) {
             return { callback: 'Ocena została edytowana', isOK: true, rateCC: rateCC };
         } else {
-            return { callback: 'Ocena nie została edytowana', isOK: false, rateCC: rateCC };
+            return { callback: 'Ocena nie została edytowana ' + response, isOK: false, rateCC: rateCC };
         }
 
     } catch (error) {
@@ -70,7 +69,7 @@ export async function api_rateCC_updateList(rateList: RateCC[], noteId: number):
             return { callback: 'Lista ocen została pomyślnie zaaktualizowana', isOK: true, rateCC: new RateCC() };
 
         } else {
-            return { callback: 'Lista ocen nie została zaktualizowana', isOK: false, rateCC: new RateCC() };
+            return { callback: 'Lista ocen nie została zaktualizowana ' + response, isOK: false, rateCC: new RateCC() };
         }
     } catch (error) {
         return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateCC: new RateCC() };
@@ -94,10 +93,33 @@ export async function api_rateCC_deleteList(rateList: RateCC[]): Promise<Foo> {
             return { callback: 'Lista ocen została pomyślnie zaaktualizowana', isOK: true, rateCC: new RateCC() };
 
         } else {
-            return { callback: 'Lista ocen nie została zaktualizowana', isOK: false, rateCC: new RateCC() };
+            return { callback: 'Lista ocen nie została zaktualizowana ' + response, isOK: false, rateCC: new RateCC() };
         }
     } catch (error) {
         return { callback: 'Błąd aktualizacji ocen ' + error, isOK: false, rateCC: new RateCC() };
+    }
+}
+
+export async function api_rateCC_delete(id: Number): Promise<Foo> {
+
+    try {
+        let foo: Foo = { callback: '', isOK: false, rateCC: new RateCC() };
+
+        const response = await fetch('http://localhost:8080/api/rateCC/delete/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            return { callback: 'Ocena została pomyślnie usunięta', isOK: true, rateCC: new RateCC() };
+
+        } else {
+            return { callback: 'Ocena nie została pomyślnie usunięta ' + response, isOK: false, rateCC: new RateCC() };
+        }
+    } catch (error) {
+        return { callback: 'Błąd usuwania oceny ' + error, isOK: false, rateCC: new RateCC() };
     }
 }
 

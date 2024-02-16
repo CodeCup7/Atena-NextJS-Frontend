@@ -1,5 +1,5 @@
 // '========================================================
-// '*********************** User CLASS *****************
+// '*********************** USER CLASS *********************
 // '========================================================
 
 export enum Role {
@@ -19,7 +19,7 @@ export class User {
     public login: string = "";
     public nameUser: string = "";
     public role: Role | undefined;
-    public available: boolean | undefined;
+    public available: boolean = false;
     public mail: string = "";
 
     // Tylko agent

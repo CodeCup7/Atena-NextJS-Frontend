@@ -21,7 +21,7 @@ import { RateBlock } from '@/app/classes/rates/rateBlock';
 
 const RateCC_Page = () => {
 
-    // ====== Ustawienie i kontrola active usera ==========================================
+    // ====== Hooks =====================================================================================================================================================================================================================
     const [isPermit, setIsPermit] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const [activeUser, setActiveUser] = useState(new User());
@@ -66,13 +66,14 @@ const RateCC_Page = () => {
                 }
 
             } catch (error) {
+                toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 console.log('Błąd useEffect', error);
             }
         }
         fetchData();
     }, [refresh, type]);
 
-    // RateCC hooks
+    // ====== Hooks RateCC =====================================================================================================================================================================================================================
     const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateCC.wiedzaBlock));
     const [obsługaScore, setObsługaScore] = useState(getRateBlock_RateAs100(rateCC.obslugaBlock));
     const [technikaScore, setTechnikaScore] = useState(getRateBlock_RateAs100(rateCC.technikaBlock));
@@ -82,13 +83,13 @@ const RateCC_Page = () => {
 
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
 
-    // ====== Ustawienie dodatkowej oceny ==========================================
+    // ====== Ustawienie dodatkowej oceny =====================================================================================================================================================================================================================
     const extraScoreScale = [];
     for (let i = -10; i <= 10; i++) {
         extraScoreScale.push(i);
     }
 
-    // ====== FUNKCJE ==========================================
+    // ====== Funkcje =====================================================================================================================================================================================================================
     function updateRateCC(rateCC: RateCC) {
         setRateCC(rateCC);
         setWiedzaScore(getRateBlock_RateAs100(rateCC.wiedzaBlock));
@@ -102,6 +103,7 @@ const RateCC_Page = () => {
         setExtraScore(rateCC.extraScore)
         rateCC.mode === Rate_Mode.PREVIEW_ ? setPreviewMode(true) : setPreviewMode(false);
     }
+
     function validate(): boolean {
         if (rateCC.agent.id !== 0 && rateCC.queue.id !== 0 && rateCC.dateCall !== "" && rateCC.idCall !== "")
             return true;
@@ -124,13 +126,14 @@ const RateCC_Page = () => {
         }
     }
 
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    // ====== Akcje =====================================================================================================================================================================================================================
     function newBtn_Click() {
         setOpenNewRateModal(true);
         localStorage.removeItem('rateCC_prev');
         const newRateCC = CreateNewEmptyRateCC(activeUser, type);
         updateRateCC(newRateCC);
     }
+
     function rateBtn_Click() {
 
         if (validate()) {
@@ -141,13 +144,9 @@ const RateCC_Page = () => {
                         rate.mode = Rate_Mode.PREVIEW_;
                         updateRateCC(rate)
 
-                        toast.info(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     } else {
-                        toast.error(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     }
                 }));
             } else {
@@ -157,43 +156,33 @@ const RateCC_Page = () => {
                         rateCC.mode = Rate_Mode.PREVIEW_;
                         updateRateCC(rateCC)
 
-                        toast.info(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     } else {
-                        toast.error(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     }
                 }));
             }
         } else {
-            toast.error("Nie uzupełniono wszystkich wymaganych pól", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.error("Nie uzupełniono wszystkich wymaganych pól", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
+
     function editBtn_Click() {
 
         if (isPermit) {
             rateCC.mode = Rate_Mode.EDIT_;
             updateRateCC(rateCC)
-            toast.warning("Włączono tryb edycji", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.warning("Włączono tryb edycji", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         } else {
             toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
         }
     }
+
     function tempSave_Click() {
         localStorage.setItem('tempRateCC', JSON.stringify(rateCC));
-        toast.success("Pomyślnie zapisano tymczasowo ocenę", {
-            position: toast.POSITION.TOP_RIGHT,
-            theme: "dark"
-        });
+        toast.success("Pomyślnie zapisano tymczasowo ocenę", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
     }
+
     function tempLoad_Click() {
         const checkTemp = localStorage.getItem('tempRateCC');
         if (checkTemp !== null) {
@@ -201,15 +190,12 @@ const RateCC_Page = () => {
             updateRateCC(tempRateCC);
         }
     }
+
     function exportToFile_Click() {
-
         api_rateCC_export(rateCC);
-
-        
-
     }
 
-    // ====================================================================================================================================================================================================
+    // ====== HTML =====================================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
@@ -446,7 +432,7 @@ const RateCC_Page = () => {
 
                     {/* # Wiedza TAB */}
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                        <h5 className='text-center my-3 text-green-500'>znajomość produktów/usług świadczonych przez PP oraz aktów prawnych / przepisów / wytycznych</h5>
+                        <h5 className='text-center my-3 text-green-500'>znajomość produktów i usług świadczonych oraz aktów prawnych, przepisów, wytycznych</h5>
 
                         <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
                                         ${rateCC.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
@@ -511,8 +497,9 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Konsultant przeprowadza rozmowę zgodnie z obowiązującymi źródłami wiedzy (rozporządzeniami, regulaminami,  instrukcjami, bazą wiedzy, aktualnościami, informacjami na stronach internetowych) adekwatnie do sytuacji Klienta.
-                                        Konsultant odpowiada na pytania Klienta udzielając prawidłowych informacji w zakresie produktów/usług/procedur. Jeżeli Konsultant podczas rozmowy sam naprawi swój błąd - ocena  zostanie zaznaczona - 1, jeśli naprawa błędu następuje w wyniku ingerencji Klienta - ocena  zostanie zaznaczona na 0.</p>
+                                    <p className='text-sm text-justify'>Agent prowadzi dialog zgodnie z aktualnymi źródłami wiedzy (przepisami, wytycznymi, instrukcjami, bazą informacji, aktualnościami, treściami na stronach internetowych),
+                                        dostosowując się do potrzeb Klienta. Agent odpowiada na pytania Klienta udzielając precyzyjnych informacji dotyczących oferowanych produktów/usług/procedur.
+                                        W przypadku samodzielnej korekty błędu przez Agenta - oznaczona zostanie ocena - 1, natomiast w przypadku poprawy błędu na skutek interwencji Klienta - ocena zostanie oznaczona jako 0.</p>
                                 </div>
                             </div>
 
@@ -523,7 +510,7 @@ const RateCC_Page = () => {
                     {/* # Obsługa aplikacji / systemów TAB */}
                     <div className={openTab === 2 ? "block" : "hidden"} id="link2">
 
-                        <h5 className='text-center my-3 text-green-500'>umiejętność korzystania z aplikacji / systemów oraz właściwe wprowadzanie danych pozyskanych podczas rozmowy</h5>
+                        <h5 className='text-center my-3 text-green-500'>umiejętność korzystania z aplikacji i systemów oraz właściwe wprowadzanie danych pozyskanych podczas rozmowy</h5>
 
                         <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
                                         ${rateCC.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
@@ -589,8 +576,9 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Umiejętne posługiwanie się dostępnymi programami/aplikacjami/stronami www, znalezienie potrzebnych i poprawnych informacji, wyszukanie w aktach prawnych konkretnych artykułów, paragrafów, pokierowanie Klienta po stronie www.
-                                        Poprawna rejestracja w systemie/aplikacji: zgłoszeń, zleceń, żądań, notatek, awarii, interwencji Klientów.</p>
+                                    <p className='text-sm text-justify'>Sprawne wykorzystanie dostępnych narzędzi i aplikacji, odnajdywanie trafnych informacji w sieci, wyszukiwanie konkretnych przepisów w aktach prawnych, '
+                                        oraz asystowanie Klientowi w poruszaniu się po stronach internetowych.Precyzyjne zarejestrowanie zgłoszeń, zleceń, wniosków, notatek, incydentów,
+                                        oraz reakcja na interwencje Klientów zgodnie z obowiązującymi procedurami.</p>
                                 </div>
                             </div>
                         </div>
@@ -611,10 +599,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_t1)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_t1)}%</span>
                                         </label>
                                     </div>
 
@@ -662,9 +650,9 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Zadawanie  pytań celem zidentyfikowania potrzeb Klienta.
-                                        W przypadku niejasności, stosowania przez Klienta niezrozumiałych stwierdzeń, komunikatów, itp. - stosowanie parafrazy (potwierdzenie zrozumienia/powtórzenie tego co powiedział Klient), pozyskanie istotnych i  adekwatnych do sprawy Klienta informacji mających wpływ na realizację usługi. Dopasowanie oferty,
-                                        przekazanie kluczowych informacji dla całości sprawy Klienta. Zaproponowanie rozwiązania zgodnego z procedurami w PP i CC. Przedstawianie zalet i korzyści produktów/usług.</p>
+                                    <p className='text-sm text-justify'>Zadawanie pytań w celu ustalenia potrzeb Klienta oraz klarowne wyjaśnianie niejasności, włączając w to stosowanie parafrazy do potwierdzenia zrozumienia jego wypowiedzi.
+                                        Pozyskiwanie istotnych informacji związanych z problemem Klienta, które mogą mieć wpływ na efektywną realizację usługi.
+                                        Dostosowanie propozycji do indywidualnych potrzeb Klienta, przekazywanie kluczowych informacji dotyczących jego sprawy. Proponowanie rozwiązań zgodnych z procedurami.</p>
                                 </div>
                             </div>
                         </div>
@@ -680,10 +668,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_t2)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_t2)}%</span>
                                         </label>
                                     </div>
 
@@ -734,16 +722,16 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Rozwianie wątpliwości - właściwa argumentacja dostosowana do potrzeb i typu Klienta. Konsultant przedstawia się jako profesjonalista.
-                                        Nie używa sformułowań o zabarwieniu negatywnym nie stosuje zwrotów budzących niepewność oraz podważających jego kompetencje
-                                        (np. niestety, nie pomogę, nie wiem, nie da się, nie mogę, nie mamy możliwości, musi Pan/Pani,  moim zdaniem, podejrzewam, z doświadczenia wiem, mogę tylko,
-                                        nie jestem w stanie, obawiam się, myślę że, prawdopodobnie, ewentualnie mogę, w ostateczności, w razie czego, tylko...,  być może).  </p>
+                                    <p className='text-sm text-justify'>Prezentowanie się jako profesjonalista poprzez unikanie sformułowań o negatywnym wydźwięku oraz eliminowanie zwrotów,
+                                        które mogą budzić niepewność lub podważać kompetencje, takich jak "niestety", "nie pomogę", "nie wiem", "nie da się", "nie mogę", "nie mamy możliwości", "musi Pan/Pani",
+                                        "moim zdaniem", "podejrzewam", "z doświadczenia wiem", "mogę tylko", "nie jestem w stanie", "obawiam się", "myślę że", "prawdopodobnie", "ewentualnie mogę", "w ostateczności",
+                                        "w razie czego", "tylko...", "być może".</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* T3 */}
-                        <h5 className='text-center my-3 text-green-500'>dbałość o wizerunek Poczty Polskiej</h5>
+                        <h5 className='text-center my-3 text-green-500'>dbałość o wizerunek firmy</h5>
 
                         <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
                                         ${rateCC.technikaBlock.ratePart.find(part => part.key === key_t3)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
@@ -754,10 +742,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_t3)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_t3)}%</span>
                                         </label>
                                     </div>
 
@@ -808,8 +796,9 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Rozpoznanie i zrozumienie powodów, dla których Klienci przedstawiają swoje zastrzeżenia w zakresie realizowanych zadań PP.
-                                        Kierowanie uwag Klienta na fakty, kszałtowanie pozytywnego  wizerunku. Konsultant nie wypowiada się negatywnie o PP ani o konkurencji.</p>
+                                    <p className='text-sm text-justify'>Rozpoznawanie i zrozumienie motywacji, które skłaniają Klientów do wyrażania zastrzeżeń dotyczących realizowanych zadań
+                                        w obszarze przetwarzania danych osobowych.Skupianie uwagi Klienta na faktach oraz kształtowanie pozytywnego wizerunku,
+                                        przy jednoczesnym unikaniu negatywnych wypowiedzi na temat polityki prywatności lub konkurencji.</p>
                                 </div>
                             </div>
                         </div>
@@ -826,10 +815,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text  xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_t4)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_t4)}%</span>
                                         </label>
                                     </div>
 
@@ -880,12 +869,11 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Konsultant właściwie zarządza przebiegiem rozmowy.
-                                        Konsultant udziela konkretnych, rzeczowych i zrozumiałych informacji - adekwatnych do zapytań Klienta.  Sprawnie porusza się po aplikacjach.
-                                        Nie odbiega od tematu rozmowy, trzyma się wątku wypowiedzi, nie wdaje się z Klientem w dyskusję. Informuje Klienta o konieczności zawieszenia rozmowy
-                                        (hold) celem  weryfikacji/sprawdzenia informacji jaka miałaby zostać Klientowi przekazana. Dziękuje za cierpliwość, dba o  optymalny czas zawieszenia rozmowy,
-                                        informuje Klienta o ew. konieczności jego przedłużenia z podaniem przyczyny.
-                                        Konsultant wita się z Klientem zaraz po połączeniu oraz rozłącza się niezwłocznie po zakończeniu rozmowy przez Klienta (gdy przerwa trwa dłużej niż 10 sekund).</p>
+                                    <p className='text-sm text-justify'>Agent odpowiednio kieruje przebiegiem rozmowy, udzielając konkretnej, rzeczowej i zrozumiałej odpowiedzi na pytania Klienta, zgodnie z ich potrzebami.
+                                        Sprawnie operuje aplikacjami i nie odchodzi od tematu, trzymając się głównego wątku rozmowy i unikając zbędnych dyskusji. W przypadku konieczności weryfikacji informacji,
+                                        informuje Klienta o zawieszeniu rozmowy (hold), tłumacząc powód, i dba o minimalizację czasu oczekiwania. Po podjęciu rozmowy ponownie dziękuje za cierpliwość i informuje
+                                        o ewentualnym wydłużeniu przerwy z uzasadnieniem. Konsultant witając się z Klientem po połączeniu i rozłączając się po zakończeniu rozmowy (jeśli przerwa trwa dłużej niż 10 sekund),
+                                        dba o profesjonalizm w komunikacji.</p>
                                 </div>
                             </div>
                         </div>
@@ -907,10 +895,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text  xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_k1)}%</span>
+                                            <span className="label-text  xl:text-4xl">{getWagRateCC(key_k1)}%</span>
                                         </label>
                                     </div>
 
@@ -961,11 +949,11 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Konsultant mówi głośno, wyraźnie i płynnie.
-                                        Konsultant stosuje odpowiednie tempo wypowiedzi. Zbyt szybkie mówienie może powodować trudności zrozumienia komunikatu, zbyt wolne może być denerwujące dla odbiorcy.
+                                    <p className='text-sm text-justify'>Agent mówi głośno, wyraźnie i płynnie.
+                                        Agent stosuje odpowiednie tempo wypowiedzi. Zbyt szybkie mówienie może powodować trudności zrozumienia komunikatu, zbyt wolne może być denerwujące dla odbiorcy.
                                         Poprawna dykcja. Brak: połykania końcówek, skracania słów, przerw pomiędzy słowami a nawet zdaniami.
-                                        Odpowiedni ton głosu, w którym słychać entuzjazm i pozytywne nastawienie. Brak monotonii. W rozmowie akcentowane są najważniejsze kwestie.
-                                        Konsultant stosuje odpowiednie pauzy. Brak wypowiedzi „na jednym wdechu”. Brak: przeciągania wyrazów/końcówek, przesadnego akcentowania.</p>
+                                        Odpowiedni ton głosu, w którym słychać entuzjazm i pozytywne nastawienie. Brak monotonii. W rozmowie akcentowane są najważniejsze kwestie. Agent stosuje odpowiednie pauzy.
+                                        Brak wypowiedzi „na jednym wdechu”. Brak: przeciągania wyrazów/końcówek, przesadnego akcentowania.</p>
                                 </div>
                             </div>
                         </div>
@@ -982,10 +970,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_k2)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_k2)}%</span>
                                         </label>
                                     </div>
 
@@ -1036,11 +1024,10 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Konsultant rozmawia uprzejmie, nie przenosi negatywnych odczuć z poprzednich rozmów.
-                                        Konsultant nie reaguje śmiechem na zachowanie/problem/ton głosu/sposób mówienia Klienta.
-                                        Konsultant jest opanowany – kiedy Klient się irytuje i czegoś nie rozumie, Konsultant nie atakuje Klienta, nie traktuje go „z góry” (np. przecież już to Panu tłumaczyłem, powtarzam po raz kolejny).
-                                        Konsultant nie okazuje zdenerwowania, zirytowania, arogancji, znudzenia.
-                                        Konsultant nie wypowiada się w sposób ironiczny, sarkastyczny, cyniczny. Konsultant nie daje odczuć Klientowi, że chce jak najszybciej zakończyć rozmowę</p>
+                                    <p className='text-sm text-justify'>Agent rozmawia uprzejmie, nie przenosząc negatywnych emocji z poprzednich interakcji.
+                                        Nie reaguje śmiechem na zachowanie, problemy, ton głosu lub sposób mówienia Klienta. Jest opanowany nawet w sytuacjach, gdy Klient jest zirytowany lub niezrozumiały.
+                                        Nie atakuje Klienta, unika traktowania go z wyższością, jak również nie okazuje zdenerwowania, zirytowania, arogancji czy znudzenia.
+                                        Unika wypowiedzi w tonie ironicznym, sarkastycznym czy cynicznym. Nie daje Klientowi wrażenia, że zależy mu na szybkim zakończeniu rozmowy.</p>
                                 </div>
                             </div>
                         </div>
@@ -1057,10 +1044,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_k3)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_k3)}%</span>
                                         </label>
                                     </div>
 
@@ -1111,9 +1098,9 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Koncentracja na wypowiedzi Klienta - uważne słuchanie Klienta, nie dopytywanie kilka razy o to samo, nie przerywanie rozmówcy jego wypowiedzi,
-                                        nie mówienie równocześnie z Klientem.Dopuszczalne jest przerywanie Klientowi wypowiedzi w sposób kulturalny jeżeli odbiega od tematu rozmowy.
-                                        Reakcja ze strony Konsultanta na monolog a także milczenie klienta. Jeżeli Klient przerywa Konsultantowi, należy zawiesić głos. Konsultant nie przekrzykuje Klienta, pozwala dokończyć wypowiedź.</p>
+                                    <p className='text-sm text-justify'>Agent skupia się na wypowiedzi Klienta poprzez uważne słuchanie, unikając wielokrotnego dopytywania o to samo, nie przerywając mu ani nie mówiąc równocześnie.
+                                        W przypadku, gdy wypowiedź Klienta jest niespójna lub odchodzi od tematu rozmowy, Agent może w sposób uprzejmy przerwać, ale dba o zachowanie kultury w komunikacji.
+                                        Reaguje na monolog Klienta oraz akceptuje milczenie, pozwalając Klientowi dokończyć wypowiedź. Jeśli Klient przerywa Agentowi, ten zawiesza głos, umożliwiając mu dokończenie wypowiedzi. </p>
                                 </div>
                             </div>
                         </div>
@@ -1135,10 +1122,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_s1)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_s1)}%</span>
                                         </label>
                                     </div>
 
@@ -1189,9 +1176,10 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Powitanie i pożegnanie zgodnie ze standardem CC. Konsultant zobowiązany jest wyraźnie podać imię i nazwisko oraz wyrazić chęć pomocy.
-                                        W zakończeniu -  wyrażenie chęci pomocy w innej niż omówiona/podsumowana sprawa (elastyczne stosowanie sformułowania Czy mogę jeszcze w czymś pomóc?),
-                                        podziękowanie za rozmowę oraz  miły akcent, np. do usłyszenia, miłego dnia, zapraszam ponownie.</p>
+                                    <p className='text-sm text-justify'>Powitanie zgodnie ze standardem :
+                                        "Dzień dobry, tutaj agent Anna Kowalska. W czym mogę pomóc?"
+                                        Pożegnanie zgodnie ze standardem:
+                                        "Dziękuję za rozmowę, jeśli jeszcze czegoś potrzebujesz, proszę śmiało się zgłosić. Miłego dnia i do usłyszenia!"</p>
                                 </div>
                             </div>
                         </div>
@@ -1208,10 +1196,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_s2)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_s2)}%</span>
                                         </label>
                                     </div>
 
@@ -1261,8 +1249,8 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Rozmowa zgodna ze skryptem - dla kampanii gdzie został wdrożony skrypt rozmowy lub  z procesem kampanii, kolejność/stałość valueów dla poszczególnych kampanii.
-                                        Prawidłowa weryfikacja Klientów. Zasadność rejestracji zgłoszeń, zleceń, żądań, notatek, awarii, interwencji Klientów. Potwierdzenie istotnych ustaleń. </p>
+                                    <p className='text-sm text-justify'>W przypadku kampanii, gdzie został wdrożony skrypt rozmowy lub proces kampanii, istotne jest przestrzeganie określonej kolejności i stałości elementów dla poszczególnych kampanii.
+                                        Weryfikacja Klientów odbywa się zgodnie z ustalonymi procedurami, aby potwierdzić ich tożsamość oraz prawo do realizacji żądanych usług.</p>
                                 </div>
                             </div>
                         </div>
@@ -1279,10 +1267,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_s3)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_s3)}%</span>
                                         </label>
                                     </div>
 
@@ -1333,11 +1321,11 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Konsultant posługuje się poprawną polszczyzną. Brak błędów językowych (np.: włańczać, bede, proszę Panią, te pismo, te upoważnienie, se napisze).
-                                        Konsultant nie stosuje niestosownych, potocznych słów/zwrotów (np.: fajnie, ok, od ręki, super, wie Pan co, system na mnie wymusza, wyskoczyły mi pytania, aplikacja wyrzuciła mi informacje,
-                                        niech Pan powie, tu widzę, zaraz, w takim razie, jakaś/jakiś). Konsultant nie stosuje żargonu pocztowego lub określeń technicznych (np.: IVR, tracking, KRRiT, WER, KUE, RS, UP, FUP,PP, PH).
-                                        Konsultant nie stosuje zdrobnień (np.: chwileczkę, pieniążki, sekundkę, paczuszka, fakturka). Konsultant nie spoufala się z Klientem, stosuje ale nienadużywa zwrotów grzecznościowych.
-                                        Konsultant udziela informacji w pierwszej osobie.   </p>
+                                    <p className='text-sm text-justify'>Agent posługuje się poprawną polszczyzną, unikając błędów językowych, takich jak "włańczać", "bede", "proszę Panią", "te pismo", "te upoważnienie",
+                                        "se napisze". Nie stosuje niestosownych, potocznych słów czy zwrotów, takich jak "fajnie", "ok", "od ręki", "super", "wie Pan co", "system na mnie wymusza", "wyskoczyły mi pytania",
+                                        "aplikacja wyrzuciła mi informacje", "niech Pan powie", "tu widzę", "zaraz", "w takim razie", "jakaś/jakiś". Unika także żargonu  firmowego. Nie używa zdrobnień, jak "chwileczkę",
+                                        "pieniążki", "sekundkę", "paczuszka", "fakturka". Konsultant utrzymuje profesjonalny dystans w relacji z Klientem, stosując odpowiednie zwroty grzecznościowe w sposób umiarkowany.
+                                        Udziela informacji w pierwszej osobie, co zapewnia jasność i bezpośredniość w komunikacji.</p>
                                 </div>
                             </div>
                         </div>
@@ -1354,10 +1342,10 @@ const RateCC_Page = () => {
 
                                     <div className='flex flex-col items-center justify-start w-full mt-5' >
                                         <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
+                                            <span className="label-text xl:text-2xl">Waga</span>
                                         </label>
                                         <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateCC(key_s4)}%</span>
+                                            <span className="label-text xl:text-4xl">{getWagRateCC(key_s4)}%</span>
                                         </label>
                                     </div>
 
@@ -1408,8 +1396,8 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Brak wtrętów językowych (np. yyy, eee, mhm, aha, prawda, dobrze, tutaj, tak, yhy, no tak, znaczy się, no, proszę mi powiedzieć, właśnie).
-                                        Brak zbędnych powtórzeń tych samych słów.</p>
+                                    <p className='text-sm text-justify'>Agent unika wtrętów językowych, takich jak "yyy", "eee", "mhm", "aha", "prawda", "dobrze", "tutaj", "tak", "yhy", "no tak", "znaczy się", "no", "proszę mi powiedzieć", "właśnie".
+                                        Dodatkowo, unika zbędnych powtórzeń tych samych słów w celu utrzymania płynności i klarowności komunikacji.</p>
                                 </div>
                             </div>
                         </div>

@@ -17,21 +17,14 @@ import { api_Feedback_search } from "../api/feedback_api";
 import { api_Test_search } from "../api/test_api";
 import { FiltrTest } from "../classes/filtrs/test_filtr";
 import { FiltrFeedback } from "../classes/filtrs/feedback_filtr";
+import { calculateStartEndDate } from "../global";
 
 export async function getFinalScoreData(dateValue: string, agent: User, howManyMonths: number) {
 
     // Pobranie danych z bazy
     const final = new FinalScore();
 
-    const parts = dateValue.split('-'); // Rozbijanie daty na części
-    // Tworzenie daty z części daty
-    const year = parseInt(parts[0]);
-    const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
-    const date = new Date(year, month, 1);
-    // Ustawienie daty na pierwszy dzień miesiąca
-    const startDate = new Date(year, month - howManyMonths, 1);
-    // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
-    const endDate = new Date(year, month + 1, 0);
+    const { startDate, endDate } = calculateStartEndDate(dateValue + '-01', howManyMonths);
 
     final.startDate = format(new Date(startDate), 'yyyy-MM-dd');
     final.endDate = format(new Date(endDate), 'yyyy-MM-dd');
@@ -64,8 +57,9 @@ export async function getFinalScoreData(dateValue: string, agent: User, howManyM
             final.rateCCList.push(rateCC)
         })
     });
-
+    console.log('final :', final);
     return final;
+   
 }
 
 export function getFinalScore(final: FinalScore): number {

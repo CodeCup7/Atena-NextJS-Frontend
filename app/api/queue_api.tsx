@@ -1,8 +1,6 @@
-
 // '==========================================================================================================================================
 // '*********************** Queue API ********************************************************************************************************
 // '==========================================================================================================================================
-
 import { Queue } from "../classes/queue";
 
 interface Foo {
@@ -10,22 +8,23 @@ interface Foo {
     isOK: boolean;
 }
 
-export async function api_QueueList_add(queueList: []) {
+export async function api_queue_add(queue: Queue) {
     try {
-        const response = await fetch('http://localhost:8080/api/queue/addList', {
+        const response = await fetch('http://localhost:8080/api/queue/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(queueList),
+            body: JSON.stringify(queue),
         });
         if (response.ok) {
-            console.log('Kolejka została dodana');
+            return { callback: 'Kolejka została dodana', isOK: true };
         } else {
-            console.log('Kolejka nie została dodana ');
+            return { callback: 'Kolejka nie została dodana ' + response, isOK: false };
         }
     } catch (error) {
         console.error('Błąd dodawania Kolejki ' + error);
+        return { callback: 'Błąd dodawania Kolejki ' + error, isOK: false };
     }
 }
 
@@ -42,20 +41,21 @@ export async function api_QueueList_getAll(): Promise<Queue[]> {
     }
 }
 
-export async function api_User_delete(id: number): Promise<Foo> {
+export async function api_queue_update(queue: Queue): Promise<Foo> {
     try {
-        const response = await fetch('http://localhost:8080/api/queue/delete/' + id, {
-            method: 'DELETE',
+        const response = await fetch('http://localhost:8080/api/queue/update', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(queue),
         });
         if (response.ok) {
-            return { callback: 'Kolejka została usunięta', isOK: true };
+            return { callback: 'Kolejka została edytowana', isOK: true };
         } else {
-            return { callback: 'Kolejka nie została usunięta', isOK: false };
+            return { callback: 'Kolejka nie została edytowana ' + response, isOK: false };
         }
     } catch (error) {
-        return { callback: 'Błąd usuwania kolejki ' + error, isOK: false };
+        return { callback: 'Błąd edytowania kolejki ' + error, isOK: false };
     }
 }

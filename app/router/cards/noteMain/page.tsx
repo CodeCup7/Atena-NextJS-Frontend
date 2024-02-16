@@ -9,19 +9,21 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { updateUserList } from '@/app/factory/factory_user';
 import { User } from '@/app/classes/user';
-import { api_NoteCC_deleteNote, api_NoteCC_getDate } from '@/app/api/noteCC_api';
+import { api_NoteCC_deleteNote, api_NoteCC_search } from '@/app/api/noteCC_api';
 import { getActiveUser } from '@/app/auth';
-import { getRateCC_Rate, getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
-import { format } from 'date-fns';
+import { getRateCC_RateAs100 } from '@/app/factory/factory_rateCC';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { RateM } from '@/app/classes/rates/rateM';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 import { api_rateCC_deleteList, api_rateCC_getAllRateNoNoteByAgent, api_rateCC_updateList } from '@/app/api/rateCC_api';
-import { FiltrRateCC } from '@/app/classes/filtrs/rateCC_filtr';
 import { api_rateM_deleteList, api_rateM_getAllRateNoNoteByAgent, api_rateM_updateList } from '@/app/api/rateM_api';
+import { calculateStartEndDate } from '@/app/global';
+import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
+import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
 
 export const NoteMain = () => {
 
+    // ====== Hooks =====================================================================================================================================================================================================================
     const [activeUser, setActiveUser] = useState(new User());
 
     const [rowIndex, setRowIndex] = useState(-1);
@@ -49,6 +51,7 @@ export const NoteMain = () => {
                 setDateValue(formattedDate);
 
             } catch (error) {
+                toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 console.error('Błąd pobierania użytkowników:', error);
             }
         }
@@ -72,6 +75,7 @@ export const NoteMain = () => {
         setChoiseRateM([]);
     }, [noteList]);
 
+    // ====== Obsługa zaznaczeń ocen =====================================================================================================================================================================================================================
     const [choiseRateCC, setChoiseRateCC] = useState<Array<RateCC>>([]);
     const [choiseRateM, setChoiseRateM] = useState<Array<RateM>>([]);
 
@@ -98,31 +102,27 @@ export const NoteMain = () => {
         }
     }
 
-    // ====== FUNKCJE ==========================================
+    // ====== Funkcje =====================================================================================================================================================================================================================
     function getCoaching(dateValue: string) {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
 
             async function fetchData() {
                 try {
-                    const parts = dateValue.split('-'); // Rozbijanie daty na części
 
-                    // Tworzenie daty z części daty
-                    const year = parseInt(parts[0]);
-                    const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
+                    const { startDate, endDate } = calculateStartEndDate(dateValue + '-01', 0);
+                    const noteFilter = new FiltrNoteCC();
+                    noteFilter.appliesDateStart = startDate.toString();
+                    noteFilter.appliesDateEnd = endDate.toString();
 
-                    const date = new Date(year, month, 1);
-                    // Ustawienie daty na pierwszy dzień miesiąca
-                    const startDate = new Date(year, month, 1);
-                    // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
-                    const endDate = new Date(year, month + 1, 0);
-                    const getExistNoteList = await api_NoteCC_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    const getExistNoteList = await api_NoteCC_search(createSearchCriteriaByFiltrNoteCC(noteFilter));
                     const noteList = await Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
 
                     setDownloadList(noteList);
                     setNoteList(noteList)
 
                 } catch (error) {
+                    toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     console.error('Błąd pobierania użytkowników:', error);
                 }
             }
@@ -130,7 +130,7 @@ export const NoteMain = () => {
         }
     }
 
-    // Filtrowanie listy coachingów
+    // ====== Filtrowanie listy coachingów =====================================================================================================================================================================================================================
     const [isMy, setSelectedCoach] = useState('false');
     const [filterStatus, setSelectedStatus] = useState(Status_Note.ALL_);
 
@@ -158,27 +158,21 @@ export const NoteMain = () => {
     }, [choiseRateCC.length, selectedNoteCC.mode, choiseRateM.length]);
 
 
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    // ====== Akcje =====================================================================================================================================================================================================================
     function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
             getCoaching(dateValue);
         } else {
-            toast.error("Wybierz datę!", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.error("Wybierz datę!", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
     function coaching_Click() {
 
         if (selectedNoteCC.mode === Rate_Mode.NEW_) { // Nowy Coaching
-            //Sprawdzenie czy wybrano rozmowy do coachingu
+            // Sprawdzenie czy wybrano rozmowy do coachingu
             if (choiseRateCC.length === 0 && choiseRateM.length === 0) {
-                toast.error("Nie wybrano żadnych rozmów do coachingu", {
-                    position: toast.POSITION.TOP_RIGHT,
-                    theme: "dark"
-                });
+                toast.error("Nie wybrano żadnych rozmów do coachingu", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 return false;
             } else {
 
@@ -189,47 +183,40 @@ export const NoteMain = () => {
                 localStorage.setItem('noteCC_new', JSON.stringify(selectedNoteCC))
                 return true;
             }
-        } else { //Podgląd coachingu
+        } else { // Podgląd coachingu
             localStorage.removeItem('noteCC_new');
             localStorage.setItem('noteCC_prev', JSON.stringify(selectedNoteCC))
             return true;
         }
     }
 
-    //Usuwanie coachingu - usuwa coaching z bazy i rozwiązuje powiązane z nim oceny ustawiajac pole noteCC_id w DB jako NULL
-    function deleteCoaching_Click() {
+    function deleteCoaching_Click() {// Usuwanie coachingu - usuwa coaching z bazy i rozwiązuje powiązane z nim oceny ustawiajac pole noteCC_id w DB jako NULL
         setOpenNewRateModal(false);
 
         api_NoteCC_deleteNote(selectedNoteCC).then((foo => {
             if (foo.isOK === true) {
                 getCoaching(dateValue);
-                toast.info(foo.callback, {
-                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                });
+                toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
             } else {
-                toast.error(foo.callback, {
-                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                });
+                toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
             }
         }));
     }
 
-    // Sekcja aktualizowania ocen w coachingu
+    async function rateCCListSync() { // ** Sekcja ** aktualizowania ocen CC w coachingu - pobranie danych
 
-    async function rateCCListSync() {
-        // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
-        const list: RateCC[] = await api_rateCC_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
+        const list: RateCC[] = await api_rateCC_getAllRateNoNoteByAgent(selectedNoteCC.agent.id); // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
         list.forEach(rateCC => {
             rateCC.mode = Rate_Mode.LOAD_;
         });
 
         const updatedNoteCC = { ...selectedNoteCC };
-        updatedNoteCC.rateCC_Col = updatedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_);// Filtracja duplikatów na podstawie atrybutu mode
+        updatedNoteCC.rateCC_Col = updatedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_); // Filtracja duplikatów na podstawie atrybutu mode
         updatedNoteCC.rateCC_Col = [...updatedNoteCC.rateCC_Col, ...list];
         setSelectedNoteCC(updatedNoteCC);
     }
 
-    async function rateCCListUpdate() {
+    async function rateCCListUpdate() { // ** Sekcja ** aktualizowania ocen CC w coachingu - aktualizacja danych
 
         if (choiseRateCC.length > 0) {
             const noLoadMode = selectedNoteCC.rateCC_Col.filter(rateCC => rateCC.mode !== Rate_Mode.LOAD_);
@@ -243,19 +230,15 @@ export const NoteMain = () => {
 
             if (updateResponse.isOK && deleteResponse.isOK) {
                 setNoteList(new Array<NoteCC>)
-                toast.info("Pomyślnie zaktualizowano listę ocen - pobierz ponownie dane", {
-                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                });
+                toast.info("Pomyślnie zaktualizowano listę ocen - pobierz ponownie dane", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
             }
         } else {
-            toast.error("Coaching musi zawierać choć jedną ocenę.", {
-                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-            });
+            toast.error("Coaching musi zawierać choć jedną ocenę.", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
 
 
     }
-    async function rateMListSync() {
+    async function rateMListSync() { // ** Sekcja ** aktualizowania ocen M w coachingu - pobranie danych
 
         // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
         const list: RateM[] = await api_rateM_getAllRateNoNoteByAgent(selectedNoteCC.agent.id);
@@ -269,7 +252,7 @@ export const NoteMain = () => {
         setSelectedNoteCC(updatedNoteCC);
     }
 
-    async function rateMListUpdate() {
+    async function rateMListUpdate() { // ** Sekcja ** aktualizowania ocen M w coachingu - aktualizacja danych
 
         if (choiseRateM.length > 0) {
 
@@ -284,18 +267,22 @@ export const NoteMain = () => {
 
             if (updateResponse.isOK && deleteResponse.isOK) {
                 setNoteList(new Array<NoteCC>)
-                toast.info("Pomyślnie zaktualizowano listę ocen - pobierz ponownie dane", {
-                    position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                });
+                toast.info("Pomyślnie zaktualizowano listę ocen - pobierz ponownie dane", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
             }
 
         } else {
-            toast.error("Coaching musi zawierać choć jedną ocenę.", {
-                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-            });
+            toast.error("Coaching musi zawierać choć jedną ocenę.", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
+    // ====== Ikony w tabeli =====================================================================================================================================================================================================================
+    const PreviewIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+    );
 
+    // ====== HTML =====================================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
@@ -505,10 +492,7 @@ export const NoteMain = () => {
                                                                     localStorage.removeItem('rateCC_prev');
                                                                     localStorage.setItem('rateCC_prev', JSON.stringify(rateCC));
                                                                 }}>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                                </svg>
+                                                                <PreviewIcon />
                                                                 Podgląd
                                                             </button>
                                                         </Link>
@@ -601,10 +585,7 @@ export const NoteMain = () => {
                                                                     localStorage.removeItem('rateM_prev');
                                                                     localStorage.setItem('rateM_prev', JSON.stringify(rateM));
                                                                 }}>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                                </svg>
+                                                                <PreviewIcon />
                                                                 Podgląd
                                                             </button>
                                                         </Link>

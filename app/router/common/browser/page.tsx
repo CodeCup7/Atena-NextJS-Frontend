@@ -1,5 +1,5 @@
 'use client'
-import { api_NoteCC_getDate, api_NoteCC_search } from '@/app/api/noteCC_api';
+import { api_NoteCC_search } from '@/app/api/noteCC_api';
 import { api_rateCC_search } from '@/app/api/rateCC_api';
 import { api_rateM_search } from '@/app/api/rateM_api';
 import { getActiveUser } from '@/app/auth';

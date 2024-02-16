@@ -20,7 +20,7 @@ export async function api_Notification_add(notification: Notification): Promise<
         if (!response.ok) {
             throw new Error('Nieudana próba dodania powiadomienia');
         }
-        return { callback: 'Powiadomienie zostało dodane', isOK: true };
+        return { callback: 'Powiadomienie zostało dodane ' + response, isOK: true };
     } catch (error) {
         console.error('Błąd dodawania powiadomienia ', error);
         return { callback: 'Błąd dodawania powiadomienia ' + error, isOK: false };

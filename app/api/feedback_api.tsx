@@ -1,7 +1,6 @@
 // '==========================================================================================================================================
 // '*********************** Feedback API *****************************************************************************************************
 // '==========================================================================================================================================
-
 import { Feedback } from "../classes/feedback";
 import { SearchCriteria } from "../classes/filtrs/searchCriteria";
 
@@ -25,7 +24,7 @@ export async function api_Feedback_add(feedback: Feedback): Promise<Foo> {
             const addedFeedback = await response.json();
             return { callback: 'Feedback został dodany', isOK: true, feedback: addedFeedback };
         } else {
-            return { callback: 'Feedback nie został dodany', isOK: false, feedback: feedback };
+            return { callback: 'Feedback nie został dodany ' + response, isOK: false, feedback: feedback };
         }
     } catch (error) {
         return { callback: 'Błąd dodawania feedbacku ' + error, isOK: false, feedback: feedback };
@@ -75,7 +74,7 @@ export async function api_Feedback_delete(feedback: Feedback): Promise<Foo> {
         if (response.ok) {
             return { callback: 'Feedback został usunięty', isOK: true, feedback: feedback };
         } else {
-            return { callback: 'Feedback nie został usunięty', isOK: false, feedback: feedback };
+            return { callback: 'Feedback nie został usunięty ' + response, isOK: false, feedback: feedback };
         }
     } catch (error) {
         return { callback: 'Błąd usuwania feedbacku ' + error, isOK: false, feedback: feedback };

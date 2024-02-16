@@ -18,7 +18,7 @@ import { RateBlock } from '@/app/classes/rates/rateBlock';
 
 const RateM_Page = () => {
 
-    // ====== Ustawienie i kontrola active usera ==========================================
+    // ====== Hooks =====================================================================================================================================================================================================================
     const [isPermit, setIsPermit] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const [activeUser, setActiveUser] = useState(new User());
@@ -28,7 +28,6 @@ const RateM_Page = () => {
     const [extraScore, setExtraScore] = useState(0);
     const [newRateModal, setOpenNewRateModal] = useState(false);
     const [agent, setAgent] = useState(0);
-    const regex = /[^\/\\]+$/;
 
     // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
@@ -65,10 +64,7 @@ const RateM_Page = () => {
         fetchData();
     }, [refresh]);
 
-    //console.log(attachment)
-    console.log(rateM)
-
-    // RateM hooks
+    // ====== Hooks RateCC =====================================================================================================================================================================================================================
     const [wiedzaScore, setWiedzaScore] = useState(getRateBlock_RateAs100(rateM.wiedzaBlock));
     const [obsługaScore, setObsługaScore] = useState(getRateBlock_RateAs100(rateM.obslugaBlock));
     const [technikaScore, setTechnikaScore] = useState(getRateBlock_RateAs100(rateM.technikaBlock));
@@ -77,13 +73,13 @@ const RateM_Page = () => {
 
     const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
 
-    // ====== Ustawienie dodatkowej oceny ==========================================
+    // ====== Ustawienie dodatkowej oceny =====================================================================================================================================================================================================================
     const extraScoreScale = [];
     for (let i = -10; i <= 10; i++) {
         extraScoreScale.push(i);
     }
 
-    // ====== FUNKCJE ==========================================
+    // ====== Funkcje =====================================================================================================================================================================================================================
     function updateRateM(rateM: RateM) {
         setRateM(rateM);
         setWiedzaScore(getRateBlock_RateAs100(rateM.wiedzaBlock));
@@ -117,7 +113,7 @@ const RateM_Page = () => {
         }
     }
 
-    // ====== ZAŁĄCZNIK  ==============================================================
+    // ====== Załącznik =====================================================================================================================================================================================================================
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [attachment, setAttachment] = useState<File | null>(null);
 
@@ -130,7 +126,8 @@ const RateM_Page = () => {
     function download() {
         api_rateM_downloadAttachment(rateM.attachmentPath);
     }
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+
+    // ====== Akcje =====================================================================================================================================================================================================================
     function newBtn_Click() {
         setOpenNewRateModal(true);
         localStorage.removeItem('rateM_prev');
@@ -147,13 +144,9 @@ const RateM_Page = () => {
                         const rate: RateM = foo.rateM; // Aktualizacja oceny o ID z DB
                         rate.mode = Rate_Mode.PREVIEW_;
                         updateRateM(rate)
-                        toast.info(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     } else {
-                        toast.error(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     }
                 }));
             } else {
@@ -163,21 +156,14 @@ const RateM_Page = () => {
                         rateM.mode = Rate_Mode.PREVIEW_;
                         updateRateM(rateM)
 
-                        toast.info(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     } else {
-                        toast.error(foo.callback, {
-                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                        });
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     }
                 }));
             }
         } else {
-            toast.error("Nie wybrano agenta lub załącznika", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.error("Nie wybrano agenta lub załącznika", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
 
@@ -186,10 +172,7 @@ const RateM_Page = () => {
         if (isPermit) {
             rateM.mode = Rate_Mode.EDIT_;
             updateRateM(rateM)
-            toast.warning("Włączono tryb edycji", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.warning("Włączono tryb edycji", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         } else {
             toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
         }
@@ -197,10 +180,7 @@ const RateM_Page = () => {
 
     function tempSave_Click() {
         localStorage.setItem('tempRateM', JSON.stringify(rateM));
-        toast.success("Pomyślnie zapisano tymczasowo ocenę", {
-            position: toast.POSITION.TOP_RIGHT,
-            theme: "dark"
-        });
+        toast.success("Pomyślnie zapisano tymczasowo ocenę", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
     }
 
     function tempLoad_Click() {
@@ -214,7 +194,7 @@ const RateM_Page = () => {
         api_rateM_export(rateM);
     }
 
-    // ====================================================================================================================================================================================================
+    // ====== HTML =====================================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />
@@ -448,7 +428,7 @@ const RateM_Page = () => {
 
                     {/* # Wiedza TAB */}
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                        <h5 className='text-center my-3 text-green-500'>znajomość produktów/usług świadczonych przez PP oraz aktów prawnych / przepisów / wytycznych</h5>
+                        <h5 className='text-center my-3 text-green-500'>znajomość produktów i usług świadczonych oraz aktów prawnych, przepisów, wytycznych</h5>
 
                         <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
                                         ${rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
@@ -513,7 +493,9 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Udzielenie poprawnej merytorycznie odpowiedzi na pytania Klienta zgodnie z obowiązującymi źródłami wiedzy (rozporządzeniami, regulaminami, instrukcjami, bazą wiedzy, informacjami na stronach internetowych PP, przepisami obowiązującymi w PP.)</p>
+                                    <p className='text-sm text-justify'>Agent udziela poprawnej merytorycznie odpowiedzi na pytania Klienta zgodnie z obowiązującymi
+                                        źródłami wiedzy, takimi jak rozporządzenia, regulaminy, instrukcje, baza wiedzy, oraz informacje zawarte na stronach internetowych firmy.
+                                        Dodatkowo, agent kieruje się obowiązującymi przepisami prawa dotyczącymi dziedziny działalności przedsiębiorstwa.</p>
                                 </div>
                             </div>
 
@@ -524,7 +506,7 @@ const RateM_Page = () => {
                     {/* # Obsługa aplikacji / systemów TAB */}
                     <div className={openTab === 2 ? "block" : "hidden"} id="link2">
 
-                        <h5 className='text-center my-3 text-green-500'>umiejętność korzystania i poruszania się w aplikacjach/systemach</h5>
+                        <h5 className='text-center my-3 text-green-500'>umiejętność korzystania oraz poruszania się w aplikacjach i systemach</h5>
 
                         <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
                                         ${rateM.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
@@ -590,7 +572,9 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Umiejętne posługiwanie się dostępnymi programami/aplikacjami/stronami www, znalezienie potrzebnych i poprawnych informacji (ZST, EJP, strona Poczty Polskiej).</p>
+                                    <p className='text-sm text-justify'>Agent wykazuje umiejętność sprawnego posługiwania się dostępnymi programami, aplikacjami oraz stronami internetowymi.
+                                        Potrafi skutecznie wyszukiwać potrzebne i poprawne informacje, korzystając z różnorodnych zasobów online, takich jak bazy danych, portale branżowe, czy oficjalne strony internetowe firm.
+                                        Dodatkowo, agent potrafi wykorzystać funkcje programów i aplikacji w celu efektywnego zarządzania danymi oraz dokumentacją potrzebną do udzielania wsparcia lub rozwiązania problemu Klienta.</p>
                                 </div>
                             </div>
                         </div>
@@ -662,8 +646,9 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Rozpoznanie sprawy Klienta-analiza przesłanego zapytania Klienta. Sprawdzenie ciągłości korespondencji. W przypadku korespondencji dotyczącej cennika/propozycji skorzystania z usług- wykorzystanie języka korzyści
-                                        (np. korzystniej, w trosce, zyska Pani/Pan,) ułatwiającego prezentację oferty/przedstawienie zalet produktów i usług świadczonych przez PP.</p>
+                                    <p className='text-sm text-justify'>Agent dokonuje rozpoznania sprawy Klienta poprzez analizę przesłanego zapytania. Sprawdza ciągłość wcześniejszej korespondencji,
+                                        aby lepiej zrozumieć kontekst oraz ewentualne wcześniejsze rozwiązania.W przypadku korespondencji dotyczącej cennika lub propozycji skorzystania z usług,
+                                        agent wykorzystuje język korzyści, prezentując ofertę w sposób korzystny dla Klienta</p>
                                 </div>
                             </div>
                         </div>
@@ -733,8 +718,9 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Udzielenie wyczerpującej odpowiedzi adekwatnej do zapytania Klienta. Wiadomość napisana w sposób konkretny, dostosowany do odbiorcy i typu sprawy.
-                                        Udzielenie odpowiedzi do nadawcy przesłanego zapytania. Rozwianie wątpliwości Klienta poprzez właściwą argumentację, dbającą o wizerunek PP.</p>
+                                    <p className='text-sm text-justify'>Agent udziela wyczerpującej odpowiedzi, która jest adekwatna do zapytania Klienta. Wiadomość jest napisana w sposób konkretny, dostosowany do odbiorcy i charakteru sprawy.
+                                        Odpowiedź jest skoncentrowana na treści przesłanego zapytania, aby zapewnić kompleksowe rozwiązanie problemu lub udzielenie potrzebnych informacji.
+                                        W przypadku rozwiązywania wątpliwości Klienta, agent korzysta z właściwej argumentacji.</p>
                                 </div>
                             </div>
                         </div>
@@ -810,13 +796,15 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Zaproponowanie rozwiązania zgodnego z procedurami w PP i CC.</p>
+                                    <p className='text-sm text-justify'>Agent proponuje rozwiązanie zgodne z obowiązującymi procedurami, które zostały ustalone w firmie.
+                                        Propozycja uwzględnia wszystkie wymogi i kroki niezbędne do skutecznego rozwiązania problemu lub realizacji żądanej usługi.
+                                        Działanie jest zgodne z przyjętymi standardami działania firmy oraz zapewnia zgodność z obowiązującymi przepisami i regulacjami..</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* S2 */}
-                        <h5 className='text-center my-3 text-green-500'>Jakość korespondencji/ Poprawność pisowni i styl wypowiedzi</h5>
+                        <h5 className='text-center my-3 text-green-500'>Jakość korespondencji. Poprawność pisowni i styl wypowiedzi</h5>
 
                         <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
                                         ${rateM.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
@@ -880,8 +868,9 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Stylistyka, gramatyka, ortografia, interpunkcja. Właściwa forma zwrotu grzecznościowego (Pan/Pani/Państwu). Konsultant nie używa sformułowań o zabarwieniu negatywnym, nie stosuje zwrotów budzących niepewność oraz podważających jego kompetencje (np. niestety, nie pomogę, nie wiem, nie da się, nie mogę, nie mamy możliwości, musi Pan/Pani,  moim zdaniem, podejrzewam,
-                                        z doświadczenia wiem, mogę tylko, nie jestem w stanie, obawiam się, myślę że, prawdopodobnie, ewentualnie mogę, w ostateczności, w razie czego, tylko...,  być może).</p>
+                                    <p className='text-sm text-justify'>Poprawność stylistyczna, gramatyczna, ortograficzna oraz interpunkcyjna. Ustosunkowanie się z szacunkiem poprzez stosowanie właściwej formy grzecznościowej (Pan/Pani/Państwu).
+                                        Agent wystrzega się użycia wyrażeń o negatywnym wydźwięku, unika też formułujących wątpliwości lub podważających jego zdolności (np. niestety, nie zdołam, nie posiadam informacji, nie da się, nie mam możliwości,
+                                        musi Pan/Pani, moim zdaniem, przypuszczam, na podstawie doświadczenia wiem, potrafię jedynie, nie potrafię, mam obawy, rozważam, prawdopodobnie, w razie potrzeby, wyłącznie..., być może).</p>
                                 </div>
                             </div>
                         </div>
@@ -951,7 +940,10 @@ const RateM_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Jednolity rozmiar i rodzaj czcionki, przejrzysty i jednolity układ graficzny tekstu, ważne fragmenty wyróżnione w jednolity sposób.</p>
+                                    <p className='text-sm text-justify'>Wszystkie elementy tekstu powinny być napisane jednolitą czcionką i mieć ten sam rozmiar.
+                                        Układ graficzny powinien być przejrzysty i jednolity, co ułatwi czytanie. Ważne fragmenty tekstu, takie jak nagłówki czy kluczowe informacje,
+                                        powinny być wyróżnione w spójny sposób, na przykład poprzez pogrubienie,kursywę lub zastosowanie innej barwy tekstu.
+                                        Dzięki temu czytelnik będzie mógł łatwo zidentyfikować najistotniejsze fragmenty tekstu.</p>
                                 </div>
                             </div>
                         </div>

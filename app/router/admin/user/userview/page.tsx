@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 
 const UserView = () => {
 
+    // ====== Hooks =========================================================
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedCoach, setSelectedCoach] = useState(0);
     const [selectedBoss, setSelectedBoss] = useState(0);
@@ -24,12 +25,14 @@ const UserView = () => {
                 const users = await updateUserList();
                 setUserList(users);
             } catch (error) {
+                toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 console.error('Błąd pobierania użytkowników:', error);
             }
         }
         fetchData();
     }, []);
 
+    // ====== SearchParametr ======================================================
     const searchParams = useSearchParams();
     const userData = searchParams.get('userData');
 
@@ -48,6 +51,7 @@ const UserView = () => {
         }
     }, [userData]);
 
+    // ====== Akcje ====================================================== 
     async function action() {
 
         let fillFields = false;
@@ -86,43 +90,31 @@ const UserView = () => {
                     if (existLogin === true) {
 
                         toast.error("Login " + user.login + " istnieje już w systemie", {
-                            position: toast.POSITION.TOP_RIGHT,
-                            theme: "dark"
+                            position: toast.POSITION.TOP_RIGHT, theme: "dark"
                         });
                     } else {
                         if (editUser.id === 0) { // Dodanie nowego usera
                             api_User_add(user).then((foo => {
                                 if (foo.isOK === true) {
-                                    toast.info(foo.callback, {
-                                        position: toast.POSITION.TOP_RIGHT,
-                                        theme: "dark"
-                                    });
+                                    toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                                 } else {
-                                    toast.error(foo.callback, {
-                                        position: toast.POSITION.TOP_RIGHT,
-                                        theme: "dark"
-                                    });
+                                    toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                                 }
                             }));
                         } else { // Edytowanie usera
 
                             api_User_update(user).then((foo => {
                                 if (foo.isOK === true) {
-                                    toast.info(foo.callback, {
-                                        position: toast.POSITION.TOP_RIGHT,
-                                        theme: "dark"
-                                    });
+                                    toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                                 } else {
-                                    toast.error(foo.callback, {
-                                        position: toast.POSITION.TOP_RIGHT,
-                                        theme: "dark"
-                                    });
+                                    toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                                 }
                             }));
                         }
                     }
                 })
                 .catch(error => {
+                    toast.error('Błąd pobierania użytkownika:', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     console.error('Błąd pobierania użytkownika:', error);
                 });
         }
@@ -132,7 +124,6 @@ const UserView = () => {
         <div className='container mx-auto p-2'>
             <ToastContainer />
             <div className='flex flex-col items-center justify-center'>
-
                 <div className='flex items-center justify-center'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-info">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
@@ -140,9 +131,7 @@ const UserView = () => {
                     <h1 className='text-4xl text-info mb-4 ml-2'>
                         {user.id != 0 ? "Edycja / Podgląd " : "Dodawanie "} Użytkownika</h1>
                 </div>
-
             </div>
-
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-2 my-7"></hr>
             {/* BODY */}
             <div className='flex items-start justify-center'>
@@ -292,15 +281,10 @@ const UserView = () => {
                                 ))}
                             </select>
                         </label>
-
                     </div>
-
                 </div>
-
-
             </div>
         </div >
-
     );
 }
 

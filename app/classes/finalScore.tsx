@@ -1,7 +1,6 @@
 // '===============================================================
-// '*********************** FinalScore CLASS **********************
+// '*********************** FINALSCORE CLASS **********************
 // '===============================================================
-
 import { getNoteCC_Rate } from "../factory/factory_noteCC";
 import { Feedback } from "./feedback";
 import { NoteCC } from "./rates/noteCC";

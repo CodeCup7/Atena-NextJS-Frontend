@@ -1,7 +1,6 @@
 // '==========================================================================================================================================
 // '*********************** User API *********************************************************************************************************
 // '==========================================================================================================================================
-
 import { User } from "../classes/user";
 
 interface Foo {
@@ -117,7 +116,7 @@ export async function api_User_update(user: User): Promise<Foo> {
             return { callback: 'Użytkownik został edytowany', isOK: true, user: new User() };
 
         } else {
-            return { callback: 'Użytkownik nie został edytowany', isOK: false, user: new User() };
+            return { callback: 'Użytkownik nie został edytowany ' + response, isOK: false, user: new User() };
         }
     } catch (error) {
         return { callback: 'Błąd edytowania użytkownika ' + error, isOK: false, user: new User() };
@@ -139,7 +138,7 @@ export async function api_User_delete(userId: number): Promise<Foo> {
             return { callback: 'Użytkownik został usunięty', isOK: true, user: new User() };
 
         } else {
-            return { callback: 'Użytkownik nie został usunięty', isOK: false, user: new User() };
+            return { callback: 'Użytkownik nie został usunięty ' + response, isOK: false, user: new User() };
         }
     } catch (error) {
         return { callback: 'Błąd usuwania użytkownika ' + error, isOK: false, user: new User() };

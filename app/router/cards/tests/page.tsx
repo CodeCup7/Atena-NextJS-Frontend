@@ -10,10 +10,11 @@ import { Test, TestLabels, TestPass } from '@/app/classes/test';
 import { api_Test_add, api_Test_addAll, api_Test_delete, api_Test_getDate } from '@/app/api/test_api';
 import readXlsxFile from 'read-excel-file';
 import { prepareTestsList } from '@/app/factory/factory_test';
+import { calculateStartEndDate } from '@/app/global';
 
 const Tests_Page = () => {
 
-    // ====== Ustawienie i kontrola active usera ==========================================
+    // ====== Hooks =====================================================================================================================================================================================================================
     const [activeUser, setActiveUser] = useState(new User());
     const [isPermit, setIsPermit] = useState(false);
     const [isPermitAgent, setIsPermitAgent] = useState(false);
@@ -39,44 +40,33 @@ const Tests_Page = () => {
                 setIsPermit(isPermit);
 
             } catch (error) {
+                toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 console.log('Błąd useEffect', error);
             }
         }
         fetchData();
     }, []);
 
-    // ====== OBSŁUGA PRZYCISKÓW ======================================================
+    // ====== Akcje =====================================================================================================================================================================================================================
     function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
 
             async function fetchData() {
                 try {
-                    const parts = dateValue.split('-'); // Rozbijanie daty na części
-
-                    // Tworzenie daty z części daty
-                    const year = parseInt(parts[0]);
-                    const month = parseInt(parts[1]) - 1 //Indexowanie zaczyna się od zera
-
-                    const date = new Date(year, month, 1);
-                    // Ustawienie daty na pierwszy dzień miesiąca
-                    const startDate = new Date(year, month, 1);
-                    // Obliczenie daty końcowej - ustawienie na ostatni dzień aktualnego miesiąca
-                    const endDate = new Date(year, month + 1, 0);
-                    const testList = await api_Test_getDate(format(new Date(startDate), 'yyyy-MM-dd'), format(new Date(endDate), 'yyyy-MM-dd'));
+                    const { startDate, endDate } = calculateStartEndDate(dateValue + '-01', 0);
+                    const testList = await api_Test_getDate(format(startDate, 'yyyy-MM-dd'), format(endDate, 'yyyy-MM-dd'));
                     setTestList(testList);
 
                 } catch (error) {
+                    toast.error('Błąd pobierania Testsów', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     console.error('Błąd pobierania Testsów:', error);
                 }
             }
             fetchData();
 
         } else {
-            toast.error("Wybierz datę!", {
-                position: toast.POSITION.TOP_RIGHT,
-                theme: "dark"
-            });
+            toast.error("Wybierz datę!", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
 
@@ -88,21 +78,15 @@ const Tests_Page = () => {
                 if (foo.isOK === true) {
 
                     setTestList((prevTestsList) => [...prevTestsList, foo.test]);
-                    toast.info(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                     return true;
                 } else {
-                    toast.error(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 }
             }));
 
         } else {
-            toast.error("Uzupełnij poprawnie wszystkie pola", {
-                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-            });
+            toast.error("Uzupełnij poprawnie wszystkie pola", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
         return false;
     }
@@ -123,7 +107,7 @@ const Tests_Page = () => {
         }));
     }
 
-    // ====== OBSŁUGA MODALA =========================================================
+    // ====== Obsługa modala =====================================================================================================================================================================================================================
     const modalRef = useRef<HTMLDialogElement>(null);
 
     const openModal = () => {
@@ -138,7 +122,7 @@ const Tests_Page = () => {
         }
     };
 
-    // ====== FUNKCJE ==============================================================
+    // ====== Funkcje =====================================================================================================================================================================================================================
     function validate(): boolean {
         if (test.agent.id !== 0 && test.dateTest !== '') {
             return true;
@@ -154,6 +138,7 @@ const Tests_Page = () => {
             readXlsxFile(file).then((rows) => {
                 setData(rows as string[][]); // Rzutowanie typu rows na string[][]
             }).catch((error) => {
+                toast.error('Wystąpił błąd podczas wczytywania pliku Excel:', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 console.error('Wystąpił błąd podczas wczytywania pliku Excel:', error);
             });
         }
@@ -167,22 +152,16 @@ const Tests_Page = () => {
             api_Test_addAll(testList).then((foo => {
                 if (foo.isOK === true) {
                     setTestList(testList);
-                    toast.info(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 } else {
-                    toast.error(foo.callback, {
-                        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-                    });
+                    toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
                 }
             }));
         } else {
-            toast.error("Wybierz plik zawierający testy", {
-                position: toast.POSITION.TOP_RIGHT, theme: "dark"
-            });
+            toast.error("Wybierz plik zawierający testy", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
     }
-
+    // ====== HTML =====================================================================================================================================================================================================================
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
             <ToastContainer />

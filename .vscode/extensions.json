@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "chakrounanas.turbo-console-log"
+        "chakrounanas.turbo-console-log",
+        "aaron-bond.better-comments"
     ]
 }
