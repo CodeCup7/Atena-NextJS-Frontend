@@ -14,21 +14,19 @@ import { Role, User } from '@/app/classes/user';
 import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC, createSearchCriteriaByFiltrRateM, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
 import { updateUserList } from '@/app/factory/factory_user';
 import Link from 'next/link';
-import { userInfo } from 'os';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 export const Search = () => {
 
+  // ====== Hooks =====================================================================================================================================================================================================================
   const [openTab, setOpenTab] = React.useState(1); // Kontrola zakładek
   const [isPermit, setIsPermit] = useState(false);
   const [activeUser, setActiveUser] = useState(new User());
   const [userList, setUserList] = useState<Array<User>>([]);
   const [queueList, setQueueList] = useState<Array<Queue>>([]);
-
   const [agentId, setAgentId] = useState(0);
-
   const [filtrNoteCC, setFiltrNoteCC] = useState(new FiltrNoteCC())
   const [filtrRateCC, setFiltrRateCC] = useState(new FiltrRateCC())
   const [filtrRateM, setFiltrRateM] = useState(new FiltrRateM())
@@ -57,12 +55,14 @@ export const Search = () => {
         setIsPermit(isPermit);
 
       } catch (error) {
-        console.log('Błąd useEffect', error);
+        toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" })
+        console.log('Błąd pobierania użytkowników', error);
       }
     }
     fetchData();
   }, []);
 
+  // ====== Funkcje =====================================================================================================================================================================================================================
   function clearCoaching_Click() {
     setFiltrNoteCC(new FiltrNoteCC())
   }
@@ -79,6 +79,7 @@ export const Search = () => {
     setFiltrRateM(new FiltrRateM())
   }
 
+  // ====== Obługa wyboru użytkowników do wyszukania ======================================================================================================================================================================================
   const handleCheckboxChange = (selectUser: User) => {
     const isSelected = choiseUsers.some(user => user.id === selectUser.id)
 
@@ -97,6 +98,7 @@ export const Search = () => {
     setFiltrFeedback((prevFiltrFB) => ({ ...prevFiltrFB, userCol: choiseUsers }));
   }, [choiseUsers]);
 
+  // ====== HTML =====================================================================================================================================================================================================================
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
       <ToastContainer />

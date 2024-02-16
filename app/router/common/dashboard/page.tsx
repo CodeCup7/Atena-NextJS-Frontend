@@ -10,13 +10,11 @@ import { Dashboard_LineChart } from '../../components/chart/dashboard_chartLine'
 import { FinalScore } from '@/app/classes/finalScore';
 import { getFinalScore, getFinalScoreData, getFinalScoreFeedback, getFinalScoreMysteryAndCurrent, getFinalScoreRateCCAndRateM, getFinalScoreTests } from '@/app/factory/factory_dashboard';
 import { NoteCC } from '@/app/classes/rates/noteCC';
-import { getMistakeReport, getNoteCC_Rate } from '@/app/factory/factory_noteCC';
-import { Mistake } from '@/app/classes/mistake';
-
+import { getNoteCC_Rate } from '@/app/factory/factory_noteCC';
 
 const Dashboard = () => {
 
-  // ====== Ustawienie i kontrola active usera ==========================================
+  // ====== Hooks =====================================================================================================================================================================================================================
   const [isPermit, setIsPermit] = useState(false);
   const [activeUser, setActiveUser] = useState(new User());
   const [userList, setUserList] = useState<Array<User>>([]);
@@ -45,13 +43,14 @@ const Dashboard = () => {
         setIsPermit(isPermit);
 
       } catch (error) {
-        console.log('Błąd useEffect', error);
+        toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" })
+        console.log('Błąd pobierania użytkowników', error);
       }
     }
     fetchData();
   }, []);
 
-
+// ====== Funkcje =====================================================================================================================================================================================================================
   async function getAgentDachboard() {
 
     if (dateAgent !== '' && agentId > 0) {
@@ -68,20 +67,16 @@ const Dashboard = () => {
         setFinal(finalScore);
 
       }
-
     } else {
-      toast.error("Uzupełnij poprawnie datę i wybierz agenta", {
-        position: toast.POSITION.TOP_RIGHT, theme: "dark"
-      });
+      toast.error("Uzupełnij poprawnie datę i wybierz agenta", {position: toast.POSITION.TOP_RIGHT, theme: "dark"});
     }
 
   }
 
-  // Funkcja, która pobiera oceny z obiektów NoteCC i zwraca listę ocen
-  function getNoteCCRates(noteList: NoteCC[]): number[] {
+  function getNoteCCRates(noteList: NoteCC[]): number[] { // Funkcja, która pobiera oceny z obiektów NoteCC i zwraca listę ocen
     return noteList.map(note => getNoteCC_Rate(note) * 100);
   }
-
+// ====== HTML =====================================================================================================================================================================================================================
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
       <ToastContainer />
