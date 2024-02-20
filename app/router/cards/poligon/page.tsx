@@ -15,23 +15,15 @@ export const Test = () => {
     async function send() {
 
         const r: RateCC = await api_rateCC_getById(1)
-        console.log(r)
+        console.log(JSON.stringify(r))
     }
 
     return (
         <div>
 
-            <Link
-                className="flex items-center group link link-info hover:link-success text-lg space-x-2"
-                href={{
-                    pathname: "/router/admin/user/userview",
-                    query: { onEdit: false, userData: JSON.stringify(new User()) }
-                }}>
-            
-                        <p>Dodaj użytkownika</p>
-                    </Link>
-                </div>
-                );
+            <button onClick={send}>Send</button>
+        </div>
+    );
 };
 
-                export default Test;
+export default Test;
