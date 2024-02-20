@@ -1,7 +1,7 @@
 import { User } from "./classes/user";
 
 //const login = 'user9';
-const login = 'Admin';
+const login = 'demo';
 
 export async function getActiveUser(): Promise<User> {
     try {
