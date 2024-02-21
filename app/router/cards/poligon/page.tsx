@@ -8,10 +8,6 @@ import Link from "next/link";
 
 export const Test = () => {
 
-
-
-
-
     async function send() {
 
         const r: RateCC = await api_rateCC_getById(1)
