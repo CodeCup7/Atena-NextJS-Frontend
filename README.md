@@ -2,7 +2,7 @@
 <img width=200px height=200px src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena/logo.png" alt="Project logo">
 </div>
 
-<h1 align="center">:star:Atena</h1>
+<h1 align="center">:star:Atena - Front</h1>
 <h3 align="center">Ocenianie i Monitorowanie Jakości Pracy Agentów Contact Center</h3> 
 <hr />
 
@@ -13,9 +13,10 @@
 
 <div align="left">
 	<h2>:memo:O projekcie</h2>
- 	Projekt zawiera w w pełni funkcjonalną wersję demonstracyjną aplikacji w VBA Excel, która służy do oceny i monitorowania jakości pracy agentów contact center. 
-	<br>Aplikacja w wersji produkcyjnej działa w organizacji już ponad rok i do tej pory umożliwniła ocenienie ponad :headphones:10k rozmów i :email:1k maili. 
+ 	:small_orange_diamond: Repozytorium zawiera przepisany w ramach nauki NextJS fron projekt <a href="https://github.com/CodeCup7/Atena-Excel-Full"><b>Atena-Excel</b></a> i do działania wymaga repozytorium backendu 	<a href="https://github.com/CodeCup7/Atena-SpringBoot-Backend"><b>Atena-SpringBoot-Backend</b></a><br>
+	<br>:small_orange_diamond:Aplikacja w wersji Excel działa w organizacji już ponad rok i do tej pory umożliwniła ocenienie ponad :headphones:10k rozmów i :email:1k maili. 
 	<br>Obecnie ocenia prace ponad 150 agentów i jest głównym narzędziem pracy dla kilku trenerów.
+	<br>:small_orange_diamond: Specyfika procesu jest tutaj nieco zmieniona - dostep do aplikacji uzyskują wszyscy użytkownicy, a system udostępnienia danych poprzez mail zastąpiłem powiadomieniami w aplikacji.
 </div>
 <br>
 
@@ -43,22 +44,35 @@
 <br>:diamond_shape_with_a_dot_inside: 7. Agregowanie informacji zwrotnej "feedback" - pochwał i skarg
 <br>:diamond_shape_with_a_dot_inside: 8. Wyszukiwanie informacji po kryteriach
 <br>:diamond_shape_with_a_dot_inside: 9. Dashboard kolejek, trenerów oraz rankingi
-<br>:diamond_shape_with_a_dot_inside: 10. Automatyczne wysyłanie wiadomości e-Mail przez MS Outlook wraz z załącznikami
+<br>:diamond_shape_with_a_dot_inside: 10. Powiadomienia o nowych ocenach, odwołaniach ...
 <br>:diamond_shape_with_a_dot_inside: 11. Generowanie ocen i kart oraz ich export do pliku
 <br>:diamond_shape_with_a_dot_inside: 12. Generowanie raportów z błędów agentów
 <br>:diamond_shape_with_a_dot_inside: 13. Pełna administracja użytkownikami, kolejkami i danymi
 
 ## :computer:Technologia
-:small_blue_diamond: 1. Pełna aplikacja w Excel VBA (Forms)
-<br>:small_blue_diamond: 2. Baza danych MS Access
-<br>:small_blue_diamond: 3. Bezserwerowa aplikacja wykorzystująca dysk sieciowy
-<br>:small_blue_diamond: 4. Zaimplementowany system wymuszenia aktualizacji
-<br>:small_blue_diamond: 5. Zaimplementowany system wyłączenia dostępu do bazy danych
-<br>:small_blue_diamond: 6. Autoryzacja domenowa
+:small_blue_diamond: 1. Pełna aplikacja w React NextJS
+<br>:small_blue_diamond: 2. Style - Tailwind CSS
+<br>:small_blue_diamond: 3. Biblioteka Tailwinda - DaisyUI
+<br>:small_blue_diamond: 4. Wykresy Chart.js oraz use-gauge
+<br>:small_blue_diamond: 5. Autoryzacja domenowa
+<br>:small_blue_diamond: 6. Backend - Spring Boot
+<br>:small_blue_diamond: 6. Baza danych - SQLite
 
 ## :rocket:Instalacja
 
-Wypakuj repozytorium na dysk i uruchom excela. Koniecznie włącz makra. Domyślnie ustawiony jest trener DEMO i podpięta baza danych w lokalizacji. Baza załadowana przykładowymi ocenami w zakresie czasowym 01.12.2023 - 29.02.2024
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Otwórz przeglądarkę [http://localhost:3000](http://localhost:3000) 
+
+<b> Do działania wymaga repozytorium backendu <a href="https://github.com/CodeCup7/Atena-SpringBoot-Backend"><b>Atena-SpringBoot-Backend</b></a><br> </b>
 
 ## :dart:Przykładowy proces:
 ### :point_right: 1. Oceń rozmowę lub wiadomość:
@@ -85,42 +99,3 @@ Szymon Kawa
 
  ##  :telephone: Kontakt
 :link: [@github](https://github.com/CodeCup7) 
-
-
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
