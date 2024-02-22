@@ -29,9 +29,9 @@
      <td>Dashboard Agenta</td>
   </tr>
   <tr align="center">
-    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena/menu.png"</td>
-    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena/karta-oceny.png"></td>
-    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena/dashboard.png"></td>
+    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/main.png"</td>
+    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/karta-oceny.png"></td>
+    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/dashboard.png"></td>
   </tr>
  </table>
  
