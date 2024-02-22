@@ -37,6 +37,7 @@ export const NoteMain = () => {
     const [noteList, setNoteList] = useState<Array<NoteCC>>([]);
     const [downloadList, setDownloadList] = useState<Array<NoteCC>>([]);
     const [userList, setUserList] = useState<Array<User>>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         async function fetchData() {
@@ -106,7 +107,7 @@ export const NoteMain = () => {
     function getCoaching(dateValue: string) {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
-
+            setIsLoading(true); // Ustaw stan ładowania na true
             async function fetchData() {
                 try {
 
@@ -119,50 +120,32 @@ export const NoteMain = () => {
                     const noteList = await Get_NoteList_With_NoStartNote(userList, getExistNoteList, dateValue);
 
                     setDownloadList(noteList);
-                    setNoteList(noteList)
+                    setNoteList(noteList);
 
                 } catch (error) {
-                    toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                    console.error('Błąd pobierania użytkowników:', error);
-                }
+                    toast.error('Błąd pobierania coachingów', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                    console.error('Błąd pobierania coachingów:', error);
+                } finally {
+                    setIsLoading(false); // Ustaw stan ładowania na false po zakończeniu operacji
+                };
             }
             fetchData();
         }
     }
 
-    // ====== Filtrowanie listy coachingów =====================================================================================================================================================================================================================
-    const [isMy, setSelectedCoach] = useState('false');
-    const [filterStatus, setSelectedStatus] = useState(Status_Note.ALL_);
-
-    function filterService() {
-
-        if (isMy === 'false' && filterStatus === Status_Note.ALL_) {// Filtr wszystko
-            setNoteList(downloadList)
-        } else if (isMy === 'true' && filterStatus === Status_Note.ALL_) { // Filtr dla MOICH i wszytskich statusów
-            const filterList = noteList.filter(note => note.agent.coachId === activeUser.id)
-            setNoteList(filterList)
-        } else if (isMy === 'true' && filterStatus !== Status_Note.ALL_) { // Filtr dla MOICH i wybranego statusu)
-            const filterList = noteList.filter(note => note.agent.coachId === activeUser.id && note.status === filterStatus)
-            setNoteList(filterList);
-        } else if (isMy === 'false' && filterStatus !== Status_Note.ALL_) { // Filtr dla wszystkich i wybranego statusu
-            const filterList = noteList.filter(note => note.status === filterStatus)
-            setNoteList(filterList)
-        }
-    }
-
     const [notePath, setNotePath] = useState('/router/cards/noteCC');
-
     // Karta coucha aktywna tylko wtedy gdy użytkownik przypisze oceny do coachingu lub gdy coaching jest w trybie podglądu
     useEffect(() => {
         setNotePath(choiseRateCC.length !== 0 || choiseRateM.length !== 0 || selectedNoteCC.mode === Rate_Mode.PREVIEW_ ? '/router/cards/noteCC' : '');
     }, [choiseRateCC.length, selectedNoteCC.mode, choiseRateM.length]);
 
-
     // ====== Akcje =====================================================================================================================================================================================================================
     function downloadDate_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
+
             getCoaching(dateValue);
+
         } else {
             toast.error("Wybierz datę!", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
@@ -238,6 +221,7 @@ export const NoteMain = () => {
 
 
     }
+
     async function rateMListSync() { // ** Sekcja ** aktualizowania ocen M w coachingu - pobranie danych
 
         // Pobranie wszytskich rozmów agenta z bazy które nie mają idNote
@@ -282,6 +266,35 @@ export const NoteMain = () => {
         </svg>
     );
 
+    // ====== Filtrowanie listy coachingów =====================================================================================================================================================================================================================
+    const [isMy, setSelectedCoach] = useState('false');
+    const [filterStatus, setSelectedStatus] = useState(Status_Note.ALL_);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        filterService();
+    }, [isMy, filterStatus, searchTerm]);
+
+    function filterService() {
+        let filteredList = downloadList;
+
+        if (isMy === 'true') {
+            filteredList = filteredList.filter(note => note.agent.coachId === activeUser.id);
+        }
+
+        if (filterStatus !== Status_Note.ALL_) {
+            filteredList = filteredList.filter(note => note.status === filterStatus);
+        }
+
+        if (searchTerm !== '') {
+            filteredList = filteredList.filter(note =>
+                note.agent.nameUser.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        setNoteList(filteredList);
+    }
+
     // ====== HTML =====================================================================================================================================================================================================================
     return (
         <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -300,20 +313,25 @@ export const NoteMain = () => {
 
             {/* Data */}
             <div className='flex flex-col items-center justify-center mt-1'>
-                <div className='flex mt-5'>
+                <div className='flex mt-5 w-full items-center justify-center'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 mx-2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
                     </svg>
                     <input
+                        className="input input-bordered w-48 max-w-xs"
                         value={dateValue}
                         onChange={e => { setDateValue(e.currentTarget.value); }}
-                        type="month"
-                        placeholder="Type here"
-                        className="input input-bordered w-full max-w-xs" />
-                    <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
+                        type="month"/>
+                    <button
+                        className="btn btn-outline btn-info mx-2"
+                        onClick={downloadDate_Click}
+                        disabled={isLoading}>
+                        {isLoading ? <span className="loading loading-ring loading-lg"></span>
+                            :
+                            <svg xmlns="http://www.w3.org   /2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                        }
                         Pobierz dane
                     </button>
                 </div>
@@ -321,73 +339,87 @@ export const NoteMain = () => {
 
             {/* Coachingi */}
             <div className='flex flex-col xl:flex-row p-2'>
-
-                <div className="overflow-x-auto mr-6 mt-6">
+                <div className="overflow-x-auto mr-6 mt-6 ">
                     <div className='flex items-center justify-start'>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="text-info w-8 h-8">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                         </svg>
                         <h1 className='text-info text-2xl text-center ml-3'> Coachingi</h1>
                     </div>
+                    <div className="overflow-x-auto h-96">
+                        <table className="table table-pin-rows min-w-full ">
+                            {/* head */}
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <select className="select select-bordered select-md w-full max-w-md"
+                                            defaultValue={'false'}
+                                            onChange={e => {
+                                                setSelectedCoach(e.target.value)
 
-                    <table className="table min-w-full">
-                        {/* head */}
-                        <thead>
-                            <tr>
-                                <th>
-                                    <select className="select select-bordered select-sm w-full max-w-xs"
-                                        defaultValue={'false'}
-                                        onChange={e => {
-                                            setSelectedCoach(e.target.value)
+                                            }}>
+                                            <option value="true">Moi</option>
+                                            <option value="false">Wszyscy</option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <select className="select select-bordered select-md w-fit max-w-md"
+                                            defaultValue={Status_Note.ALL_}
+                                            onChange={e => { setSelectedStatus(e.target.value as Status_Note) }}>
+                                            <option value={Status_Note.ALL_}>{StatusLabels[Status_Note.ALL_]}</option>
+                                            <option value={Status_Note.NO_START_}> {StatusLabels[Status_Note.NO_START_]} </option>
+                                            <option value={Status_Note.CLOSE_}> {StatusLabels[Status_Note.CLOSE_]} </option>
+                                            <option value={Status_Note.CLOSE_WITHOUT_}> {StatusLabels[Status_Note.CLOSE_WITHOUT_]} </option>
+                                            <option value={Status_Note.APPEAL_}> {StatusLabels[Status_Note.APPEAL_]} </option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <label className="input input-bordered flex items-center gap-2 w-fit">
+                                            <input
+                                                className="bg-transparent text-white"
+                                                type="text"
+                                                placeholder="Wyszukaj agenta"
+                                                value={searchTerm}
+                                                onChange={e => {
+                                                    setSearchTerm(e.target.value)
+                                                }} />
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
+                                                <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
+                                            </svg>
+                                        </label>
+                                    </th>
 
-                                        }}>
-                                        <option value="true">Moi</option>
-                                        <option value="false">Wszyscy</option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <select className="select select-bordered select-sm w-fit max-w-xs"
-                                        defaultValue={Status_Note.ALL_}
-                                        onChange={e => { setSelectedStatus(e.target.value as Status_Note) }}>
-                                        <option value={Status_Note.ALL_}>{StatusLabels[Status_Note.ALL_]}</option>
-                                        <option value={Status_Note.NO_START_}> {StatusLabels[Status_Note.NO_START_]} </option>
-                                        <option value={Status_Note.CLOSE_}> {StatusLabels[Status_Note.CLOSE_]} </option>
-                                        <option value={Status_Note.CLOSE_WITHOUT_}> {StatusLabels[Status_Note.CLOSE_WITHOUT_]} </option>
-                                        <option value={Status_Note.APPEAL_}> {StatusLabels[Status_Note.APPEAL_]} </option>
-                                    </select>
-                                </th>
-                                <th>
-                                    <button className='btn' onClick={filterService}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
-                                        </svg>
-                                        Filtruj
-                                    </button>
-                                </th>
-
-                            </tr>
-                        </thead>
-                        <tbody className="table-auto overflow-scroll w-full" >
-                            {noteList.map((noteCC, index) => {
-                                return (
-                                    <tr key={index}
-                                        onClick={() => {
-                                            setSelectedNoteCC(noteCC);
-                                            setRowIndex(index)
-                                        }}
-                                        className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
-                                            } cursor-pointer`}>
-
-                                        <td>{noteCC.agent.nameUser}</td>
-                                        <td>{StatusLabels[noteCC.status]}</td>
-                                        <td>{noteCC.appliesDate}</td>
+                                </tr>
+                            </thead>
+                            <tbody className="table-auto overflow-scroll w-full" >
+                                {isLoading ? (
+                                    <tr className='w-full'>
+                                        <td colSpan={3} align='center'> {/* Ustaw colSpan na liczbę kolumn w Twojej tabeli */}
+                                            <div className="text-center loading loading-ring loading-lg"></div>
+                                        </td>
                                     </tr>
-                                )
-                            })}
+                                ) : (
+                                    noteList.map((noteCC, index) => {
+                                        return (
+                                            <tr key={index}
+                                                onClick={() => {
+                                                    setSelectedNoteCC(noteCC);
+                                                    setRowIndex(index);
+                                                }}
+                                                className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
+                                                    } cursor-pointer`}>
 
-                        </tbody>
-                    </table>
+                                                <td>{noteCC.agent.nameUser}</td>
+                                                <td>{StatusLabels[noteCC.status]}</td>
+                                                <td>{noteCC.appliesDate}</td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
 
+                        </table>
+                    </div>
                     <div className={`flex gap-2 mt-2 disabled: ${selectedNoteCC.id > - 1} `}>
 
                         <Link className={`group link link-accent link-hover text-lg ${selectedNoteCC.id === - 1 ? 'pointer-events-none' : ''}`}

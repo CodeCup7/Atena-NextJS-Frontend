@@ -112,17 +112,29 @@ const RateCC_Page = () => {
         }
     }
 
-    function rateBlockBorderColor(rateBlock: RateBlock) {
+    function rateBlockColor(rateBlock: RateBlock, border: boolean) {
 
         const score = getRateBlock_Rate(rateBlock);
         const maxRate = getRateBlock_MaxRate(rateBlock)
 
         if (score === maxRate) {
-            return ''
+            if (border) {
+                return 'border-info'
+            } else {
+                return 'bg-info'
+            }
         } else if (score < maxRate && score > (maxRate * 60 / 100)) {
-            return 'border-warning'
+            if (border) {
+                return 'border-warning'
+            } else {
+                return 'bg-warning'
+            }
         } else {
-            return 'border-error'
+            if (border) {
+                return 'border-error'
+            } else {
+                return 'bg-error'
+            }
         }
     }
 
@@ -348,30 +360,30 @@ const RateCC_Page = () => {
                 {/* Rate blocks */}
                 <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
 
-                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.wiedzaBlock)}`}>
+                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.wiedzaBlock, true)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>
                         <label className='text-2xl'>{wiedzaScore} %</label>
-                        <div className='bg-info w-full h-full rounded-b'></div>
+                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.wiedzaBlock, false)}`}></div>
                     </div>
-                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.obslugaBlock)}`}>
+                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.obslugaBlock, true)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Obsługa aplikacji / systemów</h6>
                         <label className='text-2xl'>{obsługaScore} %</label>
-                        <div className='bg-info w-full h-full rounded-b'></div>
+                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.obslugaBlock, false)}`}></div>
                     </div>
-                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.technikaBlock)}`}>
+                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.technikaBlock, true)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Techniki obsługi</h6>
                         <label className='text-2xl'>{technikaScore} %</label>
-                        <div className='bg-info w-full h-full rounded-b'></div>
+                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.technikaBlock, false)}`}></div>
                     </div>
-                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.komunikacjaBlock)}`}>
+                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.komunikacjaBlock, true)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Komunikatywność</h6>
                         <label className='text-2xl'>{komunikacjaScore} %</label>
-                        <div className='bg-info w-full h-full rounded-b'></div>
+                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.komunikacjaBlock, false)}`}></div>
                     </div>
-                    <div className={`flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockBorderColor(rateCC.standardBlock)}`}>
+                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.standardBlock, true)}`}>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'> Standard obsługi rozmowy</h6>
                         <label className='text-2xl'>{standardScore} %</label>
-                        <div className='bg-info w-full h-full rounded-b'></div>
+                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.standardBlock, false)}`}></div>
                     </div>
                     <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Dodatkowa punktacja</h6>

@@ -12,7 +12,7 @@ export const MainMenu = () => {
         image: boolean;
         pernament: boolean;
     }
-    
+
     const [activeUser, setActiveUser] = useState(new User());
     const [menuHidden, setMenuHiden] = useState(false);
     const [isPermit, setIsPermit] = useState(false);
@@ -47,6 +47,7 @@ export const MainMenu = () => {
         }
         return ''
     }
+
 
     return (
 
