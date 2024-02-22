@@ -24,12 +24,12 @@
 
 <table>
   <tr align="center">
-    <td>Menu główne</td>
+    <td>Strona startowa</td>
      <td>Karta oceny rozmowy</td>
      <td>Dashboard Agenta</td>
   </tr>
   <tr align="center">
-    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/main.png"></td>
+    <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/start.png"></td>
     <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/karta-oceny.png"></td>
     <td><img src="https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/dashboard.png"></td>
   </tr>
