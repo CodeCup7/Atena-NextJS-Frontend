@@ -80,18 +80,18 @@ Otwórz przeglądarkę [http://localhost:3000](http://localhost:3000)
 ### :point_right: 1. Oceń rozmowę lub wiadomość:
 Używając karty oceny lub karty mail. Wybierz agenta, daty, kolejkę tam gdzie wymagane. Następnie możesz wybrać oceny poszczególnych bloków jak wiedza czy technika obsługi. Przykładową ocenę pokazano poniżej:
 
-https://github.com/CodeCup7/Atena-Excel-Full/assets/97393786/c6affce7-fa3b-4193-8a32-cc36d588523a
+https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/karta-oceny.mp4
 
 ### :point_right: 2. Przeprowadź coaching:
 Po ocenie jednej lub wielu rozmów / mailu przejdź do menu monitoringu. Wybierz miesiąc i pobierz dane. Wybierze agenta którego rozmowy oceniono
 i jego rozmowy zaznaczając je. Wybierz rozpocznij coaching. Na karcie coacha możesz zatwierdzić coaching lub wpisać dodatkowe uwagi. Po zatwierdzeniu możesz wygenerować dashboard dla ocenionego agenta.
 
-https://github.com/CodeCup7/Atena-Excel-Full/assets/97393786/fcfbd73b-52ce-492d-b02e-2005c823a466
+https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/monitoring.mp4
 
 ### :point_right: 3. Sprawdź postępy:
 Na końcu możesz wygenerować Dashboard Agenta i sprawdzić jego postępy. 
 
-https://github.com/CodeCup7/Atena-Excel-Full/assets/97393786/f452b7d0-9132-477c-b98b-ba9e70637a22
+https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/dashboard.mp4
 
 ## :art: Layout
 Cała grafikę jak i wszystkie ikony powstały przy udziale czcionki "Segoe UI Symbol". 
