@@ -80,21 +80,21 @@ Otwórz przeglądarkę [http://localhost:3000](http://localhost:3000)
 ### :point_right: 1. Oceń rozmowę lub wiadomość:
 Używając karty oceny lub karty mail. Wybierz agenta, daty, kolejkę tam gdzie wymagane. Następnie możesz wybrać oceny poszczególnych bloków jak wiedza czy technika obsługi. Przykładową ocenę pokazano poniżej:
 
-https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/karta-oceny.mp4
+https://github.com/CodeCup7/Atena-NextJS-Frontend/assets/97393786/aba00277-92f4-4487-a036-12c5491d7392
 
 ### :point_right: 2. Przeprowadź coaching:
 Po ocenie jednej lub wielu rozmów / mailu przejdź do menu monitoringu. Wybierz miesiąc i pobierz dane. Wybierze agenta którego rozmowy oceniono
 i jego rozmowy zaznaczając je. Wybierz rozpocznij coaching. Na karcie coacha możesz zatwierdzić coaching lub wpisać dodatkowe uwagi. Po zatwierdzeniu możesz wygenerować dashboard dla ocenionego agenta.
 
-https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/monitoring.mp4
+https://github.com/CodeCup7/Atena-NextJS-Frontend/assets/97393786/61d750df-e93c-46df-b8d6-8651993773c1
 
 ### :point_right: 3. Sprawdź postępy:
 Na końcu możesz wygenerować Dashboard Agenta i sprawdzić jego postępy. 
 
-https://github.com/CodeCup7/CodeCup7/blob/main/assets/atena-nextjs/dashboard.mp4
+https://github.com/CodeCup7/Atena-NextJS-Frontend/assets/97393786/d2724e6a-8356-4212-ac00-3fcd3801b34e
 
 ## :art: Layout
-Cała grafikę jak i wszystkie ikony powstały przy udziale czcionki "Segoe UI Symbol". 
+Tailwind CSS, DaisyUI, AI, heroicons, Chart.js, use-gauge, 
 
 ## ✍️Autor
 Szymon Kawa
