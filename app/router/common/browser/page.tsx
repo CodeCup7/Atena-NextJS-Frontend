@@ -33,11 +33,11 @@ const Browser = () => {
 
     // ====== Hooks =====================================================================================================================================================================================================================
     const [isPermit, setIsPermit] = useState(false);
-    const [activeUser, setActiveUser] = useState(new User());
     const [userList, setUserList] = useState<Array<User>>([]);
     const [dateStart, setDateStart] = useState('');
     const [dateEnd, setDateEnd] = useState('');
     const [agentId, setAgentId] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [noteCC_List, setNoteCC_List] = useState<Array<NoteCC>>([]);
     const [rateCC_List, setRateCC_List] = useState<Array<RateCC>>([]);
@@ -52,7 +52,6 @@ const Browser = () => {
             try {
                 const users = await updateUserList();
                 const user = await getActiveUser();
-                setActiveUser(user);
                 setUserList(users);
 
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
@@ -79,46 +78,53 @@ const Browser = () => {
 
         const fetchData = async () => {
             if (fromSearch != null) {
-                const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
-                const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
-                const criteriaListRateM = localStorage.getItem('rateMList_criteriaList');
-                const criteriaListTest = localStorage.getItem('testList_criteriaList');
-                const criteriaListFB = localStorage.getItem('feedbackList_criteriaList');
+                try {
+                    setIsLoading(true); 
+                    const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
+                    const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
+                    const criteriaListRateM = localStorage.getItem('rateMList_criteriaList');
+                    const criteriaListTest = localStorage.getItem('testList_criteriaList');
+                    const criteriaListFB = localStorage.getItem('feedbackList_criteriaList');
 
-                if (criteriaListNoteCC !== null) {
-                    const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC));
-                    setNoteCC_List(notelist);
-                    localStorage.removeItem('noteCCList_criteriaList');
-                } else if (criteriaListRateCC !== null) {
-                    const ratelist = await api_rateCC_search(JSON.parse(criteriaListRateCC));
-                    setRateCC_List(ratelist);
-                    setOpenTab(2)
-                    localStorage.removeItem('rateCCList_criteriaList');
-                } else if (criteriaListRateM !== null) {
-                    const ratelist = await api_rateM_search(JSON.parse(criteriaListRateM));
-                    setRateM_List(ratelist);
-                    setOpenTab(3)
-                    localStorage.removeItem('rateMList_criteriaList');
-                } else if (criteriaListTest !== null) {
-                    const testlist = await api_Test_search(JSON.parse(criteriaListTest));
-                    setTest_list(testlist);
-                    setOpenTab(4)
-                    localStorage.removeItem('testList_criteriaList');
-                } else if (criteriaListFB !== null) {
-                    const fblist = await api_Feedback_search(JSON.parse(criteriaListFB));
-                    setFb_List(fblist);
-                    setOpenTab(5)
-                    localStorage.removeItem('feedbackList_criteriaList');
-                }
+                    if (criteriaListNoteCC !== null) {
+                        const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC));
+                        setNoteCC_List(notelist);
+                        localStorage.removeItem('noteCCList_criteriaList');
+                    } else if (criteriaListRateCC !== null) {
+                        const ratelist = await api_rateCC_search(JSON.parse(criteriaListRateCC));
+                        setRateCC_List(ratelist);
+                        setOpenTab(2)
+                        localStorage.removeItem('rateCCList_criteriaList');
+                    } else if (criteriaListRateM !== null) {
+                        const ratelist = await api_rateM_search(JSON.parse(criteriaListRateM));
+                        setRateM_List(ratelist);
+                        setOpenTab(3)
+                        localStorage.removeItem('rateMList_criteriaList');
+                    } else if (criteriaListTest !== null) {
+                        const testlist = await api_Test_search(JSON.parse(criteriaListTest));
+                        setTest_list(testlist);
+                        setOpenTab(4)
+                        localStorage.removeItem('testList_criteriaList');
+                    } else if (criteriaListFB !== null) {
+                        const fblist = await api_Feedback_search(JSON.parse(criteriaListFB));
+                        setFb_List(fblist);
+                        setOpenTab(5)
+                        localStorage.removeItem('feedbackList_criteriaList');
+                    }
+                } finally {
+                    setIsLoading(false);
+                };
             }
         };
         fetchData();
     }, [fromSearch]);
 
     // ==== Pobranie danych bezpośrednio w przeglądarce ===========================================================================================================================================================================================================================
-    async function downloadDate_Click() {
+    async function downloadData_Click() {
 
         if (dateStart !== '' && dateEnd !== '' && dateStart <= dateEnd) {
+
+            setIsLoading(true);
 
             const filtrNoteCC = new FiltrNoteCC();
             const filtrRateCC = new FiltrRateCC();
@@ -174,6 +180,8 @@ const Browser = () => {
             setTest_list(testList);
             setFb_List(fblist);
 
+            setIsLoading(false); 
+
         } else {
             toast.error("Uzupełnij poprawnie daty", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
@@ -189,7 +197,7 @@ const Browser = () => {
 
     // ====== HTML =====================================================================================================================================================================================================================
     return (
-        <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
+        <div className='container mx-auto border-2 border-info border-opacity-50 p-2 ' >
             <ToastContainer />
             <div className='flex items-center justify-center'>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-12 h-12">
@@ -228,7 +236,7 @@ const Browser = () => {
                         <span className="label-text">Agent:</span>
                         <select
                             className="select select-info w-72"
-                            disabled={!isPermit}
+                            disabled={!isPermit || isLoading}
                             value={agentId}
                             onChange={e => {
                                 setAgentId(parseInt(e.target.value))
@@ -240,10 +248,16 @@ const Browser = () => {
                         </select>
                     </div>
                     <div className="flex items-end sm:mt-3 ">
-                        <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                            </svg>
+                        <button
+                            className="btn btn-outline btn-info mx-2"
+                            onClick={downloadData_Click}
+                            disabled={isLoading}>
+                            {isLoading ? <span className="loading loading-ring loading-lg"></span>
+                                :
+                                <svg xmlns="http://www.w3.org   /2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                </svg>
+                            }
                             Pobierz dane
                         </button>
                     </div>
@@ -320,199 +334,209 @@ const Browser = () => {
                     </a>
                 </div>
             </div>
-            {/* <!-- Tab content --> */}
-            <div className=" flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
 
-                {/* NoteCC TAB */}
-                <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                    <div className='flex items-center justify-center'>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Miesiąc</th>
-                                    <th>Data coachingu</th>
-                                    <th>Ocena</th>
-                                    <th>Coach</th>
-                                    <th>Agent</th>
-                                    <th>Odwołanie</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-auto overflow-scroll w-full">
-                                {noteCC_List.map((noteCC, index) => {
-                                    return (
-                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
-                                            <td>{noteCC.appliesDate}</td>
-                                            <td>{noteCC.coachDate}</td>
-                                            <td>{getNoteCC_RateAs100(noteCC)}</td>
-                                            <td>{noteCC.coach.nameUser}</td>
-                                            <td>{noteCC.agent.nameUser}</td>
-                                            <td>{noteCC.odwolanie !== '' ? 'Tak' : 'Nie'}</td>
-                                            <td>{StatusLabels[noteCC.status]}</td>
-                                            <td>
-                                                <Link className="group link link-info link-hover text-lg"
-                                                    href='/router/cards/noteCC'>
-                                                    <button className="btn btn-outline btn-info btn-sm"
-                                                        onClick={() => {
-                                                            localStorage.removeItem('noteCC_new');
-                                                            localStorage.setItem('noteCC_prev', JSON.stringify(noteCC))
-                                                        }}>
-                                                        <PreviewIcon />
-                                                        Podgląd
-                                                    </button>
-                                                </Link>
-                                            </td>
+            {isLoading ? (
+                <div className='w-full h-full flex flex-col  items-center'>
+                    <div className="text-center loading loading-ring w-32"></div>
+                </div>
+            ) : (
+                <div>
+                    {/* <!-- Tab content --> */}
+                    < div className=" flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
+
+                        {/* NoteCC TAB */}
+                        <div className={openTab === 1 ? "block" : "hidden"} id="link1">
+                            <div className='flex items-center justify-center'>
+
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Miesiąc</th>
+                                            <th>Data coachingu</th>
+                                            <th>Ocena</th>
+                                            <th>Coach</th>
+                                            <th>Agent</th>
+                                            <th>Odwołanie</th>
+                                            <th>Status</th>
                                         </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                                    </thead>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {noteCC_List.map((noteCC, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>{noteCC.appliesDate}</td>
+                                                    <td>{noteCC.coachDate}</td>
+                                                    <td>{getNoteCC_RateAs100(noteCC)}</td>
+                                                    <td>{noteCC.coach.nameUser}</td>
+                                                    <td>{noteCC.agent.nameUser}</td>
+                                                    <td>{noteCC.odwolanie !== '' ? 'Tak' : 'Nie'}</td>
+                                                    <td>{StatusLabels[noteCC.status]}</td>
+                                                    <td>
+                                                        <Link className="group link link-info link-hover text-lg"
+                                                            href='/router/cards/noteCC'>
+                                                            <button className="btn btn-outline btn-info btn-sm"
+                                                                onClick={() => {
+                                                                    localStorage.removeItem('noteCC_new');
+                                                                    localStorage.setItem('noteCC_prev', JSON.stringify(noteCC))
+                                                                }}>
+                                                                <PreviewIcon />
+                                                                Podgląd
+                                                            </button>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {/* RateCC TAB */}
+                        <div className={openTab === 2 ? "block" : "hidden"} id="link1">
+                            <div className='flex items-center justify-center'>
+                                <table className="table">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Data rozmowy</th>
+                                            <th>Kolejka</th>
+                                            <th>Ocena</th>
+                                            <th>Data Oceny</th>
+                                            <th>Agent</th>
+                                            <th>Typ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {rateCC_List.map((rateCC, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>{rateCC.dateRate}</td>
+                                                    <td>{rateCC.queue.nameQueue}</td>
+                                                    <td>{getRateCC_RateAs100(rateCC)}</td>
+                                                    <td>{rateCC.dateRate}</td>
+                                                    <td>{rateCC.agent.nameUser}</td>
+                                                    <td>{TypeLabels[rateCC.typeRate]}</td>
+                                                    <td>
+                                                        <Link className="group link link-info link-hover text-lg"
+                                                            href='/router/cards/rateCC'>
+                                                            <button className="btn btn-outline btn-info btn-sm"
+                                                                onClick={() => {
+                                                                    localStorage.removeItem('rateCC_prev');
+                                                                    localStorage.setItem('rateCC_prev', JSON.stringify(rateCC));
+                                                                }}>
+                                                                <PreviewIcon />
+                                                                Podgląd
+                                                            </button>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        {/* RateM TAB */}
+                        <div className={openTab === 3 ? "block" : "hidden"} id="link1">
+                            <div className='flex items-center justify-center'>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data Oceny</th>
+                                            <th>Coach</th>
+                                            <th>Agent</th>
+                                            <th>Ocena</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {rateM_List.map((rateM, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>{rateM.dateRate}</td>
+                                                    <td>{rateM.coach.nameUser}</td>
+                                                    <td>{rateM.agent.nameUser}</td>
+                                                    <td>{getRateM_RateAs100(rateM)}</td>
+                                                    <td>
+                                                        <Link className="group link link-info link-hover text-lg"
+                                                            href='/router/cards/rateM'>
+                                                            <button className="btn btn-outline btn-info btn-sm"
+                                                                onClick={() => {
+                                                                    localStorage.removeItem('rateM_prev');
+                                                                    localStorage.setItem('rateM_prev', JSON.stringify(rateM));
+                                                                }}>
+                                                                <PreviewIcon />
+                                                                Podgląd
+                                                            </button>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        {/* Test TAB */}
+                        <div className={openTab === 4 ? "block" : "hidden"} id="link1">
+                            <div className='flex items-center justify-center'>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data testu</th>
+                                            <th>Agent</th>
+                                            <th>Ocena</th>
+                                            <th>Próg</th>
+                                            <th>Czy zdany</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {test_list.map((test, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>{test.dateTest}</td>
+                                                    <td>{test.agent.nameUser}</td>
+                                                    <td>{test.score}</td>
+                                                    <td>{test.levelPass}</td>
+                                                    <td>{TestLabels[test.testPass]}</td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        {/* Feedback TAB */}
+                        <div className={openTab === 5 ? "block" : "hidden"} id="link1">
+                            <div className='flex items-center justify-center'>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Agent</th>
+                                            <th>Feedback</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="table-auto overflow-scroll w-full">
+                                        {fb_List.map((fb, index) => {
+                                            return (
+                                                <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
+                                                    <td>{fb.dateFeedback}</td>
+                                                    <td>{fb.agent.nameUser}</td>
+                                                    <td>{FeedbackLabels[fb.feedback]}</td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {/* RateCC TAB */}
-                <div className={openTab === 2 ? "block" : "hidden"} id="link1">
-                    <div className='flex items-center justify-center'>
-                        <table className="table">
-
-                            <thead>
-                                <tr>
-                                    <th>Data rozmowy</th>
-                                    <th>Kolejka</th>
-                                    <th>Ocena</th>
-                                    <th>Data Oceny</th>
-                                    <th>Agent</th>
-                                    <th>Typ</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-auto overflow-scroll w-full">
-                                {rateCC_List.map((rateCC, index) => {
-                                    return (
-                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
-                                            <td>{rateCC.dateRate}</td>
-                                            <td>{rateCC.queue.nameQueue}</td>
-                                            <td>{getRateCC_RateAs100(rateCC)}</td>
-                                            <td>{rateCC.dateRate}</td>
-                                            <td>{rateCC.agent.nameUser}</td>
-                                            <td>{TypeLabels[rateCC.typeRate]}</td>
-                                            <td>
-                                                <Link className="group link link-info link-hover text-lg"
-                                                    href='/router/cards/rateCC'>
-                                                    <button className="btn btn-outline btn-info btn-sm"
-                                                        onClick={() => {
-                                                            localStorage.removeItem('rateCC_prev');
-                                                            localStorage.setItem('rateCC_prev', JSON.stringify(rateCC));
-                                                        }}>
-                                                        <PreviewIcon />
-                                                        Podgląd
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                {/* RateM TAB */}
-                <div className={openTab === 3 ? "block" : "hidden"} id="link1">
-                    <div className='flex items-center justify-center'>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Data Oceny</th>
-                                    <th>Coach</th>
-                                    <th>Agent</th>
-                                    <th>Ocena</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-auto overflow-scroll w-full">
-                                {rateM_List.map((rateM, index) => {
-                                    return (
-                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
-                                            <td>{rateM.dateRate}</td>
-                                            <td>{rateM.coach.nameUser}</td>
-                                            <td>{rateM.agent.nameUser}</td>
-                                            <td>{getRateM_RateAs100(rateM)}</td>
-                                            <td>
-                                                <Link className="group link link-info link-hover text-lg"
-                                                    href='/router/cards/rateM'>
-                                                    <button className="btn btn-outline btn-info btn-sm"
-                                                        onClick={() => {
-                                                            localStorage.removeItem('rateM_prev');
-                                                            localStorage.setItem('rateM_prev', JSON.stringify(rateM));
-                                                        }}>
-                                                        <PreviewIcon />
-                                                        Podgląd
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                {/* Test TAB */}
-                <div className={openTab === 4 ? "block" : "hidden"} id="link1">
-                    <div className='flex items-center justify-center'>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Data testu</th>
-                                    <th>Agent</th>
-                                    <th>Ocena</th>
-                                    <th>Próg</th>
-                                    <th>Czy zdany</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-auto overflow-scroll w-full">
-                                {test_list.map((test, index) => {
-                                    return (
-                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
-                                            <td>{test.dateTest}</td>
-                                            <td>{test.agent.nameUser}</td>
-                                            <td>{test.score}</td>
-                                            <td>{test.levelPass}</td>
-                                            <td>{TestLabels[test.testPass]}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                {/* Feedback TAB */}
-                <div className={openTab === 5 ? "block" : "hidden"} id="link1">
-                    <div className='flex items-center justify-center'>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Agent</th>
-                                    <th>Feedback</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-auto overflow-scroll w-full">
-                                {fb_List.map((fb, index) => {
-                                    return (
-                                        <tr key={index} className="hover:bg-base-300  hover:text-white cursor-pointe">
-                                            <td>{fb.dateFeedback}</td>
-                                            <td>{fb.agent.nameUser}</td>
-                                            <td>{FeedbackLabels[fb.feedback]}</td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+            )}
+        </div >
     )
 }
 export default Browser;

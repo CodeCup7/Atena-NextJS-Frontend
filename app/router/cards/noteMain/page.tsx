@@ -110,7 +110,6 @@ export const NoteMain = () => {
             setIsLoading(true); // Ustaw stan ładowania na true
             async function fetchData() {
                 try {
-
                     const { startDate, endDate } = calculateStartEndDate(dateValue + '-01', 0);
                     const noteFilter = new FiltrNoteCC();
                     noteFilter.appliesDateStart = startDate.toString();
@@ -140,7 +139,7 @@ export const NoteMain = () => {
     }, [choiseRateCC.length, selectedNoteCC.mode, choiseRateM.length]);
 
     // ====== Akcje =====================================================================================================================================================================================================================
-    function downloadDate_Click() {
+    function downloadData_Click() {
 
         if (dateValue !== null && dateValue !== undefined && dateValue !== "") {
 
@@ -324,7 +323,7 @@ export const NoteMain = () => {
                         type="month"/>
                     <button
                         className="btn btn-outline btn-info mx-2"
-                        onClick={downloadDate_Click}
+                        onClick={downloadData_Click}
                         disabled={isLoading}>
                         {isLoading ? <span className="loading loading-ring loading-lg"></span>
                             :

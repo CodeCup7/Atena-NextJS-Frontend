@@ -1,6 +1,6 @@
 import { User } from "./classes/user";
 
-//const login = 'user9';
+//const login = 'adamjabłoński';
 const login = 'demo';
 
 export async function getActiveUser(): Promise<User> {

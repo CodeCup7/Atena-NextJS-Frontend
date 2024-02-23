@@ -27,6 +27,7 @@
     "read-excel-file": "^5.7.1",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.1.6",
+    "swr": "^2.2.5",
     "use-gauge": "^0.7.0"
   },
   "devDependencies": {
