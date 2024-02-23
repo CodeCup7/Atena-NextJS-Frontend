@@ -1,4 +1,4 @@
-
+'use client'
 import Link from 'next/link'
 import React from 'react'
 
@@ -75,10 +75,10 @@ export default function Administracja({
                     </Link>
                 </div>
             </div>
-
             <div className='w-full mt-5'>
                 {children}
             </div>
+
         </div>
     )
 }

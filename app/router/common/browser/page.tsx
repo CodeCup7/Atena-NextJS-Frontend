@@ -28,6 +28,7 @@ import { FiltrRateCC } from '@/app/classes/filtrs/rateCC_filtr';
 import { FiltrRateM } from '@/app/classes/filtrs/rateM_filtr';
 import { FiltrTest } from '@/app/classes/filtrs/test_filtr';
 import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrNoteCC, createSearchCriteriaByFiltrRateCC, createSearchCriteriaByFiltrRateM, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
+import { nextSaturday } from 'date-fns';
 
 const Browser = () => {
 
@@ -38,6 +39,7 @@ const Browser = () => {
     const [dateEnd, setDateEnd] = useState('');
     const [agentId, setAgentId] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [nextSearch, setNextSearch] = useState(false);
 
     const [noteCC_List, setNoteCC_List] = useState<Array<NoteCC>>([]);
     const [rateCC_List, setRateCC_List] = useState<Array<RateCC>>([]);
@@ -79,7 +81,7 @@ const Browser = () => {
         const fetchData = async () => {
             if (fromSearch != null) {
                 try {
-                    setIsLoading(true); 
+                    setIsLoading(true);
                     const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
                     const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
                     const criteriaListRateM = localStorage.getItem('rateMList_criteriaList');
@@ -89,27 +91,27 @@ const Browser = () => {
                     if (criteriaListNoteCC !== null) {
                         const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC));
                         setNoteCC_List(notelist);
-                        localStorage.removeItem('noteCCList_criteriaList');
+                        //localStorage.removeItem('noteCCList_criteriaList');
                     } else if (criteriaListRateCC !== null) {
                         const ratelist = await api_rateCC_search(JSON.parse(criteriaListRateCC));
                         setRateCC_List(ratelist);
                         setOpenTab(2)
-                        localStorage.removeItem('rateCCList_criteriaList');
+                        //localStorage.removeItem('rateCCList_criteriaList');
                     } else if (criteriaListRateM !== null) {
                         const ratelist = await api_rateM_search(JSON.parse(criteriaListRateM));
                         setRateM_List(ratelist);
                         setOpenTab(3)
-                        localStorage.removeItem('rateMList_criteriaList');
+                        //localStorage.removeItem('rateMList_criteriaList');
                     } else if (criteriaListTest !== null) {
                         const testlist = await api_Test_search(JSON.parse(criteriaListTest));
                         setTest_list(testlist);
                         setOpenTab(4)
-                        localStorage.removeItem('testList_criteriaList');
+                        //localStorage.removeItem('testList_criteriaList');
                     } else if (criteriaListFB !== null) {
                         const fblist = await api_Feedback_search(JSON.parse(criteriaListFB));
                         setFb_List(fblist);
                         setOpenTab(5)
-                        localStorage.removeItem('feedbackList_criteriaList');
+                        //localStorage.removeItem('feedbackList_criteriaList');
                     }
                 } finally {
                     setIsLoading(false);
@@ -117,7 +119,7 @@ const Browser = () => {
             }
         };
         fetchData();
-    }, [fromSearch]);
+    }, [fromSearch, nextSearch]);
 
     // ==== Pobranie danych bezpośrednio w przeglądarce ===========================================================================================================================================================================================================================
     async function downloadData_Click() {
@@ -168,19 +170,27 @@ const Browser = () => {
             const criteriaTestList = createSearchCriteriaByFiltrTest(filtrTest);
             const criteriaFbList = createSearchCriteriaByFiltrFeedback(filtrFeedback);
 
-            const noteList = await api_NoteCC_search(criteriaNoteCCList);
-            const rateCCList = await api_rateCC_search(criteriaRateCCList);
-            const rateMList = await api_rateM_search(criteriaRateMList);
-            const testList = await api_Test_search(criteriaTestList);
-            const fblist = await api_Feedback_search(criteriaFbList);
+            localStorage.setItem('noteCCList_criteriaList', JSON.stringify(criteriaNoteCCList));
+            localStorage.setItem('rateCCList_criteriaList', JSON.stringify(criteriaRateCCList));
+            localStorage.setItem('rateMList_criteriaList', JSON.stringify(criteriaRateMList));
+            localStorage.setItem('testList_criteriaList', JSON.stringify(criteriaTestList));
+            localStorage.setItem('feedbackList_criteriaList', JSON.stringify(criteriaFbList));
 
-            setNoteCC_List(noteList);
-            setRateCC_List(rateCCList);
-            setRateM_List(rateMList);
-            setTest_list(testList);
-            setFb_List(fblist);
+            setNextSearch(!nextSearch);
 
-            setIsLoading(false); 
+            // const noteList = await api_NoteCC_search(criteriaNoteCCList);
+            // const rateCCList = await api_rateCC_search(criteriaRateCCList);
+            // const rateMList = await api_rateM_search(criteriaRateMList);
+            // const testList = await api_Test_search(criteriaTestList);
+            // const fblist = await api_Feedback_search(criteriaFbList);
+
+            // setNoteCC_List(noteList);
+            // setRateCC_List(rateCCList);
+            // setRateM_List(rateMList);
+            // setTest_list(testList);
+            // setFb_List(fblist);
+
+            // setIsLoading(false); 
 
         } else {
             toast.error("Uzupełnij poprawnie daty", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });

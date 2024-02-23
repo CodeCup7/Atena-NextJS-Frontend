@@ -320,7 +320,7 @@ export const NoteMain = () => {
                         className="input input-bordered w-48 max-w-xs"
                         value={dateValue}
                         onChange={e => { setDateValue(e.currentTarget.value); }}
-                        type="month"/>
+                        type="month" />
                     <button
                         className="btn btn-outline btn-info mx-2"
                         onClick={downloadData_Click}
@@ -338,7 +338,7 @@ export const NoteMain = () => {
 
             {/* Coachingi */}
             <div className='flex flex-col xl:flex-row p-2'>
-                <div className="overflow-x-auto mr-6 mt-6 ">
+                <div className="overflow-x-auto mr-6 mt-6 items-center justify-start">
                     <div className='flex items-center justify-start'>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="text-info w-8 h-8">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
@@ -349,9 +349,31 @@ export const NoteMain = () => {
                         <table className="table table-pin-rows min-w-full ">
                             {/* head */}
                             <thead>
+                                <tr >
+                                    <td colSpan={3} align='left'>
+                                        <label className="input input-bordered flex items-center gap-2 w-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
+                                                <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
+                                            </svg>
+                                            <input
+                                                className="bg-transparent text-white"
+                                                type="text"
+                                                placeholder="Wyszukaj agenta"
+                                                value={searchTerm}
+                                                onChange={e => {
+                                                    setSearchTerm(e.target.value)
+                                                }} />
+
+                                        </label>
+                                    </td>
+
+                                </tr>
                                 <tr>
                                     <th>
-                                        <select className="select select-bordered select-md w-full max-w-md"
+                                        Filtruj
+                                    </th>
+                                    <th>
+                                        <select className="select select-bordered select-sm w-full"
                                             defaultValue={'false'}
                                             onChange={e => {
                                                 setSelectedCoach(e.target.value)
@@ -362,7 +384,7 @@ export const NoteMain = () => {
                                         </select>
                                     </th>
                                     <th>
-                                        <select className="select select-bordered select-md w-fit max-w-md"
+                                        <select className="select select-bordered select-sm w-fit"
                                             defaultValue={Status_Note.ALL_}
                                             onChange={e => { setSelectedStatus(e.target.value as Status_Note) }}>
                                             <option value={Status_Note.ALL_}>{StatusLabels[Status_Note.ALL_]}</option>
@@ -373,19 +395,7 @@ export const NoteMain = () => {
                                         </select>
                                     </th>
                                     <th>
-                                        <label className="input input-bordered flex items-center gap-2 w-fit">
-                                            <input
-                                                className="bg-transparent text-white"
-                                                type="text"
-                                                placeholder="Wyszukaj agenta"
-                                                value={searchTerm}
-                                                onChange={e => {
-                                                    setSearchTerm(e.target.value)
-                                                }} />
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
-                                                <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
-                                            </svg>
-                                        </label>
+
                                     </th>
 
                                 </tr>
