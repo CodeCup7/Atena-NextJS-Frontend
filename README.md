@@ -15,7 +15,7 @@
 
 <div align="left">
 	<h2>:memo:O projekcie</h2>
- 	:small_orange_diamond: Repozytorium zawiera przepisany w ramach nauki NextJS fron projekt <a href="https://github.com/CodeCup7/Atena-Excel-Full"><b>Atena-Excel</b></a> i do działania wymaga repozytorium backendu 	<a href="https://github.com/CodeCup7/Atena-SpringBoot-Backend"><b>Atena-SpringBoot-Backend</b></a><br>
+ 	:small_orange_diamond: Repozytorium zawiera przepisany w ramach nauki NextJS i Sprinboot front projekt <a href="https://github.com/CodeCup7/Atena-Excel-Full"><b>Atena-Excel</b></a> i do działania wymaga repozytorium backendu 	<a href="https://github.com/CodeCup7/Atena-SpringBoot-Backend"><b>Atena-SpringBoot-Backend</b></a><br>
 	<br>:small_orange_diamond:Aplikacja w wersji Excel działa w organizacji już ponad rok i do tej pory umożliwniła ocenienie ponad :headphones:10k rozmów i :email:1k maili. 
 	<br>Obecnie ocenia prace ponad 150 agentów i jest głównym narzędziem pracy dla kilku trenerów.
 	<br>:small_orange_diamond: Specyfika procesu jest tutaj nieco zmieniona - dostep do aplikacji uzyskują wszyscy użytkownicy, a system udostępnienia danych poprzez mail zastąpiłem powiadomieniami w aplikacji.
