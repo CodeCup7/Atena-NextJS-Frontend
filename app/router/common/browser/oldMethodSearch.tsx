@@ -53,7 +53,6 @@ const Browser = () => {
                 const users = await updateUserList();
                 const user = await getActiveUser();
                 setUserList(users);
-                downloadDate();
 
                 const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
                 setIsPermit(isPermit);
@@ -71,43 +70,57 @@ const Browser = () => {
         fetchData();
     }, []);
 
-    async function downloadDate() {
+    // ==== Obsługa przejścia z wyszukiwarki i wyświetlenia podglądu wyszukanych kryteriów =====================================================================================================================================================================================================
+    const searchParams = useSearchParams();
+    const fromSearch = searchParams.get('fromSearch');
 
-        try {
-            setIsLoading(true);
-            const criteriaListNoteCC = sessionStorage.getItem('noteCCList_criteriaList');
-            const criteriaListRateCC = sessionStorage.getItem('rateCCList_criteriaList');
-            const criteriaListRateM = sessionStorage.getItem('rateMList_criteriaList');
-            const criteriaListTest = sessionStorage.getItem('testList_criteriaList');
-            const criteriaListFB = sessionStorage.getItem('feedbackList_criteriaList');
+    useEffect(() => {
 
-            if (criteriaListNoteCC !== null) {
-                const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC));
-                setNoteCC_List(notelist);
-            }
-            if (criteriaListRateCC !== null) {
-                const ratelist = await api_rateCC_search(JSON.parse(criteriaListRateCC));
-                setRateCC_List(ratelist);
-            }
-            if (criteriaListRateM !== null) {
-                const ratelist = await api_rateM_search(JSON.parse(criteriaListRateM));
-                setRateM_List(ratelist);
-            }
-            if (criteriaListTest !== null) {
-                const testlist = await api_Test_search(JSON.parse(criteriaListTest));
-                setTest_list(testlist);
-            }
-            if (criteriaListFB !== null) {
-                const fblist = await api_Feedback_search(JSON.parse(criteriaListFB));
-                setFb_List(fblist);
-            }
-        } catch (error) {
-            console.error("Wystąpił błąd podczas pobierania danych:", error);
-            toast.error("Wystąpił błąd podczas pobierania danych", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-        } finally {
-            setIsLoading(false);
+        const fetchData = async () => {
+
+            try {
+                setIsLoading(true);
+                const criteriaListNoteCC = localStorage.getItem('noteCCList_criteriaList');
+                const criteriaListRateCC = localStorage.getItem('rateCCList_criteriaList');
+                const criteriaListRateM = localStorage.getItem('rateMList_criteriaList');
+                const criteriaListTest = localStorage.getItem('testList_criteriaList');
+                const criteriaListFB = localStorage.getItem('feedbackList_criteriaList');
+
+                if (criteriaListNoteCC !== null) {
+                    const notelist = await api_NoteCC_search(JSON.parse(criteriaListNoteCC));
+                    setNoteCC_List(notelist);
+                    localStorage.removeItem('noteCCList_criteriaList');
+                } else if (criteriaListRateCC !== null) {
+                    const ratelist = await api_rateCC_search(JSON.parse(criteriaListRateCC));
+                    setRateCC_List(ratelist);
+                    setOpenTab(2)
+                    localStorage.removeItem('rateCCList_criteriaList');
+                } else if (criteriaListRateM !== null) {
+                    const ratelist = await api_rateM_search(JSON.parse(criteriaListRateM));
+                    setRateM_List(ratelist);
+                    setOpenTab(3)
+                    localStorage.removeItem('rateMList_criteriaList');
+                } else if (criteriaListTest !== null) {
+                    const testlist = await api_Test_search(JSON.parse(criteriaListTest));
+                    setTest_list(testlist);
+                    setOpenTab(4)
+                    localStorage.removeItem('testList_criteriaList');
+                } else if (criteriaListFB !== null) {
+                    const fblist = await api_Feedback_search(JSON.parse(criteriaListFB));
+                    setFb_List(fblist);
+                    setOpenTab(5)
+                    localStorage.removeItem('feedbackList_criteriaList');
+                }
+            } catch (error) {
+                console.error("Wystąpił błąd podczas pobierania danych:", error);
+                toast.error("Wystąpił błąd podczas pobierania danych", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+            } finally {
+                setIsLoading(false);
+            };
+
         };
-    }
+        fetchData();
+    }, [fromSearch]);
 
     // ==== Pobranie danych bezpośrednio w przeglądarce ===========================================================================================================================================================================================================================
     async function downloadData_Click() {
@@ -144,14 +157,20 @@ const Browser = () => {
             const criteriaRateMList = createSearchCriteriaByFiltrRateM(filtrRateM);
             const criteriaTestList = createSearchCriteriaByFiltrTest(filtrTest);
             const criteriaFbList = createSearchCriteriaByFiltrFeedback(filtrFeedback);
+            const noteList = await api_NoteCC_search(criteriaNoteCCList);
+            const rateCCList = await api_rateCC_search(criteriaRateCCList);
+            const rateMList = await api_rateM_search(criteriaRateMList);
+            const testList = await api_Test_search(criteriaTestList);
+            const fblist = await api_Feedback_search(criteriaFbList);
 
-            sessionStorage.setItem('noteCCList_criteriaList', JSON.stringify(criteriaNoteCCList));
-            sessionStorage.setItem('rateCCList_criteriaList', JSON.stringify(criteriaRateCCList));
-            sessionStorage.setItem('rateMList_criteriaList', JSON.stringify(criteriaRateMList));
-            sessionStorage.setItem('testList_criteriaList', JSON.stringify(criteriaTestList));
-            sessionStorage.setItem('feedbackList_criteriaList', JSON.stringify(criteriaFbList));
+            setNoteCC_List(noteList);
+            setRateCC_List(rateCCList);
+            setRateM_List(rateMList);
+            setTest_list(testList);
+            setFb_List(fblist);
 
-            downloadDate();
+            setIsLoading(false); 
+
         } else {
             toast.error("Uzupełnij poprawnie daty", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
         }
