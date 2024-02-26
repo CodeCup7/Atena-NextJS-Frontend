@@ -443,115 +443,46 @@ const RateCC_Page = () => {
 
                 {/* <!-- Tab content --> */}
                 <div className=" flex flex-col min-w-0 break-words w-full mb-6 tab-content tab-space">
-
                     {/* # Wiedza TAB */}
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_w1) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
+                        {rateCC.wiedzaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateCC(rateCC)} />))}
                     </div>
                     {/* # Obsługa aplikacji / systemów TAB */}
                     <div className={openTab === 2 ? "block" : "hidden"} id="link2">
-
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_o1) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
+                        {rateCC.obslugaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateCC(rateCC)} />))}
                     </div>
-
                     {/* # Techniki obsługi TAB */}
                     <div className={openTab === 3 ? "block" : "hidden"} id="link3">
-
-                        {/* T1 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_t1) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* T2 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_t2) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* T3 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_t3) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* T4 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_t4) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
+                        {rateCC.technikaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateCC(rateCC)} />))}
                     </div>
 
                     {/* # Komunikatywność  TAB */}
                     <div className={openTab === 4 ? "block" : "hidden"} id="link4">
-
-                        {/* K1 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_k1) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* K2 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_k2) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* K3 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_k3) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
+                        {rateCC.komunikacjaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateCC(rateCC)} />))}
                     </div>
-
                     {/* # Standard obsługi rozmowy TAB */}
                     <div className={openTab === 5 ? "block" : "hidden"} id="link5">
-
-                        {/* S1 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_s1) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* S2 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_s2) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* S3 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_s3) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
-
-                        {/* S4 */}
-                        <RatePartComponent
-                            rateCC={rateCC}
-                            ratePart={rateCC.technikaBlock.ratePart.find(part => part.key === key_s4) || new RatePart()}
-                            prewievMode={prewievMode}
-                            updateRateCC={updateRateCC}/>
+                        {rateCC.standardBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateCC(rateCC)} />))}
                     </div>
 
                     {/* # Dodatkowa punktacja TAB */}
