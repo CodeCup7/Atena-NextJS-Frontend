@@ -588,7 +588,7 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Sprawne wykorzystanie dostępnych narzędzi i aplikacji, odnajdywanie trafnych informacji w sieci, wyszukiwanie konkretnych przepisów w aktach prawnych,
+                                    <p className='text-sm text-justify'>Sprawne wykorzystanie dostępnych narzędzi i aplikacji, odnajdywanie trafnych informacji w sieci, wyszukiwanie konkretnych przepisów w aktach prawnych, '
                                         oraz asystowanie Klientowi w poruszaniu się po stronach internetowych.Precyzyjne zarejestrowanie zgłoszeń, zleceń, wniosków, notatek, incydentów,
                                         oraz reakcja na interwencje Klientów zgodnie z obowiązującymi procedurami.</p>
                                 </div>
@@ -734,10 +734,10 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className="text-sm text-justify">Prezentowanie się jako profesjonalista poprzez unikanie sformułowań o negatywnym wydźwięku oraz eliminowanie zwrotów,
-                                        które mogą budzić niepewność lub podważać kompetencje, takich jak &quot;niestety&quot;, &quot;nie pomogę&quot;, &quot;nie wiem&quot;, &quot;nie da się&quot;, &quot;nie mogę&quot;, &quot;nie mamy możliwości&quot;, &quot;musi Pan/Pani&quot;,
-                                        &quot;moim zdaniem&quot;, &quot;podejrzewam&quot;, &quot;z doświadczenia wiem&quot;, &quot;mogę tylko&quot;, &quot;nie jestem w stanie&quot;, &quot;obawiam się&quot;, &quot;myślę że&quot;, &quot;prawdopodobnie&quot;, &quot;ewentualnie mogę&quot;, &quot;w ostateczności&quot;,
-                                        &quot;w razie czego&quot;, &quot;tylko...&quot;, być może&quot;.</p>
+                                    <p className='text-sm text-justify'>Prezentowanie się jako profesjonalista poprzez unikanie sformułowań o negatywnym wydźwięku oraz eliminowanie zwrotów,
+                                        które mogą budzić niepewność lub podważać kompetencje, takich jak "niestety", "nie pomogę", "nie wiem", "nie da się", "nie mogę", "nie mamy możliwości", "musi Pan/Pani",
+                                        "moim zdaniem", "podejrzewam", "z doświadczenia wiem", "mogę tylko", "nie jestem w stanie", "obawiam się", "myślę że", "prawdopodobnie", "ewentualnie mogę", "w ostateczności",
+                                        "w razie czego", "tylko...", "być może".</p>
                                 </div>
                             </div>
                         </div>
@@ -1189,9 +1189,9 @@ const RateCC_Page = () => {
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
                                     <p className='text-sm text-justify'>Powitanie zgodnie ze standardem :
-                                    &quot;Dzień dobry, tutaj agent Anna Kowalska. W czym mogę pomóc?&quot;
+                                        "Dzień dobry, tutaj agent Anna Kowalska. W czym mogę pomóc?"
                                         Pożegnanie zgodnie ze standardem:
-                                        &quot;Dziękuję za rozmowę, jeśli jeszcze czegoś potrzebujesz, proszę śmiało się zgłosić. Miłego dnia i do usłyszenia!"</p>
+                                        "Dziękuję za rozmowę, jeśli jeszcze czegoś potrzebujesz, proszę śmiało się zgłosić. Miłego dnia i do usłyszenia!"</p>
                                 </div>
                             </div>
                         </div>
@@ -1333,10 +1333,10 @@ const RateCC_Page = () => {
                                 <div className='flex flex-col'>
                                     <h5 className='text-center'>Opis wskaźnika</h5>
                                     <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Agent posługuje się poprawną polszczyzną, unikając błędów językowych, takich jak &quot;włańczać&quot;, &quot;bede&quot;, &quot;proszę Panią&quot;, &quot;te pismo&quot;, &quot;te upoważnienie&quot;,
-                                        &quot;se napisze&quot;. Nie stosuje niestosownych, potocznych słów czy zwrotów, takich jak &quot;fajnie&quot;, &quot;ok&quot;, &quot;od ręki&quot;, &quot;super&quot;, &quot;wie Pan co&quot;, &quot;system na mnie wymusza&quot;, &quot;wyskoczyły mi pytania&quot;,
-                                        &quot;aplikacja wyrzuciła mi informacje&quot;, &quot;niech Pan powie&quot;, &quot;tu widzę&quot;, &quot;zaraz&quot;, &quot;w takim razie&quot;, &quot;jakaś/jakiś&quot;. Unika także żargonu  firmowego. Nie używa zdrobnień, jak &quot;chwileczkę&quot;,
-                                        &quot;pieniążki&quot;, &quot;sekundkę&quot;, &quot;paczuszka&quot;, &quot;fakturka&quot;. Konsultant utrzymuje profesjonalny dystans w relacji z Klientem, stosując odpowiednie zwroty grzecznościowe w sposób umiarkowany.
+                                    <p className='text-sm text-justify'>Agent posługuje się poprawną polszczyzną, unikając błędów językowych, takich jak "włańczać", "bede", "proszę Panią", "te pismo", "te upoważnienie",
+                                        "se napisze". Nie stosuje niestosownych, potocznych słów czy zwrotów, takich jak "fajnie", "ok", "od ręki", "super", "wie Pan co", "system na mnie wymusza", "wyskoczyły mi pytania",
+                                        "aplikacja wyrzuciła mi informacje", "niech Pan powie", "tu widzę", "zaraz", "w takim razie", "jakaś/jakiś". Unika także żargonu  firmowego. Nie używa zdrobnień, jak "chwileczkę",
+                                        "pieniążki", "sekundkę", "paczuszka", "fakturka". Konsultant utrzymuje profesjonalny dystans w relacji z Klientem, stosując odpowiednie zwroty grzecznościowe w sposób umiarkowany.
                                         Udziela informacji w pierwszej osobie, co zapewnia jasność i bezpośredniość w komunikacji.</p>
                                 </div>
                             </div>
@@ -1455,13 +1455,7 @@ const RateCC_Page = () => {
                                     disabled={prewievMode}
                                     onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? rateCC.extraScoreTxt = e.target.value : "")} />
                             </div>
-
-
-
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
