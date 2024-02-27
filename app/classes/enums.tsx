@@ -25,6 +25,12 @@ export enum Type_RateCC {
     MYSTERY_ = 'MYSTERY_',
   };
 
+  export enum Type_Rate {
+    ALL_ = 'ALL_',
+    CC_ = 'CC_',
+    M_ = 'M_',
+  };
+
 export const TypeLabels: Record<Type_RateCC, string> = {
     [Type_RateCC.ALL_]: "Wszystkie",
     [Type_RateCC.RATTING_]: "Karta Oceny",

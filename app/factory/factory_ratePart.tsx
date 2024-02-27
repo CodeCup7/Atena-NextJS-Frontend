@@ -1,24 +1,15 @@
 // '==========================================================================================================================================
 // '*********************** RatePart Factory *************************************************************************************************
 // '==========================================================================================================================================
+import { Type_Rate } from "../classes/enums";
 import { RatePart } from "../classes/rates/ratePart";
-import { getWagRateCC, getWagRateM } from "../globalKeys";
+import { getWagRate } from "../globalKeys";
 
-export function CreateNewEmptyRatePartCC(key_: string) {
-
-    let ratePart = new RatePart();
-    ratePart.key = key_;
-    ratePart.waga = getWagRateCC(key_);
-    ratePart.ocena = 1;
-    return ratePart;
-
-}
-
-export function CreateNewEmptyRatePartM(key_: string) {
+export function CreateNewEmptyRatePart(key_: string, typeRate: Type_Rate) {
 
     let ratePart = new RatePart();
     ratePart.key = key_;
-    ratePart.waga = getWagRateM(key_);
+    ratePart.waga = getWagRate(key_, typeRate);
     ratePart.ocena = 1;
     return ratePart;
 

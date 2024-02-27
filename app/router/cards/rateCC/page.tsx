@@ -1,5 +1,5 @@
 'use client'
-import { ModeLabels, Rate_Mode, TypeLabels, Type_RateCC } from '@/app/classes/enums';
+import { ModeLabels, Rate_Mode, TypeLabels, Type_Rate, Type_RateCC } from '@/app/classes/enums';
 import { Queue } from '@/app/classes/queue';
 import { RateCC } from '@/app/classes/rates/rateCC';
 import { Role, User } from '@/app/classes/user';
@@ -17,7 +17,9 @@ import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from 
 import { getActiveUser } from '@/app/auth';
 import { useSearchParams } from "next/navigation";
 import { RateBlock } from '@/app/classes/rates/rateBlock';
-import RatePartComponent from './ratePartComponent';
+import { getKeyTitle, key_k, key_o, key_s, key_t, key_w, key_w1 } from '@/app/globalKeys';
+import RatePartComponent from '../components/ratePartComponent';
+import RateBlockComponent from '../components/rateBlockComponent';
 
 
 const RateCC_Page = () => {
@@ -38,7 +40,8 @@ const RateCC_Page = () => {
     const searchParams = useSearchParams();
     const type = searchParams.get('type') as Type_RateCC;
 
-    console.log(rateCC);
+    const rateBlocks: string[] = [getKeyTitle(key_w, Type_Rate.CC_), getKeyTitle(key_o, Type_Rate.CC_), getKeyTitle(key_t, Type_Rate.CC_),
+    getKeyTitle(key_k, Type_Rate.CC_), getKeyTitle(key_s, Type_Rate.CC_),]
 
     // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
@@ -110,32 +113,6 @@ const RateCC_Page = () => {
             return true;
         else {
             return false;
-        }
-    }
-
-    function rateBlockColor(rateBlock: RateBlock, border: boolean) {
-
-        const score = getRateBlock_Rate(rateBlock);
-        const maxRate = getRateBlock_MaxRate(rateBlock)
-
-        if (score === maxRate) {
-            if (border) {
-                return 'border-info'
-            } else {
-                return 'bg-info'
-            }
-        } else if (score < maxRate && score > (maxRate * 60 / 100)) {
-            if (border) {
-                return 'border-warning'
-            } else {
-                return 'bg-warning'
-            }
-        } else {
-            if (border) {
-                return 'border-error'
-            } else {
-                return 'bg-error'
-            }
         }
     }
 
@@ -360,32 +337,11 @@ const RateCC_Page = () => {
                 </div>
                 {/* Rate blocks */}
                 <div className='col-span-10 grid md:grid-cols-3 2xl:grid-cols-6 gap-2 '>
-
-                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.wiedzaBlock, true)}`}>
-                        <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>
-                        <label className='text-2xl'>{wiedzaScore} %</label>
-                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.wiedzaBlock, false)}`}></div>
-                    </div>
-                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.obslugaBlock, true)}`}>
-                        <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Obsługa aplikacji / systemów</h6>
-                        <label className='text-2xl'>{obsługaScore} %</label>
-                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.obslugaBlock, false)}`}></div>
-                    </div>
-                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.technikaBlock, true)}`}>
-                        <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Techniki obsługi</h6>
-                        <label className='text-2xl'>{technikaScore} %</label>
-                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.technikaBlock, false)}`}></div>
-                    </div>
-                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.komunikacjaBlock, true)}`}>
-                        <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Komunikatywność</h6>
-                        <label className='text-2xl'>{komunikacjaScore} %</label>
-                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.komunikacjaBlock, false)}`}></div>
-                    </div>
-                    <div className={`flex flex-col border-2 rounded-lg items-center w-full h-20 gap-2 ${rateBlockColor(rateCC.standardBlock, true)}`}>
-                        <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'> Standard obsługi rozmowy</h6>
-                        <label className='text-2xl'>{standardScore} %</label>
-                        <div className={`w-full h-full rounded-b ${rateBlockColor(rateCC.standardBlock, false)}`}></div>
-                    </div>
+                    <RateBlockComponent title={getKeyTitle(key_w, Type_Rate.CC_)} score={wiedzaScore} rateBlock={rateCC.wiedzaBlock} />
+                    <RateBlockComponent title={getKeyTitle(key_o, Type_Rate.CC_)} score={obsługaScore} rateBlock={rateCC.obslugaBlock} />
+                    <RateBlockComponent title={getKeyTitle(key_t, Type_Rate.CC_)} score={technikaScore} rateBlock={rateCC.technikaBlock} />
+                    <RateBlockComponent title={getKeyTitle(key_k, Type_Rate.CC_)} score={komunikacjaScore} rateBlock={rateCC.komunikacjaBlock} />
+                    <RateBlockComponent title={getKeyTitle(key_s, Type_Rate.CC_)} score={standardScore} rateBlock={rateCC.standardBlock} />
                     <div className='flex flex-col border-info border-2 rounded-lg items-center w-full h-20 gap-2 '>
                         <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Dodatkowa punktacja</h6>
                         <label className='text-2xl'>{rateCC.extraScore}</label>
@@ -397,40 +353,20 @@ const RateCC_Page = () => {
             <div className='col-span-12 mt-2'>
                 <div className="tabs justify-center items-center">
 
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 1 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(1);
-                        }}
-                        data-toggle="tab" href="#link1" role="tablist" > Wiedza </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 2 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(2);
-                        }}
-                        data-toggle="tab" href="#link2" role="tablist" > Obsługa aplikacji / systemów </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 3 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(3);
-                        }}
-                        data-toggle="tab" href="#link3" role="tablist" > Techniki obsługi </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 4 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(4);
-                        }}
-                        data-toggle="tab" href="#link4" role="tablist" > Komunikatywność </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 5 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(5);
-                        }}
-                        data-toggle="tab" href="#link5" role="tablist" > Standard obsługi rozmowy </a>
+                    {rateBlocks.map((title: string, index: number) => (
+                        <a
+                            key={index}
+                            className={`tab tab-bordered sm:tab-sm md:tab-lg text-xs ${openTab === index + 1 ? "tab-active" : ""}`}
+                            onClick={e => {
+                                e.preventDefault();
+                                setOpenTab(index + 1);
+                            }}
+                            data-toggle="tab"
+                            href={`#link${index + 1}`}
+                            role="tablist">
+                            {title}
+                        </a>
+                    ))}
 
                     <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 6 ? " tab-active " : "")
                     }
@@ -446,6 +382,8 @@ const RateCC_Page = () => {
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
                         {rateCC.wiedzaBlock.ratePart.map(part => (
                             <RatePartComponent
+                                typeRate={Type_Rate.CC_}
+                                key={part.key}
                                 ratePart={part}
                                 prewievMode={prewievMode}
                                 updateRatePart={() => updateRateCC(rateCC)} />))}
@@ -454,6 +392,8 @@ const RateCC_Page = () => {
                     <div className={openTab === 2 ? "block" : "hidden"} id="link2">
                         {rateCC.obslugaBlock.ratePart.map(part => (
                             <RatePartComponent
+                                typeRate={Type_Rate.CC_}
+                                key={part.key}
                                 ratePart={part}
                                 prewievMode={prewievMode}
                                 updateRatePart={() => updateRateCC(rateCC)} />))}
@@ -462,6 +402,8 @@ const RateCC_Page = () => {
                     <div className={openTab === 3 ? "block" : "hidden"} id="link3">
                         {rateCC.technikaBlock.ratePart.map(part => (
                             <RatePartComponent
+                                typeRate={Type_Rate.CC_}
+                                key={part.key}
                                 ratePart={part}
                                 prewievMode={prewievMode}
                                 updateRatePart={() => updateRateCC(rateCC)} />))}
@@ -471,6 +413,8 @@ const RateCC_Page = () => {
                     <div className={openTab === 4 ? "block" : "hidden"} id="link4">
                         {rateCC.komunikacjaBlock.ratePart.map(part => (
                             <RatePartComponent
+                                typeRate={Type_Rate.CC_}
+                                key={part.key}
                                 ratePart={part}
                                 prewievMode={prewievMode}
                                 updateRatePart={() => updateRateCC(rateCC)} />))}
@@ -479,6 +423,8 @@ const RateCC_Page = () => {
                     <div className={openTab === 5 ? "block" : "hidden"} id="link5">
                         {rateCC.standardBlock.ratePart.map(part => (
                             <RatePartComponent
+                                typeRate={Type_Rate.CC_}
+                                key={part.key}
                                 ratePart={part}
                                 prewievMode={prewievMode}
                                 updateRatePart={() => updateRateCC(rateCC)} />))}
@@ -489,55 +435,45 @@ const RateCC_Page = () => {
                         {/* --- */}
                         <h5 className='text-center my-3 text-green-500'>dodatkowa punktacja</h5>
 
-                        <div className="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center"/>
+                        <div className="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center" />
 
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
+                        {/* OCENA */}
+                        <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
+                            <div className='flex flex-col xl:flex-row w-full '>
 
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            disabled={prewievMode}
-                                            value={extraScore}
-                                            onChange={e => {
-                                                rateCC.extraScore = parseInt(e.target.value)
-                                                updateRateCC(rateCC);
-                                            }}>
-                                            {extraScoreScale.map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
+                                    <label className="label">
+                                        <span className="label-text xl:text-2xl">Ocena</span>
+                                    </label>
+                                    <select className="select select-bordered xl:select-lg text-center m-2"
+                                        disabled={prewievMode}
+                                        value={extraScore}
+                                        onChange={e => {
+                                            rateCC.extraScore = parseInt(e.target.value)
+                                            updateRateCC(rateCC);
+                                        }}>
+                                        {extraScoreScale.map((value, index) => (
+                                            <option key={index} value={value}>{value}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
-
-                            <div className='md:col-span-10 2xl:col-span-9 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Opis</span>
-                                </label>
-                                <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScoreTxt : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateCC.standardBlock.ratePart.find(part => part.key === key_s4 ? rateCC.extraScoreTxt = e.target.value : "")} />
-                            </div>
-
-
-
                         </div>
 
-
-
+                        <div className='md:col-span-10 2xl:col-span-9 gap-5 p-2 h-full'>
+                            <label className="label">
+                                <span className="label-text">Opis</span>
+                            </label>
+                            <textarea defaultValue={rateCC.mode != Rate_Mode.NEW_ as Rate_Mode ? rateCC.extraScoreTxt : ""}
+                                className="textarea textarea-bordered h-1/2 w-full"
+                                disabled={prewievMode}
+                                onChange={e => rateCC.extraScoreTxt = e.target.value} />
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
     )
 }
 
 export default RateCC_Page
-
-

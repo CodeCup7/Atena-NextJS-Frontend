@@ -1,10 +1,8 @@
 'use client'
-import { ModeLabels, Rate_Mode, TypeLabels } from '@/app/classes/enums';
+import { ModeLabels, Rate_Mode, Type_Rate } from '@/app/classes/enums';
 import { RateM } from '@/app/classes/rates/rateM';
 import { Role, User } from '@/app/classes/user';
 import { CreateNewEmptyRateM, getRateM_RateAs100, } from '@/app/factory/factory_rateM';
-import { valueOfRatePartCC } from '@/app/global';
-import { getWagRateM, key_k1, key_k2, key_k3, key_o1, key_s1, key_s2, key_s3, key_s4, key_t1, key_t2, key_t3, key_t4, key_w, key_w1 } from '@/app/globalKeys';
 import React, { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -15,6 +13,9 @@ import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from 
 import { getActiveUser } from '@/app/auth';
 import { RateM_chart } from '../../components/chart/rateM_chart';
 import { RateBlock } from '@/app/classes/rates/rateBlock';
+import RatePartComponent from '../components/ratePartComponent';
+import { getKeyTitle, key_o, key_s, key_t, key_w } from '@/app/globalKeys';
+import RateBlockComponent from '../components/rateBlockComponent';
 
 const RateM_Page = () => {
 
@@ -28,6 +29,9 @@ const RateM_Page = () => {
     const [extraScore, setExtraScore] = useState(0);
     const [newRateModal, setOpenNewRateModal] = useState(false);
     const [agent, setAgent] = useState(0);
+
+    const rateBlocks: string[] = [getKeyTitle(key_w, Type_Rate.CC_), getKeyTitle(key_o, Type_Rate.CC_), getKeyTitle(key_t, Type_Rate.CC_),
+    getKeyTitle(key_s, Type_Rate.CC_),]
 
     // Pobranie danych (użytkownicy, kolejki). Sprawdzenie czy nowa ocena czy podgląd.
     useEffect(() => {
@@ -364,27 +368,19 @@ const RateM_Page = () => {
                     <div className="flex flex-col lg:flex-row gap-4 justify-end items-center sm:justify-center w-full m-2">
 
                         <div className='flex flex-col 2xl:flex-row gap-2'>
-                            <div className={`flex flex-col border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockColor(rateM.wiedzaBlock, true)}`}>
-                                <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Wiedza</h6>
-                                <label className='text-2xl'>{wiedzaScore} %</label>
-                                <div className={`w-full h-full rounded-b ${rateBlockColor(rateM.wiedzaBlock, false)}`}></div>
+                            <div className="flex flex-col items-center h-20 gap-2 w-48">
+                                <RateBlockComponent title={getKeyTitle(key_w, Type_Rate.CC_)} score={wiedzaScore} rateBlock={rateM.wiedzaBlock} />
                             </div>
-                            <div className={`flex flex-col border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockColor(rateM.obslugaBlock, true)}`}>
-                                <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Obsługa aplikacji / systemów</h6>
-                                <label className='text-2xl'>{obsługaScore} %</label>
-                                <div className={`w-full h-full rounded-b ${rateBlockColor(rateM.obslugaBlock, false)}`}></div>
+                            <div className="flex flex-col items-center h-20 gap-2 w-48">
+                                <RateBlockComponent title={getKeyTitle(key_o, Type_Rate.CC_)} score={obsługaScore} rateBlock={rateM.obslugaBlock} />
                             </div>
                         </div>
-                        <div className={`flex flex-col border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockColor(rateM.technikaBlock, true)}`}>
-                            <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Techniki obsługi</h6>
-                            <label className='text-2xl'>{technikaScore} %</label>
-                            <div className={`w-full h-full rounded-b ${rateBlockColor(rateM.technikaBlock, false)}`}></div>
+                        <div className="flex flex-col items-center h-20 gap-2 w-48">
+                            <RateBlockComponent title={getKeyTitle(key_t, Type_Rate.CC_)} score={technikaScore} rateBlock={rateM.technikaBlock} />
                         </div>
                         <div className='flex flex-col 2xl:flex-row gap-2'>
-                            <div className={`flex flex-col border-2 rounded-lg items-center h-20 gap-2 w-48 ${rateBlockColor(rateM.standardBlock, true)}`}>
-                                <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'> Standard obsługi rozmowy</h6>
-                                <label className='text-2xl'>{standardScore} %</label>
-                                <div className={`w-full h-full rounded-b ${rateBlockColor(rateM.standardBlock, false)}`}></div>
+                            <div className="flex flex-col items-center h-20 gap-2 w-48">
+                                <RateBlockComponent title={getKeyTitle(key_s, Type_Rate.CC_)} score={standardScore} rateBlock={rateM.standardBlock} />
                             </div>
                             <div className='flex flex-col border-2 rounded-lg items-center  h-20 gap-2 w-48'>
                                 <h6 className='text-center text-sm bg-slate-700 w-full rounded-t'>Dodatkowa punktacja</h6>
@@ -399,33 +395,20 @@ const RateM_Page = () => {
             <div className='col-span-12 mt-2'>
                 <div className="tabs justify-center items-center">
 
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 1 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(1);
-                        }}
-                        data-toggle="tab" href="#link1" role="tablist" > Wiedza </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 2 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(2);
-                        }}
-                        data-toggle="tab" href="#link2" role="tablist" > Obsługa aplikacji / systemów </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 3 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(3);
-                        }}
-                        data-toggle="tab" href="#link3" role="tablist" > Techniki obsługi </a>
-
-                    <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 4 ? " tab-active " : "")
-                    }
-                        onClick={e => {
-                            e.preventDefault(); setOpenTab(4);
-                        }}
-                        data-toggle="tab" href="#link5" role="tablist" > Standard obsługi rozmowy </a>
+                    {rateBlocks.map((title: string, index: number) => (
+                        <a
+                            key={index}
+                            className={`tab tab-bordered sm:tab-sm md:tab-lg text-xs ${openTab === index + 1 ? "tab-active" : ""}`}
+                            onClick={e => {
+                                e.preventDefault();
+                                setOpenTab(index + 1);
+                            }}
+                            data-toggle="tab"
+                            href={`#link${index + 1}`}
+                            role="tablist">
+                            {title}
+                        </a>
+                    ))}
 
                     <a className={"tab tab-bordered sm:tab-sm md:tab-lg text-xs" + (openTab === 5 ? " tab-active " : "")
                     }
@@ -440,525 +423,46 @@ const RateM_Page = () => {
 
                     {/* # Wiedza TAB */}
                     <div className={openTab === 1 ? "block" : "hidden"} id="link1">
-                        <h5 className='text-center my-3 text-green-500'>znajomość produktów i usług świadczonych oraz aktów prawnych, przepisów, wytycznych</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_w1)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.wiedzaBlock.ratePart.find(ratePart => ratePart.key === key_w1);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.wiedzaBlock.ratePart.find(part => part.key === key_w1 ? part.uwagi = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Agent udziela poprawnej merytorycznie odpowiedzi na pytania Klienta zgodnie z obowiązującymi
-                                        źródłami wiedzy, takimi jak rozporządzenia, regulaminy, instrukcje, baza wiedzy, oraz informacje zawarte na stronach internetowych firmy.
-                                        Dodatkowo, agent kieruje się obowiązującymi przepisami prawa dotyczącymi dziedziny działalności przedsiębiorstwa.</p>
-                                </div>
-                            </div>
-
-
-                        </div>
+                        {rateM.wiedzaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                typeRate={Type_Rate.M_}
+                                key={part.key}
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateM(rateM)} />))}
 
                     </div>
                     {/* # Obsługa aplikacji / systemów TAB */}
                     <div className={openTab === 2 ? "block" : "hidden"} id="link2">
-
-                        <h5 className='text-center my-3 text-green-500'>umiejętność korzystania oraz poruszania się w aplikacjach i systemach</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_o1)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.obslugaBlock.ratePart.find(part => part.key === key_o1)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.obslugaBlock.ratePart.find(ratePart => ratePart.key === key_o1);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.obslugaBlock.ratePart.find(part => part.key === key_o1)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.obslugaBlock.ratePart.find(part => part.key === key_o1 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.obslugaBlock.ratePart.find(part => part.key === key_o1)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.obslugaBlock.ratePart.find(part => part.key === key_o1 ? part.uwagi = e.target.value : "")} />
-                            </div>
-
-
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Agent wykazuje umiejętność sprawnego posługiwania się dostępnymi programami, aplikacjami oraz stronami internetowymi.
-                                        Potrafi skutecznie wyszukiwać potrzebne i poprawne informacje, korzystając z różnorodnych zasobów online, takich jak bazy danych, portale branżowe, czy oficjalne strony internetowe firm.
-                                        Dodatkowo, agent potrafi wykorzystać funkcje programów i aplikacji w celu efektywnego zarządzania danymi oraz dokumentacją potrzebną do udzielania wsparcia lub rozwiązania problemu Klienta.</p>
-                                </div>
-                            </div>
-                        </div>
+                        {rateM.obslugaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                typeRate={Type_Rate.M_}
+                                key={part.key}
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateM(rateM)} />))}
                     </div>
 
                     {/* # Techniki obsługi TAB */}
                     <div className={openTab === 3 ? "block" : "hidden"} id="link3">
-
-                        {/* T1 */}
-                        <h5 className='text-center my-3 text-green-500'>Rozpoznanie potrzeb klienta i zaproponowanie właściwego rozwiązania</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_t1)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.technikaBlock.ratePart.find(part => part.key === key_t1)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.technikaBlock.ratePart.find(ratePart => ratePart.key === key_t1);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.technikaBlock.ratePart.find(part => part.key === key_t1)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.technikaBlock.ratePart.find(part => part.key === key_t1 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.technikaBlock.ratePart.find(part => part.key === key_t1)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.technikaBlock.ratePart.find(part => part.key === key_t1 ? part.uwagi = e.target.value : "")} />
-
-                            </div>
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Agent dokonuje rozpoznania sprawy Klienta poprzez analizę przesłanego zapytania. Sprawdza ciągłość wcześniejszej korespondencji,
-                                        aby lepiej zrozumieć kontekst oraz ewentualne wcześniejsze rozwiązania.W przypadku korespondencji dotyczącej cennika lub propozycji skorzystania z usług,
-                                        agent wykorzystuje język korzyści, prezentując ofertę w sposób korzystny dla Klienta</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* T2 */}
-                        <h5 className='text-center my-3 text-green-500'>Praca z obiekcjami, reagowanie na uwagi Klienta - w tym trudny Klient</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_t2)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.technikaBlock.ratePart.find(part => part.key === key_t2)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.technikaBlock.ratePart.find(ratePart => ratePart.key === key_t2);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.technikaBlock.ratePart.find(part => part.key === key_t2)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.technikaBlock.ratePart.find(part => part.key === key_t2 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.technikaBlock.ratePart.find(part => part.key === key_t2)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.technikaBlock.ratePart.find(part => part.key === key_t2 ? part.uwagi = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Agent udziela wyczerpującej odpowiedzi, która jest adekwatna do zapytania Klienta. Wiadomość jest napisana w sposób konkretny, dostosowany do odbiorcy i charakteru sprawy.
-                                        Odpowiedź jest skoncentrowana na treści przesłanego zapytania, aby zapewnić kompleksowe rozwiązanie problemu lub udzielenie potrzebnych informacji.
-                                        W przypadku rozwiązywania wątpliwości Klienta, agent korzysta z właściwej argumentacji.</p>
-                                </div>
-                            </div>
-                        </div>
+                        {rateM.technikaBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                typeRate={Type_Rate.M_}
+                                key={part.key}
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateM(rateM)} />))}
 
                     </div>
-
                     {/* # Standard obsługi rozmowy TAB */}
                     <div className={openTab === 4 ? "block" : "hidden"} id="link5">
-
-                        {/* S1 */}
-                        <h5 className='text-center my-3 text-green-500'>znajomość procesu</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_s1)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.standardBlock.ratePart.find(part => part.key === key_s1)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.standardBlock.ratePart.find(ratePart => ratePart.key === key_s1);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s1)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s1 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s1)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s1 ? part.uwagi = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Agent proponuje rozwiązanie zgodne z obowiązującymi procedurami, które zostały ustalone w firmie.
-                                        Propozycja uwzględnia wszystkie wymogi i kroki niezbędne do skutecznego rozwiązania problemu lub realizacji żądanej usługi.
-                                        Działanie jest zgodne z przyjętymi standardami działania firmy oraz zapewnia zgodność z obowiązującymi przepisami i regulacjami..</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* S2 */}
-                        <h5 className='text-center my-3 text-green-500'>Jakość korespondencji. Poprawność pisowni i styl wypowiedzi</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_s2)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.standardBlock.ratePart.find(part => part.key === key_s2)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.standardBlock.ratePart.find(ratePart => ratePart.key === key_s2);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s2)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s2 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s2)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s2 ? part.uwagi = e.target.value : "")} />
-                            </div>
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Poprawność stylistyczna, gramatyczna, ortograficzna oraz interpunkcyjna. Ustosunkowanie się z szacunkiem poprzez stosowanie właściwej formy grzecznościowej (Pan/Pani/Państwu).
-                                        Agent wystrzega się użycia wyrażeń o negatywnym wydźwięku, unika też formułujących wątpliwości lub podważających jego zdolności (np. niestety, nie zdołam, nie posiadam informacji, nie da się, nie mam możliwości,
-                                        musi Pan/Pani, moim zdaniem, przypuszczam, na podstawie doświadczenia wiem, potrafię jedynie, nie potrafię, mam obawy, rozważam, prawdopodobnie, w razie potrzeby, wyłącznie..., być może).</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* S3 */}
-                        <h5 className='text-center my-3 text-green-500'>Forma korespondencji/ Prawidłowy wygląd dokumentu</h5>
-
-                        <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border
-                                        ${rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-
-                            {/* WAGA i OCENA */}
-                            <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                                <div className='flex flex-col xl:flex-row w-full '>
-
-                                    <div className='flex flex-col items-center justify-start w-full mt-5' >
-                                        <label className="label">
-                                            <span className="label-text text-center xl:text-2xl">Waga</span>
-                                        </label>
-                                        <label className="label xl:h-16 xl:mt-2">
-                                            <span className="label-text text-center xl:text-4xl">{getWagRateM(key_s3)}%</span>
-                                        </label>
-                                    </div>
-
-                                    <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                                        <label className="label">
-                                            <span className="label-text xl:text-2xl">Ocena</span>
-                                        </label>
-                                        <select className="select select-bordered xl:select-lg text-center m-2"
-                                            value={rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.ocena}
-                                            disabled={prewievMode}
-                                            onChange={e => {
-                                                const ratePart = rateM.standardBlock.ratePart.find(ratePart => ratePart.key === key_s3);
-                                                if (ratePart) {
-                                                    ratePart.ocena = parseInt(e.target.value);
-                                                }
-                                                updateRateM(rateM);
-                                            }}>
-                                            {valueOfRatePartCC().map((value, index) => (
-                                                <option key={index} value={value}>{value}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
-                                <label className="label">
-                                    <span className="label-text">Nieprawidłowości</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.nieprawidlowosci : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s3 ? part.nieprawidlowosci = e.target.value : "")} />
-                            </div>
-
-                            <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full '>
-
-                                <label className="label">
-                                    <span className="label-text">Uwagi</span>
-                                </label>
-                                <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.standardBlock.ratePart.find(part => part.key === key_s3)?.uwagi : ""}
-                                    className="textarea textarea-bordered h-1/2 w-full"
-                                    disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s3 ? part.uwagi = e.target.value : "")} />
-                            </div>
-                            <div className='md:col-span-12 2xl:md:col-span-4 gap-5 p-2 items-center justify-center'>
-                                <div className='flex flex-col'>
-                                    <h5 className='text-center'>Opis wskaźnika</h5>
-                                    <hr className='opacity-50 m-1'></hr>
-                                    <p className='text-sm text-justify'>Wszystkie elementy tekstu powinny być napisane jednolitą czcionką i mieć ten sam rozmiar.
-                                        Układ graficzny powinien być przejrzysty i jednolity, co ułatwi czytanie. Ważne fragmenty tekstu, takie jak nagłówki czy kluczowe informacje,
-                                        powinny być wyróżnione w spójny sposób, na przykład poprzez pogrubienie,kursywę lub zastosowanie innej barwy tekstu.
-                                        Dzięki temu czytelnik będzie mógł łatwo zidentyfikować najistotniejsze fragmenty tekstu.</p>
-                                </div>
-                            </div>
-                        </div>
+                        {rateM.standardBlock.ratePart.map(part => (
+                            <RatePartComponent
+                                typeRate={Type_Rate.M_}
+                                key={part.key}
+                                ratePart={part}
+                                prewievMode={prewievMode}
+                                updateRatePart={() => updateRateM(rateM)} />))}
                     </div>
 
                     {/* # Dodatkowa punktacja TAB */}
@@ -997,7 +501,7 @@ const RateM_Page = () => {
                                 <textarea defaultValue={rateM.mode != Rate_Mode.NEW_ as Rate_Mode ? rateM.extraScoreTxt : ""}
                                     className="textarea textarea-bordered h-1/2 w-full"
                                     disabled={prewievMode}
-                                    onChange={e => rateM.standardBlock.ratePart.find(part => part.key === key_s4 ? rateM.extraScoreTxt = e.target.value : "")} />
+                                    onChange={e => rateM.extraScoreTxt = e.target.value} />
                             </div>
                         </div>
                     </div>

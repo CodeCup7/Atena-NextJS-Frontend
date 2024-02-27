@@ -1,12 +1,12 @@
 // '==========================================================================================================================================
 // '*********************** RateCC Factory ***************************************************************************************************
 // '==========================================================================================================================================
-import { Type_RateCC } from "../classes/enums";
+import { Type_Rate, Type_RateCC } from "../classes/enums";
 import { RateBlock } from "../classes/rates/rateBlock";
 import { RateCC } from "../classes/rates/rateCC";
 import { User } from "../classes/user";
 import { key_w1, key_o1, key_t1, key_t2, key_t3, key_t4, key_k1, key_k2, key_k3, key_s1, key_s2, key_s3, key_s4 } from "../globalKeys";
-import { CreateNewEmptyRatePartCC } from "./factory_ratePart";
+import { CreateNewEmptyRatePart } from "./factory_ratePart";
 export function CreateNewEmptyRateCC(coach: User, type: Type_RateCC) {
 
     let rateCC = new RateCC();
@@ -15,19 +15,19 @@ export function CreateNewEmptyRateCC(coach: User, type: Type_RateCC) {
     rateCC.dateRate = new Date().toLocaleDateString('en-CA');
     rateCC.typeRate = type;
 
-    rateCC.wiedzaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_w1));
-    rateCC.obslugaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_o1));
-    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_t1));
-    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_t2));
-    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_t3));
-    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_t4));
-    rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_k1));
-    rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_k2));
-    rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePartCC(key_k3));
-    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePartCC(key_s1));
-    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePartCC(key_s2));
-    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePartCC(key_s3));
-    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePartCC(key_s4));
+    rateCC.wiedzaBlock.ratePart.push(CreateNewEmptyRatePart(key_w1, Type_Rate.CC_));
+    rateCC.obslugaBlock.ratePart.push(CreateNewEmptyRatePart(key_o1, Type_Rate.CC_));
+    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t1, Type_Rate.CC_));
+    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t2, Type_Rate.CC_));
+    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t3, Type_Rate.CC_));
+    rateCC.technikaBlock.ratePart.push(CreateNewEmptyRatePart(key_t4, Type_Rate.CC_));
+    rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k1, Type_Rate.CC_));
+    rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k2, Type_Rate.CC_));
+    rateCC.komunikacjaBlock.ratePart.push(CreateNewEmptyRatePart(key_k3, Type_Rate.CC_));
+    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s1, Type_Rate.CC_));
+    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s2, Type_Rate.CC_));
+    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s3, Type_Rate.CC_));
+    rateCC.standardBlock.ratePart.push(CreateNewEmptyRatePart(key_s4, Type_Rate.CC_));
 
     return rateCC;
 
