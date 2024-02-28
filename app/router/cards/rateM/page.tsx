@@ -348,7 +348,6 @@ const RateM_Page = () => {
 
                                 </div>
                             }
-
                         </div>
                     </div>
                 </div>

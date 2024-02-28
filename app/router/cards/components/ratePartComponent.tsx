@@ -19,6 +19,7 @@ const RatePartComponent = (props: RateBlockProps) => {
             <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border ${props.ratePart.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
                 <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
                     <div className='flex flex-col xl:flex-row w-full '>
+                        
                         <div className='flex flex-col items-center justify-start w-full mt-5' >
                             <label className="label">
                                 <span className="label-text text-center xl:text-2xl">Waga</span>
@@ -27,11 +28,12 @@ const RatePartComponent = (props: RateBlockProps) => {
                                 <span className="label-text text-center xl:text-4xl">{getWagRate(props.ratePart.key, props.typeRate)}%</span>
                             </label>
                         </div>
+                        
                         <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
                             <label className="label">
                                 <span className="label-text xl:text-2xl">Ocena</span>
                             </label>
-                            <select className="select select-bordered xl:select-lg text-center m-2"
+                            <select className="select select-bordered xl:select-lg text-center m-2 border-info rounded-2xl"
                                 value={props.ratePart.ocena}
                                 disabled={props.prewievMode}
                                 onChange={e => {
@@ -43,6 +45,8 @@ const RatePartComponent = (props: RateBlockProps) => {
                                 ))}
                             </select>
                         </div>
+
+                        
                     </div>
                 </div>
                 <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
