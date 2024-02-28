@@ -11,13 +11,11 @@ import { api_Test_add, api_Test_addAll, api_Test_delete, api_Test_getDate } from
 import readXlsxFile from 'read-excel-file';
 import { prepareTestsList } from '@/app/factory/factory_test';
 import { calculateStartEndDate } from '@/app/global';
+import { IconAdd, IconCalendar, IconDownload, IconTest } from '../../components/icons/icons';
 
 const Tests_Page = () => {
 
     // ====== Hooks =====================================================================================================================================================================================================================
-    const [activeUser, setActiveUser] = useState(new User());
-    const [isPermit, setIsPermit] = useState(false);
-    const [isPermitAgent, setIsPermitAgent] = useState(false);
     const [userList, setUserList] = useState<Array<User>>([]);
     const [testList, setTestList] = useState<Array<Test>>([]);
     const [test, setTest] = useState(new Test());
@@ -33,11 +31,7 @@ const Tests_Page = () => {
                 const users = await updateUserList();
                 const user = await getActiveUser();
                 setUserList(users);
-                setActiveUser(user);
                 setTest(new Test())
-
-                const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
-                setIsPermit(isPermit);
 
             } catch (error) {
                 toast.error('Błąd pobierania użytkowników', { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
@@ -168,10 +162,7 @@ const Tests_Page = () => {
 
             {/* NAGŁÓWEK */}
             <div className='flex items-center justify-center'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-12 h-12">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                </svg>
-
+                <IconTest size={12} className='text-info' />
                 <h1 className='text-4xl text-info mb-4 ml-2'>Testy</h1>
             </div>
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
@@ -180,9 +171,7 @@ const Tests_Page = () => {
             <div className='flex flex-col md:flex-row mt-5 gap-2 justify-center'>
 
                 <div className='flex m-2'>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 mx-2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
-                    </svg>
+                    <IconCalendar size={16} className='text-info mr-2' />
                     <input
                         value={dateValue}
                         onChange={e => { setDateValue(e.currentTarget.value); }}
@@ -190,18 +179,14 @@ const Tests_Page = () => {
                         placeholder="Type here"
                         className="input input-bordered w-full max-w-xs" />
                     <button onClick={downloadDate_Click} className="btn btn-outline btn-info mx-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
+                        <IconDownload />
                         Pobierz dane
                     </button>
                 </div>
 
                 <div className='flex gap-2'>
                     <button className="btn btn-outline btn-info m-2" onClick={openModal}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
+                        <IconAdd />
                         Dodaj pojedyńczy test
                     </button>
 
@@ -264,9 +249,7 @@ const Tests_Page = () => {
                                     closeModal
                                 }
                             }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
+                            <IconAdd />
                             Dodaj
                         </button>
                     </div>

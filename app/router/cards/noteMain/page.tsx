@@ -20,6 +20,7 @@ import { api_rateM_deleteList, api_rateM_getAllRateNoNoteByAgent, api_rateM_upda
 import { calculateStartEndDate } from '@/app/global';
 import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
 import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
+import { IconAdd, IconCalendar, IconDelete, IconDownload, IconJoinDisc, IconNoteCC, IconNoteMain, IconSearch, IconUpdate } from '../../components/icons/icons';
 
 export const NoteMain = () => {
 
@@ -303,9 +304,7 @@ export const NoteMain = () => {
             }}
                 title='Potwierdź decyzję' content={'Czy napewno chcesz usunąć coaching agenta ' + selectedNoteCC.agent.nameUser + ' ?'} />
             <div className='flex items-center justify-center'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="text-info w-12 h-12">
-                    <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                </svg>
+                <IconNoteMain size={12} className='text-info' />
                 <h1 className='text-info text-3xl text-center ml-3'> Menu monitoringu</h1>
             </div>
             <hr className="w-full h-1 opacity-50 border-0 rounded bg-info mt-1"></hr>
@@ -313,26 +312,22 @@ export const NoteMain = () => {
             {/* Data */}
             <div className='flex flex-col items-center justify-center mt-1'>
                 <div className='flex mt-5 w-full items-center justify-center'>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-12 h-12 mx-2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
-                    </svg>
-                    <input
-                        className="input input-bordered w-48 max-w-xs"
-                        value={dateValue}
-                        onChange={e => { setDateValue(e.currentTarget.value); }}
-                        type="month" />
-                    <button
-                        className="btn btn-outline btn-info mx-2"
-                        onClick={downloadData_Click}
-                        disabled={isLoading}>
-                        {isLoading ? <span className="loading loading-ring loading-lg"></span>
-                            :
-                            <svg xmlns="http://www.w3.org   /2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 ">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                            </svg>
-                        }
-                        Pobierz dane
-                    </button>
+                    <IconCalendar size={12} className='text-info mr-2'/>
+                        <input
+                            className="input input-bordered w-48 max-w-xs"
+                            value={dateValue}
+                            onChange={e => { setDateValue(e.currentTarget.value); }}
+                            type="month" />
+                        <button
+                            className="btn btn-outline btn-info mx-2"
+                            onClick={downloadData_Click}
+                            disabled={isLoading}>
+                            {isLoading ? <span className="loading loading-ring loading-lg"></span>
+                                :
+                                <IconDownload />
+                            }
+                            Pobierz dane
+                        </button>
                 </div>
             </div>
 
@@ -340,9 +335,7 @@ export const NoteMain = () => {
             <div className='flex flex-col xl:flex-row p-2'>
                 <div className="overflow-x-auto mr-6 mt-6 items-center justify-start">
                     <div className='flex items-center justify-start'>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="text-info w-8 h-8">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-                        </svg>
+                        <IconNoteCC size={8} className='text-info' />
                         <h1 className='text-info text-2xl text-center ml-3'> Coachingi</h1>
                     </div>
                     <div className="overflow-x-auto h-96">
@@ -352,9 +345,7 @@ export const NoteMain = () => {
                                 <tr >
                                     <td colSpan={3} align='left'>
                                         <label className="input input-bordered flex items-center gap-2 w-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
-                                                <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
-                                            </svg>
+                                            <IconSearch />
                                             <input
                                                 className="bg-transparent text-white"
                                                 type="text"
@@ -417,7 +408,6 @@ export const NoteMain = () => {
                                                 }}
                                                 className={`hover:bg-base-300  hover:text-white cursor-pointer ${index === rowIndex ? 'bg-slate-950 text-white' : ''
                                                     } cursor-pointer`}>
-
                                                 <td>{noteCC.agent.nameUser}</td>
                                                 <td>{StatusLabels[noteCC.status]}</td>
                                                 <td>{noteCC.appliesDate}</td>
@@ -438,9 +428,7 @@ export const NoteMain = () => {
                             <button className="btn btn-outline btn-info btn-sm"
                                 disabled={selectedNoteCC.id === -1}
                                 onClick={coaching_Click}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
-                                </svg>
+                                <PreviewIcon />
                                 {selectedNoteCC.id === 0 ? "Rozpocznij coaching" : "Podgląd"}
                             </button>
                         </Link>
@@ -448,9 +436,7 @@ export const NoteMain = () => {
                         <button className="btn btn-outline btn-error btn-sm"
                             disabled={selectedNoteCC.status === Status_Note.NO_START_}
                             onClick={deleteCoaching_Click}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                            </svg>
+                            <IconDelete />
                             Usuń
                         </button>
                     </div>
@@ -552,24 +538,18 @@ export const NoteMain = () => {
                                             localStorage.removeItem('rateCC_prev');
                                         }}>
                                         <button className="group btn btn-outline btn-info btn-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 group-hover:stroke-blue-50">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                            </svg>
+                                            <IconAdd />
                                             Nowa
                                         </button>
                                     </Link>
                                     <button className="btn btn-outline btn-info btn-sm"
                                         onClick={rateCCListSync}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                                        </svg>
+                                        <IconJoinDisc />
                                         Dołącz rozłącz
                                     </button>
                                     <button className="btn btn-outline btn-info btn-sm"
                                         onClick={rateCCListUpdate}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                        </svg>
+                                        <IconUpdate />
                                         Aktualizuj
                                     </button>
                                 </div>
@@ -645,36 +625,26 @@ export const NoteMain = () => {
                                             localStorage.removeItem('rateM_prev');
                                         }}>
                                         <button className="group btn btn-outline btn-info btn-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 group-hover:stroke-blue-50">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                            </svg>
+                                            <IconAdd />
                                             Nowa
                                         </button>
                                     </Link>
                                     <button className="btn btn-outline btn-info btn-sm"
                                         onClick={rateMListSync}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                                        </svg>
+                                        <IconJoinDisc />
                                         Dołącz rozłącz
                                     </button>
                                     <button className="btn btn-outline btn-info btn-sm"
                                         onClick={rateMListUpdate}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                        </svg>
+                                        <IconUpdate />
                                         Aktualizuj
                                     </button>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
             </div>
-
         </div >
     )
 }

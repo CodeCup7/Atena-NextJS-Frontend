@@ -16,6 +16,7 @@ import { RateBlock } from '@/app/classes/rates/rateBlock';
 import RatePartComponent from '../components/ratePartComponent';
 import { getKeyTitle, key_o, key_s, key_t, key_w } from '@/app/globalKeys';
 import RateBlockComponent from '../components/rateBlockComponent';
+import { IconChange, IconDownload, IconMenu, IconRateM } from '../../components/icons/icons';
 
 const RateM_Page = () => {
 
@@ -224,7 +225,7 @@ const RateM_Page = () => {
                 <div className="col-span-2 navbar-start">
                     <div className="dropdown">
                         <label tabIndex={0} className="btn btn-ghost btn-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                            <IconMenu />
                         </label>
                         <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                             <button
@@ -255,10 +256,7 @@ const RateM_Page = () => {
                 </div>
                 <div className="col-span-4">
                     <div className='flex items-center justify-center'>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-12 h-12">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                        </svg>
-
+                        <IconRateM size={8} className='text-info mr-2' />
                         <h1 className='text-info text-3xl text-center ml-3'>Karta mail</h1>
                     </div>
                 </div>
@@ -324,17 +322,13 @@ const RateM_Page = () => {
                                         onChange={() => { }} />
                                     <div className="dropdown w-max">
                                         <label tabIndex={0} className="group btn btn-md hover:text-warning">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-6 h-6 hover:text-warning">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                                            </svg>
+                                            <IconMenu className='text-info' />
                                         </label>
                                         <ul tabIndex={0} className="dropdown dropdown-content z-[50] menu shadow bg-base-100 rounded-box border-2">
                                             <li>
                                                 <button className='btn btn-info btn-sm hover:btn-success m-1  items-center justify-star h-10 '
                                                     onClick={download}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                                    </svg>
+                                                    <IconDownload />
                                                     <p>Pobierz</p>
                                                 </button>
                                             </li>
@@ -345,9 +339,7 @@ const RateM_Page = () => {
                                                         setAttachment(null);
                                                     }}
                                                     disabled={prewievMode}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-                                                    </svg>
+                                                    <IconChange />
                                                     <p>Zmień</p>
                                                 </button>
                                             </li>

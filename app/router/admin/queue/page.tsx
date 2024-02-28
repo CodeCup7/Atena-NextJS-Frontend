@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { api_queue_add, api_queue_update } from '@/app/api/queue_api'
 import { Queue } from '@/app/classes/queue'
 import { updateQueueList } from '@/app/factory/factory_queue'
+import { IconAction, IconActivate, IconAdd, IconDeactivate } from '../../components/icons/icons';
 
 const Queue_Page = () => {
 
@@ -71,27 +72,12 @@ const Queue_Page = () => {
     }
   };
 
-  // ====== Ikony w tabeli =========================================================
-  const DeactivateIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-    </svg>
-  );
-
-  const ActivateIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-    </svg>
-  );
-
   // ====== HTML =================================================================
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
       <ToastContainer />
       <button className="btn btn-outline btn-info btn-sm" onClick={openModal}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-        </svg>
+        <IconAdd />
         Dodaj kolejkę
       </button>
       <div className='flex flex-row'>
@@ -102,9 +88,7 @@ const Queue_Page = () => {
                 <th>Nazwa kolejki</th>
                 <th>Czy aktywna</th>
                 <th className='flex items-center justify-center'>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-                  </svg>
+                  <IconAction />
                   <h1 className='ml-1'>Akcja</h1>
                 </th>
               </tr>
@@ -120,12 +104,12 @@ const Queue_Page = () => {
                       <ul tabIndex={0} className="dropdown dropdown-content z-[50] menu shadow bg-base-100 rounded-box border-2">
                         <li>
                           {queue.available ?
-                            <button className='btn btn-info btn-sm hover:btn-success m-1 items-center justify-center h-10'
+                            <button className='btn btn-info btn-sm hover:btn-warning m-1 items-center justify-center h-10'
                               onClick={() => {
                                 queue.available = false;
                                 updateQueue(queue);
                               }}>
-                              <DeactivateIcon />
+                              <IconDeactivate />
                               &nbsp;&nbsp;<p>Dezaktwuj</p>
                             </button>
                             :
@@ -134,7 +118,7 @@ const Queue_Page = () => {
                                 queue.available = true;
                                 updateQueue(queue);
                               }}>
-                              <ActivateIcon />
+                              <IconActivate />
                               &nbsp;&nbsp;<p>Aktywuj</p>
                             </button>
                           }

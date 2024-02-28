@@ -14,6 +14,7 @@ import { Role, User } from '@/app/classes/user';
 import { createSearchCriteriaByFiltrFeedback, createSearchCriteriaByFiltrTest } from '@/app/factory/factory_searchCriteria';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
+import { IconClose, IconInfo, IconNotificationOFF, IconNotificationON, IconPreview } from '../../icons/icons';
 
 const NotificationComponent = () => {
 
@@ -99,13 +100,9 @@ const NotificationComponent = () => {
       <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
         <div className="indicator">
           {notiList.length === 0 ?
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-neutral-content w-8 h-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-            </svg>
+            <IconNotificationOFF size={8} className='text-neutral-content' />
             :
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="text-info w-8 h-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
-            </svg>
+            <IconNotificationON size={8} className='text-info' />
           }
           <span className="badge badge-sm indicator-item">{notiList.length}</span>
         </div>
@@ -114,7 +111,7 @@ const NotificationComponent = () => {
         <div className="card-body">
           {notiList.length === 0 ? (
             <div role="alert" className="alert">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <IconInfo />
               <span>Brak powiadomień</span>
             </div>
           ) : (
@@ -126,9 +123,7 @@ const NotificationComponent = () => {
                     <div className="badge badge-secondary">Nowe</div>
                     <div className="card-actions justify-end">
                       <button className='btn btn-neutral btn-xs' onClick={e => { close(noti) }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
+                        <IconClose />
                       </button>
                     </div>
                   </h2>
@@ -144,10 +139,7 @@ const NotificationComponent = () => {
                                   noti.type === Notification_Type.TEST_ ? '/router/cards/tests' :
                                     Notification_Type.FEEDBACK_ ? '/router/cards/feedback' : ''}>
                       <button className="btn btn-neutral btn-xs" onClick={e => { preview(noti) }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                        </svg>
+                        <IconPreview />
                         Podgląd
                       </button>
                     </Link>

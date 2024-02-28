@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSearchParams } from "next/navigation";
+import { IconAdd, IconAddUser, IconEdit } from "@/app/router/components/icons/icons";
 
 const UserView = () => {
 
@@ -125,9 +126,7 @@ const UserView = () => {
             <ToastContainer />
             <div className='flex flex-col items-center justify-center'>
                 <div className='flex items-center justify-center'>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-info">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-                    </svg>
+                    <IconAddUser size={12} className="text-info" />
                     <h1 className='text-4xl text-info mb-4 ml-2'>
                         {user.id != 0 ? "Edycja / Podgląd " : "Dodawanie "} Użytkownika</h1>
                 </div>
@@ -193,13 +192,7 @@ const UserView = () => {
                     <button
                         onClick={action}
                         className='btn btn-info hover:btn-primary mt-5'>
-                        {user.id === 0 ?
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg> :
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" data-slot="icon" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                            </svg>}
+                        {user.id === 0 ? <IconEdit /> : <IconAdd />}
                         {user.id != 0 ? "Edytuj" : "Dodaj"}
                     </button>
                 </div>

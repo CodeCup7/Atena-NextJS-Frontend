@@ -17,6 +17,7 @@ import { Mistake } from '@/app/classes/mistake';
 import { calculateStartEndDate } from '@/app/global';
 import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
 import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
+import { IconMenu, IconNoteCC, IconPreview } from '../../components/icons/icons';
 
 const NoteCC_Page = () => {
 
@@ -191,14 +192,6 @@ const NoteCC_Page = () => {
         api_noteCC_export(noteCC);
     }
 
-    // ====== Ikony w tabeli =====================================================================================================================================================================================================================
-    const PreviewIcon = () => (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
-    );
-
     // ====== HTML =============================================================================================================================================================================================================================
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -208,7 +201,7 @@ const NoteCC_Page = () => {
                 <div className="col-span-2 navbar-start">
                     <div className="dropdown">
                         <label tabIndex={0} className="btn btn-ghost btn-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                            <IconMenu />
                         </label>
                         <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                             <button
@@ -238,7 +231,11 @@ const NoteCC_Page = () => {
                     <p className={`justify-center  {rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? 'text-yellow-600' : rateCC.mode === Rate_Mode.NEW_ as Rate_Mode ? 'text-green-500' : 'text-red-700'}`}>Tryb: {ModeLabels[noteCC.mode]}</p>
                 </div>
                 <div className="col-span-4">
-                    <h1 className='text-info text-3xl text-center justify-center'># Karta Coucha</h1>
+                    <div className='flex gap-2 justify-center'>
+                        <IconNoteCC size={12} className='text-info' />
+                        <h1 className='text-info text-3xl '>Karta Coucha</h1>
+                    </div>
+
                 </div>
                 <div className='col-span-4'>
                     <p className='text-right mr-2'>{noteCC.id > 0 ? "id:" + noteCC.id : ''}</p>
@@ -460,7 +457,7 @@ const NoteCC_Page = () => {
                                                                     localStorage.removeItem('rateCC_prev');
                                                                     localStorage.setItem('rateCC_prev', JSON.stringify(rateCC));
                                                                 }}>
-                                                                <PreviewIcon />
+                                                                <IconPreview />
                                                                 Podgląd
                                                             </button>
                                                         </Link>
@@ -498,7 +495,7 @@ const NoteCC_Page = () => {
                                                                     localStorage.removeItem('rateM_prev');
                                                                     localStorage.setItem('rateM_prev', JSON.stringify(rateM));
                                                                 }}>
-                                                                <PreviewIcon />
+                                                                <IconPreview />
                                                                 Podgląd
                                                             </button>
                                                         </Link>

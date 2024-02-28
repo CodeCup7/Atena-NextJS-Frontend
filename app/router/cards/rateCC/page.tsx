@@ -5,7 +5,6 @@ import { RateCC } from '@/app/classes/rates/rateCC';
 import { Role, User } from '@/app/classes/user';
 import { updateQueueList } from '@/app/factory/factory_queue';
 import { CreateNewEmptyRateCC, getRateCC_RateAs100, } from '@/app/factory/factory_rateCC';
-
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
@@ -13,13 +12,13 @@ import { RateCC_chart } from '../../components/chart/rateCC_chart';
 import ConfirmDialog from '../../components/dialog/ConfirmDialog';
 import { api_rateCC_add, api_rateCC_export, api_rateCC_update } from '@/app/api/rateCC_api';
 import { updateUserList } from '@/app/factory/factory_user';
-import { getRateBlock_MaxRate, getRateBlock_Rate, getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
+import { getRateBlock_RateAs100 } from '@/app/factory/factory_rateBlock';
 import { getActiveUser } from '@/app/auth';
 import { useSearchParams } from "next/navigation";
-import { RateBlock } from '@/app/classes/rates/rateBlock';
 import { getKeyTitle, key_k, key_o, key_s, key_t, key_w, key_w1 } from '@/app/globalKeys';
 import RatePartComponent from '../components/ratePartComponent';
 import RateBlockComponent from '../components/rateBlockComponent';
+import { IconCurrent, IconMenu, IconMystery, IconRateCC } from '../../components/icons/icons';
 
 
 const RateCC_Page = () => {
@@ -199,7 +198,7 @@ const RateCC_Page = () => {
                 <div className="col-span-2 navbar-start">
                     <div className="dropdown">
                         <label tabIndex={0} className="btn btn-ghost btn-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                            <IconMenu />
                         </label>
                         <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                             <button
@@ -232,7 +231,16 @@ const RateCC_Page = () => {
                     <p className={`justify-center  {rateCC.mode === Rate_Mode.PREVIEW_ as Rate_Mode ? 'text-yellow-600' : rateCC.mode === Rate_Mode.NEW_ as Rate_Mode ? 'text-green-500' : 'text-red-700'}`}>Tryb: {ModeLabels[rateCC.mode]}</p>
                 </div>
                 <div className="col-span-4">
-                    <h1 className='text-info text-3xl text-center justify-center'>{TypeLabels[rateCC.typeRate]}</h1>
+                    <div className='flex gap-2 justify-center items-center'>
+                        {rateCC.typeRate === Type_RateCC.RATTING_ ?
+                            <IconRateCC size={8} className='text-info mr-2' />
+                            :
+                            rateCC.typeRate === Type_RateCC.CURRENT_ ?
+                                <IconCurrent size={8} className='text-info mr-2' />
+                                :
+                                <IconMystery size={8} className='text-info mr-2' />}
+                        <h1 className='text-info text-3xl text-center justify-center'>{TypeLabels[rateCC.typeRate]}</h1>
+                    </div>
                 </div>
                 <div className='col-span-4'>
                     <p className='text-right mr-2'>id: {rateCC.id}</p>
