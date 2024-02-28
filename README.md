@@ -93,6 +93,9 @@ Na końcu możesz wygenerować Dashboard Agenta i sprawdzić jego postępy.
 
 https://github.com/CodeCup7/Atena-NextJS-Frontend/assets/97393786/d2724e6a-8356-4212-ac00-3fcd3801b34e
 
+### :point_right: 4. Logowanie:
+W wersji demonstracyjnej można poprzez plik <b>auth</b> zmienić logowanie z admin/coucha na użytkownika. Na produkcji jest logowanie domenowe.
+
 ## :art: Layout
 Tailwind CSS, DaisyUI, AI, heroicons, Chart.js, use-gauge, 
 
