@@ -167,6 +167,7 @@ export function getKeyTitle(key: string, typeRate: Type_Rate):string {
 
 export function getKeyDiscription(key: string, typeRate: Type_Rate) {
 
+    
     switch (key) {
         case key_w1: {
             return typeRate === Type_Rate.CC_ ?
@@ -181,7 +182,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "przepisami prawa dotyczącymi dziedziny działalności przedsiębiorstwa.";
         }
         case key_o1: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Sprawne wykorzystanie dostępnych narzędzi i aplikacji, odnajdywanie trafnych informacji w sieci, wyszukiwanie" +
                 "konkretnych przepisów w aktach prawnych, oraz asystowanie Klientowi w poruszaniu się po stronach internetowych." +
                 "Precyzyjne zarejestrowanie zgłoszeń, zleceń, wniosków, notatek, incydentów, oraz reakcja na interwencje" +
@@ -193,7 +194,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "dokumentacją potrzebną do udzielania wsparcia lub rozwiązania problemu Klienta.";
         }
         case key_t1: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Zadawanie pytań w celu ustalenia potrzeb Klienta oraz klarowne wyjaśnianie niejasności," +
                 "włączając w to stosowanie parafrazy do potwierdzenia zrozumienia jego wypowiedzi." +
                 "Pozyskiwanie istotnych informacji związanych z problemem Klienta, które mogą mieć wpływ na efektywną realizację usługi." +
@@ -205,7 +206,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "skorzystania z usług, agent wykorzystuje język korzyści, prezentując ofertę w sposób korzystny dla Klienta";
         }
         case key_t2: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Prezentowanie się jako profesjonalista poprzez unikanie sformułowań o negatywnym wydźwięku " +
                 "oraz eliminowanie zwrotów, które mogą budzić niepewność lub podważać kompetencje, takich jak:" +
                 " \"niestety\", \"nie pomogę\", \"nie wiem\", \"nie da się\", \"nie mogę\", \"nie mamy możliwości\", \"musi Pan/Pani\"," +
@@ -217,7 +218,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "rozwiązanie problemu lub udzielenie potrzebnych informacji. W przypadku rozwiązywania wątpliwości Klienta, agent korzysta z właściwej argumentacji.";
         }
         case key_t3: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Rozpoznawanie i zrozumienie motywacji, które skłaniają Klientów do wyrażania zastrzeżeń dotyczących realizowanych " +
                 "zadań w obszarze przetwarzania danych osobowych.Skupianie uwagi Klienta na faktach oraz kształtowanie pozytywnego wizerunku," +
                 "przy jednoczesnym unikaniu negatywnych wypowiedzi na temat polityki prywatności lub konkurencji."
@@ -225,7 +226,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "";
         }
         case key_t4: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Agent odpowiednio kieruje przebiegiem rozmowy, udzielając konkretnej, rzeczowej i zrozumiałej odpowiedzi na pytania Klienta, z" +
                 "godnie z ich potrzebami. Sprawnie operuje aplikacjami i nie odchodzi od tematu, trzymając się głównego wątku rozmowy i unikając" +
                 "zbędnych dyskusji. W przypadku konieczności weryfikacji informacji, informuje Klienta o zawieszeniu rozmowy (hold)," +
@@ -236,7 +237,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "";
         }
         case key_k1: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Agent mówi głośno, wyraźnie i płynnie. Agent stosuje odpowiednie tempo wypowiedzi. Zbyt szybkie mówienie może powodować" +
                 "trudności zrozumienia komunikatu, zbyt wolne może być denerwujące dla odbiorcy. Poprawna dykcja. Brak: połykania końcówek," +
                 "skracania słów, przerw pomiędzy słowami a nawet zdaniami. Odpowiedni ton głosu, w którym słychać entuzjazm i pozytywne nastawienie." +
@@ -246,7 +247,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "";
         }
         case key_k2: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Agent rozmawia uprzejmie, nie przenosząc negatywnych emocji z poprzednich interakcji." +
                 "Nie reaguje śmiechem na zachowanie, problemy, ton głosu lub sposób mówienia Klienta. Jest opanowany nawet w sytuacjach," +
                 "gdy Klient jest zirytowany lub niezrozumiały. Nie atakuje Klienta, unika traktowania go z wyższością, jak również nie okazuje" +
@@ -256,7 +257,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "";
         }
         case key_k3: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Agent skupia się na wypowiedzi Klienta poprzez uważne słuchanie, unikając wielokrotnego dopytywania o to samo," +
                 "nie przerywając mu ani nie mówiąc równocześnie. W przypadku, gdy wypowiedź Klienta jest niespójna lub odchodzi od tematu rozmowy," +
                 "Agent może w sposób uprzejmy przerwać, ale dba o zachowanie kultury w komunikacji. Reaguje na monolog Klienta oraz" +
@@ -266,7 +267,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "";
         }
         case key_s1: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Powitanie zgodnie ze standardem : \"Dzień dobry, tutaj agent Anna Kowalska. W czym mogę pomóc?\" Pożegnanie zgodnie ze standardem: " +
                 " \"Dziękuję za rozmowę, jeśli jeszcze czegoś potrzebujesz, proszę śmiało się zgłosić. Miłego dnia i do usłyszenia!\""
                 :
@@ -275,7 +276,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "firmy oraz zapewnia zgodność z obowiązującymi przepisami i regulacjami..";
         }
         case key_s2: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "W przypadku kampanii, gdzie został wdrożony skrypt rozmowy lub proces kampanii, istotne jest przestrzeganie określonej" +
                 "kolejności i stałości elementów dla poszczególnych kampanii. Weryfikacja Klientów odbywa się zgodnie z ustalonymi procedurami," +
                 "aby potwierdzić ich tożsamość oraz prawo do realizacji żądanych usług."
@@ -287,7 +288,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "w razie potrzeby, wyłącznie..., być może).";
         }
         case key_s3: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Agent posługuje się poprawną polszczyzną, unikając błędów językowych, takich jak \"włańczać\", \"bede\"," +
                 "\"proszę Panią\", \"te pismo\", \"te upoważnienie\", \"se napisze\". Nie stosuje niestosownych, potocznych słów czy zwrotów," +
                 "takich jak \"fajnie\", \"ok\", \"od ręki\", \"super\", \"wie Pan co\", \"system na mnie wymusza\", \"wyskoczyły mi pytania\"," +
@@ -300,7 +301,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
 
         }
         case key_s4: {
-            typeRate === Type_Rate.CC_ ?
+            return typeRate === Type_Rate.CC_ ?
                 "Agent unika wtrętów językowych, takich jak \"yyy\", \"eee\", \"mhm\", \"aha\", \"prawda\", \"dobrze\", \"tutaj\", \"tak\"," +
                 "\"yhy\", \"no tak\", \"znaczy się\", \"no\", \"proszę mi powiedzieć\", \"właśnie\"." +
                 "Dodatkowo, unika zbędnych powtórzeń tych samych słów w celu utrzymania płynności i klarowności komunikacji."
@@ -308,7 +309,7 @@ export function getKeyDiscription(key: string, typeRate: Type_Rate) {
                 "";
         }
         default: {
-            return 0;
+            return "Nie znaleziono tekstu opisu wskaźnika";
         }
     }
 }

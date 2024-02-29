@@ -1,8 +1,8 @@
 
-import { valueOfRatePartCC } from '@/app/global';
 import { RatePart } from '@/app/classes/rates/ratePart';
 import { Type_Rate } from '@/app/classes/enums';
 import { getKeyTitle, getWagRate, getKeyDiscription } from '@/app/globalKeys';
+import { IconFiltr, IconRates } from '../../components/icons/icons';
 
 interface RateBlockProps {
     ratePart: RatePart;
@@ -13,42 +13,54 @@ interface RateBlockProps {
 
 const RatePartComponent = (props: RateBlockProps) => {
 
+
     return (
         <div>
             <h5 className='text-center my-3 text-green-500'>{getKeyTitle(props.ratePart.key, props.typeRate)}</h5>
             <div className={`grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 2xl:grid-rows-1 items-center justify-center border ${props.ratePart.ocena ?? 0 > 0 ? '' : 'border-red-600'}`}>
-                <div className='md:col-span-2 md:flex md:flex-row gap-5 h-full ' >
-                    <div className='flex flex-col xl:flex-row w-full '>
-                        
-                        <div className='flex flex-col items-center justify-start w-full mt-5' >
+
+                <div className='md:col-span-2 md:flex md:flex-col gap-5 h-full items-center' >
+                    <div className='flex flex-row w-full  gap-10 items-center justify-center ml-2'>
+                        <div className='flex flex-col mt-2 justify-center items-center'>
+                            <label className="label gap-2">
+                                
+                                <IconFiltr transform="rotate(180)" color='grey'/>
+                                <span className="label-text text-center ">Waga</span>
+                            </label>
                             <label className="label">
-                                <span className="label-text text-center xl:text-2xl">Waga</span>
+                                <span className="label-text text-center xl:text-3xl">{getWagRate(props.ratePart.key, props.typeRate)}%</span>
                             </label>
-                            <label className="label xl:h-16 xl:mt-2">
-                                <span className="label-text text-center xl:text-4xl">{getWagRate(props.ratePart.key, props.typeRate)}%</span>
-                            </label>
-                        </div>
-                        
-                        <div className='flex flex-col items-center justify-start w-full xl:mt-5'>
-                            <label className="label">
-                                <span className="label-text xl:text-2xl">Ocena</span>
-                            </label>
-                            <select className="select select-bordered xl:select-lg text-center m-2 border-info rounded-2xl"
-                                value={props.ratePart.ocena}
-                                disabled={props.prewievMode}
-                                onChange={e => {
-                                    props.ratePart.ocena = parseInt(e.target.value);
-                                    props.updateRatePart(props.ratePart);
-                                }}>
-                                {valueOfRatePartCC().map((value, index) => (
-                                    <option key={index} value={value}>{value}</option>
-                                ))}
-                            </select>
                         </div>
 
-                        
+                        <div className='flex flex-col mt-2 justify-center items-center'>
+                            <label className="label gap-2">
+                                <IconRates color='grey' />
+
+                                <span className="label-text text-center ">Ocena</span>
+                            </label>
+                            <label className="label">
+                                <span className={`label-text text-center xl:text-4xl ${props.ratePart.ocena === 1 ? 'text-green-500' : 'text-red-700'}`}>{props.ratePart.ocena}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className={`w-fit flex justify-between text-xs px-2 mb-4 ${props.prewievMode ? 'hidden' : ''}`}>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            value={props.ratePart.ocena}
+                            className="range range-info"
+                            step="1"
+                            disabled={props.prewievMode}
+                            onChange={e => {
+                                props.ratePart.ocena = parseInt(e.target.value);
+                                props.updateRatePart(props.ratePart);
+                            }}
+                        />
                     </div>
                 </div>
+
                 <div className='md:col-span-5 2xl:col-span-3 gap-5 p-2 h-full'>
                     <label className="label">
                         <span className="label-text">Nieprawidłowości</span>
