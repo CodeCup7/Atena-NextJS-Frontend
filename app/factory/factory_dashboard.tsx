@@ -57,7 +57,7 @@ export async function getFinalScoreData(dateValue: string, agent: User, howManyM
             final.rateCCList.push(rateCC)
         })
     });
-    console.log('final :', final);
+
     return final;
    
 }

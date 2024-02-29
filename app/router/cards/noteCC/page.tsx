@@ -1,5 +1,5 @@
 'use client'
-import { ModeLabels, Rate_Mode, StatusLabels, Status_Note } from '@/app/classes/enums';
+import { ModeLabels, Rate_Mode, StatusLabels, Status_Note, Type_Rate, Type_RateCC } from '@/app/classes/enums';
 import { CreateNewEmptyNoteCC, getMistakeReport, getNoteCC_Rate, getNoteCC_RateAs100 } from '@/app/factory/factory_noteCC';
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,7 +17,7 @@ import { Mistake } from '@/app/classes/mistake';
 import { calculateStartEndDate } from '@/app/global';
 import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
 import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
-import { IconMenu, IconNoteCC, IconPreview } from '../../components/icons/icons';
+import { IconDownload, IconMenu, IconNoteCC, IconPreview } from '../../components/icons/icons';
 
 const NoteCC_Page = () => {
 
@@ -92,11 +92,11 @@ const NoteCC_Page = () => {
         let mistakeList: Mistake[] = [];
 
         if (period) {
-
-            const { startDate, endDate } = calculateStartEndDate(noteCC.appliesDate + '-01', 0);
+            const { startDate, endDate } = calculateStartEndDate(noteCC.appliesDate + '-01', 2);
             const noteFilter = new FiltrNoteCC();
             noteFilter.appliesDateStart = startDate.toString();
             noteFilter.appliesDateEnd = endDate.toString();
+            noteFilter.userCol.push(noteCC.agent);
 
             const noteList = await api_NoteCC_search(createSearchCriteriaByFiltrNoteCC(noteFilter));
 
@@ -351,7 +351,6 @@ const NoteCC_Page = () => {
                                     />
                                 </label>
                             </div>
-
                             <div className='flex flex-col mt-2'>
                                 <label className="form-control w-full">
                                     <div className="label">
@@ -393,12 +392,18 @@ const NoteCC_Page = () => {
                             <div className='w-full h-52 mt-2'>
                                 <Dashboard_NoteCC_BarChart
                                     data={mistakeChartBarValue || new Array<Record<string, number>>()}
-                                    agentName={noteCC.agent.nameUser} />
+                                    agentName={noteCC.agent.nameUser} 
+                                    typeRate={Type_Rate.CC_}/>
                             </div>
                             <hr className='mt-4 opacity-40'></hr>
                             <div className='flex gap-2 mt-4'>
-                                <button className='btn btn-neutral btn-sm ' onClick={e => dashboardGenerate(true)}>3 ost. miesiące</button>
-                                <button className='btn btn-neutral btn-sm ' onClick={e => dashboardGenerate(false)}>Obecny miesiąc</button>
+                                <button
+                                    className='btn btn-neutral btn-sm '
+                                    onClick={e => dashboardGenerate(true)}>
+                                    3 ost. miesiące</button>
+                                <button
+                                    className='btn btn-neutral btn-sm '
+                                    onClick={e => dashboardGenerate(false)}>Obecny miesiąc</button>
                             </div>
 
                         </div>

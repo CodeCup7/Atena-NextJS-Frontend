@@ -11,7 +11,7 @@ import { FinalScore } from '@/app/classes/finalScore';
 import { getFinalScore, getFinalScoreData, getFinalScoreFeedback, getFinalScoreMysteryAndCurrent, getFinalScoreRateCCAndRateM, getFinalScoreTests } from '@/app/factory/factory_dashboard';
 import { NoteCC } from '@/app/classes/rates/noteCC';
 import { getNoteCC_Rate } from '@/app/factory/factory_noteCC';
-import { IconCurrent, IconDashboard, IconDownload, IconFeedback, IconMystery, IconNoteCC, IconPreview, IconRateCC, IconTest } from '../../components/icons/icons';
+import { IconCurrent, IconDashboard, IconDownload, IconFeedbackUp, IconNoteCC, IconRateCC, IconTest } from '../../components/icons/icons';
 
 const Dashboard = () => {
 
@@ -77,6 +77,18 @@ const Dashboard = () => {
   function getNoteCCRates(noteList: NoteCC[]): number[] { // Funkcja, która pobiera oceny z obiektów NoteCC i zwraca listę ocen
     return noteList.map(note => getNoteCC_Rate(note) * 100);
   }
+
+
+  function scoreCount(score: number) {
+    if (score > 0) {
+      return Math.round(score * 100) + " % więcej niż w ost. 3 miesiącach"
+    } else if (score < 0) {
+      return Math.round(score * 100) + " % mniej niż w ost. 3 miesiącach"
+    } else {
+      return "Tak samo jak w ost. 3 miesiącach"
+    }
+  }
+
   // ====== HTML =====================================================================================================================================================================================================================
   return (
     <div className='container mx-auto border-2 border-info border-opacity-50 p-2' >
@@ -140,7 +152,8 @@ const Dashboard = () => {
             </div>
             <div className="stat-title">Coachingi</div>
             <div className="stat-value text-primary">{Math.round(getFinalScore(final) * 100) + " %"}</div>
-            <div className="stat-desc">21% more than last month</div>
+            <div className="stat-desc">{scoreCount(getFinalScore(final) - getFinalScore(finalPeriod))}
+            </div>
           </div>
 
           <div className="stat">
@@ -149,7 +162,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-title">Rozmowy i maile</div>
             <div className="stat-value text-secondary">{Math.round(getFinalScoreRateCCAndRateM(final) * 100) + " %"}</div>
-            <div className="stat-desc">21% more than last month</div>
+            <div className="stat-desc">{scoreCount(getFinalScoreRateCCAndRateM(final) - getFinalScoreRateCCAndRateM(finalPeriod))}</div>
           </div>
           <div className="stat">
             <div className="stat-figure text-info">
@@ -157,7 +170,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-title">Tajemniczy / Bieżący</div>
             <div className="stat-value text-info">{Math.round(getFinalScoreMysteryAndCurrent(final) * 100) + " %"}</div>
-            <div className="stat-desc">21% more than last month</div>
+            <div className="stat-desc">{scoreCount(getFinalScoreMysteryAndCurrent(final) - getFinalScoreMysteryAndCurrent(finalPeriod))}</div>
           </div>
           <div className="stat">
             <div className="stat-figure text-warning">
@@ -165,15 +178,15 @@ const Dashboard = () => {
             </div>
             <div className="stat-title">Testy</div>
             <div className="stat-value text-warning">{Math.round(getFinalScoreTests(final) * 100) + " %"}</div>
-            <div className="stat-desc">21% more than last month</div>
+            <div className="stat-desc">{scoreCount(getFinalScoreTests(final) - getFinalScoreTests(finalPeriod))}</div>
           </div>
           <div className="stat">
             <div className="stat-figure text-accent">
-              <IconFeedback size={12} />
+              <IconFeedbackUp size={12} />
             </div>
             <div className="stat-title">Skargi / Pochwały</div>
             <div className="stat-value text-accent">{Math.round(getFinalScoreFeedback(final) * 100) + " %"}</div>
-            <div className="stat-desc">21% more than last month</div>
+            <div className="stat-desc">{scoreCount(getFinalScoreFeedback(final) - getFinalScoreFeedback(finalPeriod))}</div>
           </div>
         </div>
       </div>

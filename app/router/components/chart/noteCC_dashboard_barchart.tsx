@@ -2,12 +2,13 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, Title, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement } from "chart.js";
-import { Mistake } from "@/app/classes/mistake";
-import { getKeyAsName } from "@/app/globalKeys";
+import { getKeyTitle } from "@/app/globalKeys";
+import { Type_Rate } from "@/app/classes/enums";
 
 interface ArcedProps {
   agentName: string;
   data: Record<string, number>[]
+  typeRate: Type_Rate;
 }
 
 ChartJS.register(Title, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement);
@@ -39,7 +40,7 @@ export function Dashboard_NoteCC_BarChart(props: ArcedProps) {
     <div>
       <Bar
         data={{
-          labels: props.data.map(entry => getKeyAsName(Object.keys(entry)[0])),
+          labels: props.data.map(entry => getKeyTitle(Object.keys(entry)[0], props.typeRate) ),
           datasets: [{
             label: props.agentName,
             data: props.data.map(entry => Object.values(entry)[0]),
