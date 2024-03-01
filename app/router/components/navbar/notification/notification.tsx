@@ -16,18 +16,18 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import { IconClose, IconInfo, IconNotificationOFF, IconNotificationON, IconPreview } from '../../icons/icons';
 
-const NotificationComponent = () => {
+const NotificationComponent = ({ activeUser }: { activeUser: User }) => {
 
   const [notiList, setNotiList] = useState<Array<Notification>>([]); // Lista powiadomień
-  const [activeUser, setActiveUser] = useState(new User());
+  //const [activeUser, setActiveUser] = useState(new User());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getActiveUser();
-      setActiveUser(user);
+      //const user = await getActiveUser();
+      //setActiveUser(user);
 
-      const list = await api_NotificationList_getAll(user);
+      const list = await api_NotificationList_getAll(activeUser);
       setNotiList(list);
     };
 

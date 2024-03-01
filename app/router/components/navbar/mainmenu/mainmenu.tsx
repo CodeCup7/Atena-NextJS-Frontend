@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react';
 import { IconAdmin, IconBrowser, IconCurrent, IconDashboard, IconFeedbackUp, IconHomePage, IconMystery, IconNoteMain, IconRateCC, IconRateM, IconSearch, IconTest} from '../../icons/icons';
 
-export const MainMenu = () => {
+export const MainMenu = ({ activeUser }: { activeUser: User }) => {
 
     interface Foo {
         button: boolean;
@@ -14,23 +14,23 @@ export const MainMenu = () => {
         pernament: boolean;
     }
 
-    const [activeUser, setActiveUser] = useState(new User());
+    //const [activeUser, setActiveUser] = useState(new User());
     const [menuHidden, setMenuHiden] = useState(false);
-    const [isPermit, setIsPermit] = useState(false);
+    const isPermit: boolean = activeUser.role === Role.ADMIN_ || activeUser.role === Role.COACH_;
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const user = await getActiveUser();
-                setActiveUser(user);
-                const isPermit: boolean = user.role === Role.ADMIN_ || user.role === Role.COACH_;
-                setIsPermit(isPermit);
-            } catch (error) {
-                console.log('Błąd useEffect', error);
-            }
-        }
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         try {
+    //             //const user = await getActiveUser();
+    //             //setActiveUser(user);
+    //             // const isPermit: boolean = activeUser.role === Role.ADMIN_ || activeUser.role === Role.COACH_;
+    //             // setIsPermit(isPermit);
+    //         } catch (error) {
+    //             console.log('Błąd useEffect', error);
+    //         }
+    //     }
+    //     fetchData();
+    // }, []);
 
 
     function disabledLink(foo: Foo) {

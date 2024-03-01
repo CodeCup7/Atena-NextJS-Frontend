@@ -5,22 +5,22 @@
 import { getActiveUser } from '@/app/auth';
 import { User } from '@/app/classes/user';
 import React, { useEffect, useState } from 'react'
-const Avatar = () => {
+const Avatar = ({ activeUser }: { activeUser: User }) => {
 
-    const [activeUser, setActiveUser] = useState(new User());
+    //const [activeUser, setActiveUser] = useState(new User());
     let initials = '';
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const user = await getActiveUser();
-                setActiveUser(user);
-            } catch (error) {
-                console.error('Błąd pobierania aktywnego użytkownika:', error);
-            }
-        };
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             //const user = await getActiveUser();
+    //             //setActiveUser(user);
+    //         } catch (error) {
+    //             console.error('Błąd pobierania aktywnego użytkownika:', error);
+    //         }
+    //     };
+    //     fetchData();
+    // }, []);
 
     if (activeUser) {
         initials = activeUser.nameUser.split(" ").map((n) => n[0]).join(".");
