@@ -26,8 +26,8 @@ export const extraRate_maxValue: number = 10
 // '==========================================================================================================================================
 
 /**
- * Funkcja zwraca zakres dat na podstawie przesłanej daty. Zakres ustalany jest na podstawie przesłanego paramerty 'howManyMonths'. Nasepuje ustalenie ile miesięcy w stecz ma zostać ustalony początek zakresu. 
- * np dla przesłanego dateValue = 18-02-2024 i parametry howManyMonths = 3 zostanie zwrócony startDate= 01.12.2023 i endDate=29.02.2024
+ * Funkcja zwraca zakres dat na podstawie przesłanej daty. Zakres ustalany jest na podstawie przesłanego paramerty 'howManyMonths'. Następuje ustalenie ile miesięcy w stecz ma zostać ustalony początek zakresu. 
+ * np dla przesłanego dateValue = 18-02-2024 i parametry howManyMonths = 3 zostanie zwrócony startDate = 01.12.2023 i endDate = 29.02.2024
  * @param {string} dateValue - Data w formacie 'YYYY-MM'.
  * @param {number} howManyMonths - Liczba miesięcy wstecz. 0 - tylko bieżący miesiąc 2 - bieżący miesiąc i 2 miesiące wstecz. 
  * @returns {{ startDate: Date, endDate: Date }} Obiekt zawierający datę początkową i końcową.
@@ -44,4 +44,31 @@ export function calculateStartEndDate(dateValue: string, howManyMonths: number):
         startDate,
         endDate
     };
+}
+
+/**
+ * Funkcja zwraca zakres dat poprzedniego miesiąca od daty przesłanej
+ * np dla przesłanego dateValue = 18-02-2024 zostanie zwrócony startDate = 01.01.2024 i endDate = 31.01.2024
+ * @param {string} dateValue - Data w formacie 'YYYY-MM'
+ * @returns {{ startDate: Date, endDate: Date }} Obiekt zawierający datę początkową i końcową.
+ */
+export function calculatePrevMonth(dateValue: string): { startDate: Date, endDate: Date } {
+console.log('dateValue :', dateValue);
+    const [year, month, day] = dateValue.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day);
+
+    let startDate: Date;
+    let endDate: Date;
+
+    if (currentDate.getDate() === 1) {
+         // Jeśli data to pierwszy dzień stycznia, cofnij się o jeden rok i zacznij od grudnia poprzedniego roku
+        startDate = new Date(year, month - 2, 1);
+        endDate = new Date(year, month - 1, 0);
+    } else {
+        // W przeciwnym razie zacznij od poprzedniego miesiąca
+        startDate = new Date(year, month - 1, 1);
+        endDate = new Date(year, month, 0);
+    }
+
+    return { startDate, endDate };
 }

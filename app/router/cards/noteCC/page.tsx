@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { getRateM_RateAs100 } from '@/app/factory/factory_rateM';
 import { Dashboard_NoteCC_BarChart } from '../../components/chart/noteCC_dashboard_barchart';
 import { Mistake } from '@/app/classes/mistake';
-import { calculateStartEndDate } from '@/app/global';
+import { calculatePrevMonth, calculateStartEndDate } from '@/app/global';
 import { FiltrNoteCC } from '@/app/classes/filtrs/noteCC_Filtr';
 import { createSearchCriteriaByFiltrNoteCC } from '@/app/factory/factory_searchCriteria';
 import { IconDownload, IconMenu, IconNoteCC, IconPreview } from '../../components/icons/icons';
@@ -27,11 +27,12 @@ const NoteCC_Page = () => {
     const [isPermitAgent, setIsPermitAgent] = useState(false);
 
     const [noteCC, setNoteCC] = useState(CreateNewEmptyNoteCC(activeUser));
-    const [prewievMode, setPreviewMode] = useState(false);
+    const [previewMode, setPreviewMode] = useState(false);
 
     const [noteTab, setOpenNoteTab] = useState(1);
     const [rateTab, setOpenRateTab] = useState(1);
     const [prevNoteHide, setPrevNoteHide] = useState(true);
+    const [prevNoteData, setPrevNoteData] = useState(new NoteCC());
     const [score, setScore] = useState(0);
     const [mistakeChartBarValue, setMistakeChartBarValue] = useState<Array<Record<string, number>>>();
 
@@ -87,12 +88,98 @@ const NoteCC_Page = () => {
         }
     }
 
+    // ====== Akcje =====================================================================================================================================================================================================================
+    function rateBtn_Click() {
+
+        if (validate()) {
+            if (noteCC.id === 0) {
+                api_NoteCC_add(noteCC).then((foo => {
+                    if (foo.isOK === true) {
+
+                        const note: NoteCC = foo.noteCC; // Aktualizacja oceny o ID z DB
+                        note.mode = Rate_Mode.PREVIEW_;
+                        updateNoteCC(note)
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                    } else {
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                    }
+                }));
+            } else {
+                api_NoteCC_update(noteCC).then((foo => {
+                    if (foo.isOK === true) {
+
+                        noteCC.mode = Rate_Mode.PREVIEW_;
+                        updateNoteCC(noteCC)
+                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                    } else {
+                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                    }
+                }));
+            }
+        } else {
+            toast.error("Wybierz date coachingu", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+        }
+    }
+    function editBtn_Click() {
+
+        if (isPermit) {
+            noteCC.mode = Rate_Mode.EDIT_;
+            updateNoteCC(noteCC)
+            toast.warning("Włączono tryb edycji", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+        } else {
+            toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
+        }
+    }
+    function odwolanie_click() {
+
+        if (isPermitAgent) {
+
+            noteCC.status = Status_Note.APPEAL_;
+
+            api_NoteCC_update(noteCC).then((foo => {
+                if (foo.isOK === true) {
+
+                    noteCC.mode = Rate_Mode.PREVIEW_;
+                    updateNoteCC(noteCC)
+
+                    toast.info("Odwołanie zostało poprawnie zamieszczone", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                } else {
+                    toast.error("Błąd wysyłania odwołania", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
+                }
+            }));
+        }
+    }
+    function exportToFile_Click() {
+        api_noteCC_export(noteCC);
+    }
+    async function prevNoteCC_Click() {
+
+         if (prevNoteData.id === 0) {
+         
+             const { startDate, endDate } = calculatePrevMonth(noteCC.appliesDate);
+
+            const noteFilter = new FiltrNoteCC();
+            noteFilter.appliesDateStart = startDate.toString();
+            noteFilter.appliesDateEnd = endDate.toString();
+            noteFilter.userCol.push(noteCC.agent);
+    
+            const noteList = await api_NoteCC_search(createSearchCriteriaByFiltrNoteCC(noteFilter));
+            console.log('noteList :', noteList);
+    
+             setPrevNoteData(prevNoteData => {
+                 return noteList[0];
+             });
+         }
+    
+        setPrevNoteHide(!prevNoteHide);
+    }
+
     async function dashboardGenerate(period: boolean) {
 
         let mistakeList: Mistake[] = [];
 
         if (period) {
-            const { startDate, endDate } = calculateStartEndDate(noteCC.appliesDate + '-01', 2);
+            const { startDate, endDate } = calculateStartEndDate(noteCC.appliesDate, 2);
             const noteFilter = new FiltrNoteCC();
             noteFilter.appliesDateStart = startDate.toString();
             noteFilter.appliesDateEnd = endDate.toString();
@@ -126,72 +213,6 @@ const NoteCC_Page = () => {
 
     }
 
-    // ====== Akcje =====================================================================================================================================================================================================================
-    function rateBtn_Click() {
-
-        if (validate()) {
-            if (noteCC.id === 0) {
-                api_NoteCC_add(noteCC).then((foo => {
-                    if (foo.isOK === true) {
-
-                        const note: NoteCC = foo.noteCC; // Aktualizacja oceny o ID z DB
-                        note.mode = Rate_Mode.PREVIEW_;
-                        updateNoteCC(note)
-                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                    } else {
-                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                    }
-                }));
-            } else {
-                api_NoteCC_update(noteCC).then((foo => {
-                    if (foo.isOK === true) {
-
-                        noteCC.mode = Rate_Mode.PREVIEW_;
-                        updateNoteCC(noteCC)
-                        toast.info(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                    } else {
-                        toast.error(foo.callback, { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                    }
-                }));
-            }
-        } else {
-            toast.error("Wybierz date coachingu", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-        }
-    }
-
-    function editBtn_Click() {
-
-        if (isPermit) {
-            noteCC.mode = Rate_Mode.EDIT_;
-            updateNoteCC(noteCC)
-            toast.warning("Włączono tryb edycji", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-        } else {
-            toast.error("Nie masz uprawnień do edytowania", { autoClose: 15000 })
-        }
-    }
-    function odwolanie_click() {
-
-        if (isPermitAgent) {
-
-            noteCC.status = Status_Note.APPEAL_;
-
-            api_NoteCC_update(noteCC).then((foo => {
-                if (foo.isOK === true) {
-
-                    noteCC.mode = Rate_Mode.PREVIEW_;
-                    updateNoteCC(noteCC)
-
-                    toast.info("Odwołanie zostało poprawnie zamieszczone", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                } else {
-                    toast.error("Błąd wysyłania odwołania", { position: toast.POSITION.TOP_RIGHT, theme: "dark" });
-                }
-            }));
-        }
-    }
-    function exportToFile_Click() {
-        api_noteCC_export(noteCC);
-    }
-
     // ====== HTML =============================================================================================================================================================================================================================
     return (
         <div className='container mx-auto w-full border-2 border-info border-opacity-50 p-2' >
@@ -206,7 +227,7 @@ const NoteCC_Page = () => {
                         <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}
+                                disabled={!isPermit || (isPermit && previewMode)}
                                 onClick={e => {
                                     noteCC.status = Status_Note.CLOSE_
                                     rateBtn_Click();
@@ -214,7 +235,7 @@ const NoteCC_Page = () => {
                                 {noteCC.mode === Rate_Mode.EDIT_ ? 'Aktualizuj' : 'Zatwierdź'}
                             </button>
                             <button className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && prewievMode)}
+                                disabled={!isPermit || (isPermit && previewMode)}
                                 onClick={e => {
                                     noteCC.status = Status_Note.CLOSE_WITHOUT_
                                     rateBtn_Click();
@@ -222,7 +243,7 @@ const NoteCC_Page = () => {
                                 Zamknij BEZ</button>
                             <button
                                 className="btn btn-outline btn-info btn-sm"
-                                disabled={!isPermit || (isPermit && !prewievMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
+                                disabled={!isPermit || (isPermit && !previewMode)} onClick={editBtn_Click} >Włącz edytowanie</button>
                             <button className="btn btn-outline btn-info btn-sm" onClick={exportToFile_Click}>Export do xls</button>
                         </ul>
                     </div>
@@ -275,7 +296,7 @@ const NoteCC_Page = () => {
                                 <input
                                     className="input input-bordered input-info max-w-md w-72"
                                     type="date"
-                                    disabled={prewievMode}
+                                    disabled={previewMode}
                                     defaultValue={noteCC.coachDate}
                                     onChange={e => {
                                         noteCC.coachDate = e.target.value;
@@ -345,7 +366,7 @@ const NoteCC_Page = () => {
                                         <span>Zalecenia (Bieżący Coaching)</span>
                                     </div>
                                     <textarea className="textarea textarea-bordered textarea-lg w-full"
-                                        disabled={!isPermit || (isPermit && prewievMode)}
+                                        disabled={!isPermit || (isPermit && previewMode)}
                                         defaultValue={noteCC.zalecenia}
                                         onChange={e => noteCC.zalecenia = e.target.value}
                                     />
@@ -356,11 +377,12 @@ const NoteCC_Page = () => {
                                     <div className="label">
                                         <span>Zalecenia (Poprzedni Coaching)</span>
                                         <button className='btn btn-outline btn-info btn-sm'
-                                            onClick={() => setPrevNoteHide(!prevNoteHide)}
+                                            onClick={() => prevNoteCC_Click()}
                                         >{prevNoteHide === true ? 'Pokaż' : 'Ukryj'}</button>
                                     </div>
                                     <textarea className={`textarea textarea-bordered textarea-lg w-full ${prevNoteHide === true ? 'hidden' : ''}`}
                                         disabled
+                                        defaultValue={prevNoteData.zalecenia}
                                     />
                                 </label>
                             </div>
@@ -392,8 +414,8 @@ const NoteCC_Page = () => {
                             <div className='w-full h-52 mt-2'>
                                 <Dashboard_NoteCC_BarChart
                                     data={mistakeChartBarValue || new Array<Record<string, number>>()}
-                                    agentName={noteCC.agent.nameUser} 
-                                    typeRate={Type_Rate.CC_}/>
+                                    agentName={noteCC.agent.nameUser}
+                                    typeRate={Type_Rate.CC_} />
                             </div>
                             <hr className='mt-4 opacity-40'></hr>
                             <div className='flex gap-2 mt-4'>
