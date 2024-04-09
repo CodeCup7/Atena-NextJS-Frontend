@@ -10,7 +10,9 @@ export async function getActiveUser(): Promise<User> {
         if (activeUser) {
             return activeUser;
         } else {
+
             const response = await fetch(`http://localhost:8080/api/user/getUserLogin/${login}`);
+            
             if (!response.ok) {
                 console.log('Error: ', response.status);
                 throw new Error('Network response was not ok');
@@ -21,6 +23,7 @@ export async function getActiveUser(): Promise<User> {
             return userData as User;
         }
     } catch (error) {
+
         return new User();
     }
 }

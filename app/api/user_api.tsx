@@ -78,7 +78,7 @@ export async function api_UserList_getByLogin(login: string): Promise<User> {
         }
         return await response.json();
     } catch (error) {
-        console.error('Error during API call:', error);
+        //console.error('Error during API call:', error);
         return new User();
     }
 }
